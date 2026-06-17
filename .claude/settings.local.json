@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(git config --global user.email \"igor.bragato@gmail.com\")",
+      "PowerShell(git config --global user.name \"Igor Bragato\")",
+      "PowerShell(git config --global init.defaultBranch main)",
+      "PowerShell(git config --global user.name)",
+      "PowerShell(git config --global user.email)",
+      "PowerShell($env:Path = [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"User\"\\); Write-Output \"=== GitHub CLI ===\"; gh --version; Write-Output \"=== VS Code ===\"; code --version)",
+      "PowerShell(Get-ChildItem -Force | Select-Object Name; Write-Output \"---- File totali:\"; \\(Get-ChildItem -Force | Measure-Object\\).Count)"
+    ]
+  }
+}
