@@ -1,0 +1,155 @@
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { Mail, Loader2 } from "lucide-react";
+import Logo from "../components/ui/Logo";
+import Button from "../components/ui/Button";
+import { useAuth } from "../lib/auth/AuthContext";
+
+// Inline brand glyphs (no extra dependency).
+function GoogleIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24">
+      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.76h3.56c2.08-1.92 3.28-4.74 3.28-8.09Z" />
+      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.56-2.76c-.98.66-2.23 1.06-3.72 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23Z" />
+      <path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84Z" />
+      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1A11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.3 9.14 5.38 12 5.38Z" />
+    </svg>
+  );
+}
+
+function MetaIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="#0866FF">
+      <path d="M6.9 3C4.2 3 2 5.5 2 9.2c0 2.3.9 4.7 2.3 6.2.9 1 2 1.6 3.2 1.6 1.5 0 2.5-.9 3.6-2.7.4-.6.7-1.2 1-1.8.3.6.6 1.2 1 1.8 1.1 1.8 2.1 2.7 3.6 2.7 1.2 0 2.3-.6 3.2-1.6C21.1 13.9 22 11.5 22 9.2 22 5.5 19.8 3 17.1 3c-1.7 0-3 .9-4.2 2.8L12 6.9l-.9-1.1C9.9 3.9 8.6 3 6.9 3Zm0 2.3c.8 0 1.6.6 2.6 2.1l1 1.6c-.6 1-1.2 2-1.7 2.8-.8 1.3-1.3 1.6-1.9 1.6-.6 0-1.1-.3-1.5-.8-.7-.9-1.1-2.3-1.1-3.6 0-2.2 1-3.7 2.6-3.7Zm10.2 0c1.6 0 2.6 1.5 2.6 3.7 0 1.3-.4 2.7-1.1 3.6-.4.5-.9.8-1.5.8-.6 0-1.1-.3-1.9-1.6-.5-.8-1.1-1.8-1.7-2.8l1-1.6c1-1.5 1.8-2.1 2.6-2.1Z" />
+    </svg>
+  );
+}
+
+export default function LoginPage() {
+  const { signInWithProvider, signInWithEmail, signUpWithEmail, loading } =
+    useAuth();
+  const [mode, setMode] = useState("signin"); // signin | signup
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [nickname, setNickname] = useState("");
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    if (mode === "signup") signUpWithEmail(email, password, nickname);
+    else signInWithEmail(email, password);
+  }
+
+  return (
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4">
+      {/* soft ambient glow */}
+      <div
+        className="pointer-events-none absolute -top-40 left-1/2 h-96 w-96 -translate-x-1/2
+          rounded-full opacity-25 blur-3xl"
+        style={{ background: "var(--color-accent)" }}
+      />
+
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="relative w-full max-w-sm"
+      >
+        <div className="mb-8 flex flex-col items-center text-center">
+          <Logo size={36} />
+          <p className="mt-4 text-sm text-muted">
+            Il tuo spazio, a modo tuo. <br />
+            Una dashboard che asseconda il tuo modo di pensare.
+          </p>
+        </div>
+
+        <div className="rounded-3xl border border-line bg-surface p-6">
+          <div className="space-y-2.5">
+            <Button
+              variant="surface"
+              size="lg"
+              className="w-full"
+              disabled={loading}
+              onClick={() => signInWithProvider("google")}
+            >
+              <GoogleIcon /> Continua con Google
+            </Button>
+            <Button
+              variant="surface"
+              size="lg"
+              className="w-full"
+              disabled={loading}
+              onClick={() => signInWithProvider("meta")}
+            >
+              <MetaIcon /> Continua con Meta
+            </Button>
+          </div>
+
+          <div className="my-5 flex items-center gap-3 text-xs text-muted">
+            <span className="h-px flex-1 bg-line" /> oppure
+            <span className="h-px flex-1 bg-line" />
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-3">
+            {mode === "signup" && (
+              <input
+                type="text"
+                required
+                placeholder="Nickname"
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+                className="w-full rounded-xl border border-line bg-surface-2/40 px-4 py-3
+                  text-sm outline-none placeholder:text-muted focus:border-accent"
+              />
+            )}
+            <input
+              type="email"
+              required
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full rounded-xl border border-line bg-surface-2/40 px-4 py-3
+                text-sm outline-none placeholder:text-muted focus:border-accent"
+            />
+            <input
+              type="password"
+              required
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full rounded-xl border border-line bg-surface-2/40 px-4 py-3
+                text-sm outline-none placeholder:text-muted focus:border-accent"
+            />
+            <Button
+              type="submit"
+              variant="accent"
+              size="lg"
+              className="w-full"
+              disabled={loading}
+            >
+              {loading ? (
+                <Loader2 size={18} className="animate-spin" />
+              ) : (
+                <Mail size={18} />
+              )}
+              {mode === "signup" ? "Crea account" : "Accedi"}
+            </Button>
+          </form>
+
+          <p className="mt-5 text-center text-sm text-muted">
+            {mode === "signup" ? "Hai già un account?" : "Non hai un account?"}{" "}
+            <button
+              onClick={() => setMode(mode === "signup" ? "signin" : "signup")}
+              className="font-medium text-accent hover:underline"
+            >
+              {mode === "signup" ? "Accedi" : "Registrati"}
+            </button>
+          </p>
+        </div>
+
+        <p className="mt-6 text-center text-xs text-muted/70">
+          Modalità demo · nessun dato reale viene inviato
+        </p>
+      </motion.div>
+    </div>
+  );
+}
