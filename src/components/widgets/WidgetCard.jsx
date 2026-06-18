@@ -2,10 +2,12 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, X } from "lucide-react";
 import { WIDGETS, instanceType } from "../../lib/widgets/registry";
+import { useI18n } from "../../lib/i18n/LanguageContext";
 import { LIVE_WIDGETS } from "./live";
 import WidgetHeader from "./WidgetHeader";
 
 export default function WidgetCard({ id, titleOverride, onRemove, onRename }) {
+  const { t } = useI18n();
   const type = instanceType(id);
   const widget = WIDGETS[type];
   const {
@@ -19,7 +21,7 @@ export default function WidgetCard({ id, titleOverride, onRemove, onRename }) {
 
   if (!widget) return null;
   const Live = LIVE_WIDGETS[type];
-  const title = titleOverride ?? widget.name;
+  const title = titleOverride ?? t(widget.nameKey);
   const rename = (next) => onRename?.(id, next);
 
   const style = {
@@ -61,13 +63,13 @@ export default function WidgetCard({ id, titleOverride, onRemove, onRename }) {
       {Live ? (
         <Live instanceId={id} title={title} onRename={rename} />
       ) : (
-        <PlaceholderBody widget={widget} title={title} onRename={rename} />
+        <PlaceholderBody widget={widget} title={title} desc={t(widget.descKey)} onRename={rename} />
       )}
     </div>
   );
 }
 
-function PlaceholderBody({ widget, title, onRename }) {
+function PlaceholderBody({ widget, title, desc, onRename }) {
   return (
     <div className="flex flex-col p-5">
       <WidgetHeader
@@ -76,7 +78,7 @@ function PlaceholderBody({ widget, title, onRename }) {
         title={title}
         onRename={onRename}
       />
-      <p className="text-sm leading-relaxed text-muted">{widget.description}</p>
+      <p className="text-sm leading-relaxed text-muted">{desc}</p>
       <div className="mt-4">
         <span className="inline-flex items-center rounded-full bg-surface-2 px-2.5 py-1 text-xs font-medium text-muted">
           In arrivo

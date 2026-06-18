@@ -2,10 +2,25 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
+import { playSound, vibrate } from "./sound";
+
+const PREFS_KEY = "diverge.notif.prefs";
+const DEFAULT_PREFS = { sound: "chime", haptics: true };
+
+function loadPrefs() {
+  try {
+    const raw = localStorage.getItem(PREFS_KEY);
+    if (raw) return { ...DEFAULT_PREFS, ...JSON.parse(raw) };
+  } catch {
+    // ignore
+  }
+  return DEFAULT_PREFS;
+}
 
 /*
   DiVerge — Notification system.
@@ -55,7 +70,18 @@ function seed() {
 
 export function NotificationProvider({ children }) {
   const [items, setItems] = useState(seed);
+  const [prefs, setPrefs] = useState(loadPrefs);
   const timers = useRef({});
+  const prefsRef = useRef(prefs);
+  prefsRef.current = prefs;
+
+  useEffect(() => {
+    localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
+  }, [prefs]);
+
+  const updatePrefs = useCallback((patch) => {
+    setPrefs((p) => ({ ...p, ...patch }));
+  }, []);
 
   const addNotification = useCallback((n) => {
     const id = uid();
@@ -68,6 +94,9 @@ export function NotificationProvider({ children }) {
       ...n,
     };
     setItems((list) => [item, ...list]);
+    // Sound + haptic feedback, per the user's preferences.
+    playSound(prefsRef.current.sound);
+    if (prefsRef.current.haptics) vibrate(20);
     timers.current[id] = setTimeout(() => {
       setItems((list) =>
         list.map((x) => (x.id === id ? { ...x, toast: false } : x))
@@ -100,13 +129,15 @@ export function NotificationProvider({ children }) {
       items,
       toasts,
       unreadCount,
+      prefs,
+      updatePrefs,
       addNotification,
       dismissToast,
       remove,
       markAllRead,
       clearAll,
     };
-  }, [items, addNotification, dismissToast, remove, markAllRead, clearAll]);
+  }, [items, prefs, updatePrefs, addNotification, dismissToast, remove, markAllRead, clearAll]);
 
   return (
     <NotificationContext.Provider value={value}>

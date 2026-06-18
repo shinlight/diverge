@@ -5,9 +5,11 @@ import Logo from "../ui/Logo";
 import Avatar from "../ui/Avatar";
 import NotificationsBell from "../notifications/NotificationsBell";
 import { useAuth, displayName } from "../../lib/auth/AuthContext";
+import { useI18n } from "../../lib/i18n/LanguageContext";
 
 export default function TopBar({ onOpenTheme }) {
   const { user } = useAuth();
+  const { t } = useI18n();
 
   return (
     <header className="sticky top-0 z-30 border-b border-line/70 bg-bg/80 backdrop-blur-xl">
@@ -21,7 +23,7 @@ export default function TopBar({ onOpenTheme }) {
             whileHover={{ y: -1 }}
             whileTap={{ scale: 0.95 }}
             onClick={onOpenTheme}
-            aria-label="Personalizza tema"
+            aria-label={t("toolbar.customizeTheme")}
             className="grid h-10 w-10 place-items-center rounded-xl text-muted
               transition-colors hover:bg-surface-2/60 hover:text-content"
           >
@@ -32,7 +34,7 @@ export default function TopBar({ onOpenTheme }) {
 
           <Link
             to="/profilo"
-            aria-label="Vai al profilo"
+            aria-label={t("toolbar.goToProfile")}
             className="flex items-center gap-2.5 rounded-full pl-2 transition-opacity hover:opacity-80"
           >
             <span className="hidden max-w-[140px] truncate text-sm font-medium sm:block">

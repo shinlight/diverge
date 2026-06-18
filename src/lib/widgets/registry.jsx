@@ -1,4 +1,4 @@
-import { Mail, Calendar, CheckSquare, StickyNote, Cloud, Clock, Sparkles } from "lucide-react";
+import { Mail, Calendar, CheckSquare, StickyNote, Cloud, Clock, Sparkles, ClipboardList } from "lucide-react";
 
 /*
   DiVerge — Widget registry.
@@ -14,8 +14,8 @@ import { Mail, Calendar, CheckSquare, StickyNote, Cloud, Clock, Sparkles } from 
 export const WIDGETS = {
   gmail: {
     id: "gmail",
-    name: "Gmail",
-    description: "Le tue email più recenti, a colpo d'occhio.",
+    nameKey: "widgets.gmail.name",
+    descKey: "widgets.gmail.desc",
     icon: Mail,
     accent: "#ea4335",
     status: "live",
@@ -23,8 +23,8 @@ export const WIDGETS = {
   },
   calendar: {
     id: "calendar",
-    name: "Calendario",
-    description: "I prossimi impegni dalla tua agenda Google.",
+    nameKey: "widgets.calendar.name",
+    descKey: "widgets.calendar.desc",
     icon: Calendar,
     accent: "#4285f4",
     status: "live",
@@ -32,8 +32,8 @@ export const WIDGETS = {
   },
   tasks: {
     id: "tasks",
-    name: "To-Do",
-    description: "Una lista semplice per non perdere il filo.",
+    nameKey: "widgets.tasks.name",
+    descKey: "widgets.tasks.desc",
     icon: CheckSquare,
     accent: "#2fb380",
     status: "soon",
@@ -41,26 +41,26 @@ export const WIDGETS = {
   },
   notes: {
     id: "notes",
-    name: "Note rapide",
-    description: "Cattura un pensiero prima che voli via.",
+    nameKey: "widgets.notes.name",
+    descKey: "widgets.notes.desc",
     icon: StickyNote,
     accent: "#f0a132",
-    status: "soon",
-    size: "sm",
+    status: "live",
+    size: "md",
   },
   weather: {
     id: "weather",
-    name: "Meteo",
-    description: "Uno sguardo veloce al cielo di oggi.",
+    nameKey: "widgets.weather.name",
+    descKey: "widgets.weather.desc",
     icon: Cloud,
     accent: "#22b8cf",
-    status: "soon",
+    status: "live",
     size: "sm",
   },
   focus: {
     id: "focus",
-    name: "Timer Focus",
-    description: "Sessioni di concentrazione in stile Pomodoro.",
+    nameKey: "widgets.focus.name",
+    descKey: "widgets.focus.desc",
     icon: Clock,
     accent: "#e864c4",
     status: "live",
@@ -68,13 +68,22 @@ export const WIDGETS = {
   },
   ai: {
     id: "ai",
-    name: "Assistente AI",
-    description: "Chatta con un modello AI a tua scelta. Aggiungine più di uno!",
+    nameKey: "widgets.ai.name",
+    descKey: "widgets.ai.desc",
     icon: Sparkles,
     accent: "#7c5cff",
     status: "live",
     size: "md",
     multiInstance: true, // the user can add several, each with its own model
+  },
+  clipboard: {
+    id: "clipboard",
+    nameKey: "widgets.clipboard.name",
+    descKey: "widgets.clipboard.desc",
+    icon: ClipboardList,
+    accent: "#14b8a6",
+    status: "live",
+    size: "md",
   },
 };
 

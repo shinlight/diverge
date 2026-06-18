@@ -1,8 +1,10 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { WIDGET_LIST } from "../../lib/widgets/registry";
+import { useI18n } from "../../lib/i18n/LanguageContext";
 
 export default function AddWidgetSheet({ open, onClose, layout, onAdd }) {
+  const { t } = useI18n();
   // Multi-instance widgets (AI) stay available so you can add several.
   const available = WIDGET_LIST.filter(
     (w) => w.multiInstance || !layout.includes(w.id)
@@ -32,14 +34,12 @@ export default function AddWidgetSheet({ open, onClose, layout, onAdd }) {
           >
             <div className="mb-5 flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold">Aggiungi un widget</h2>
-                <p className="text-sm text-muted">
-                  Scegli cosa tenere sotto controllo.
-                </p>
+                <h2 className="text-lg font-semibold">{t("addWidget.title")}</h2>
+                <p className="text-sm text-muted">{t("addWidget.subtitle")}</p>
               </div>
               <button
                 onClick={onClose}
-                aria-label="Chiudi"
+                aria-label={t("common.close")}
                 className="grid h-9 w-9 place-items-center rounded-xl text-muted
                   hover:bg-surface-2 hover:text-content"
               >
@@ -49,7 +49,7 @@ export default function AddWidgetSheet({ open, onClose, layout, onAdd }) {
 
             {available.length === 0 ? (
               <p className="py-8 text-center text-sm text-muted">
-                Hai già aggiunto tutti i widget disponibili. 🎉
+                {t("addWidget.allAdded")}
               </p>
             ) : (
               <div className="grid max-h-[55vh] grid-cols-1 gap-2 overflow-y-auto sm:grid-cols-2">
@@ -74,10 +74,10 @@ export default function AddWidgetSheet({ open, onClose, layout, onAdd }) {
                       </span>
                       <span className="min-w-0">
                         <span className="block text-sm font-medium">
-                          {w.name}
+                          {t(w.nameKey)}
                         </span>
                         <span className="block truncate text-xs text-muted">
-                          {w.description}
+                          {t(w.descKey)}
                         </span>
                       </span>
                     </button>

@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { LanguageProvider } from "./lib/i18n/LanguageContext";
 import { ThemeProvider } from "./lib/theme/ThemeContext";
 import { AuthProvider, useAuth } from "./lib/auth/AuthContext";
 import { NotificationProvider } from "./lib/notifications/NotificationContext";
@@ -29,15 +30,17 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <NotificationProvider>
-          <BrowserRouter>
-            <AppRoutes />
-            <NotificationToasts />
-          </BrowserRouter>
-        </NotificationProvider>
-      </AuthProvider>
-    </ThemeProvider>
+    <LanguageProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <NotificationProvider>
+            <BrowserRouter>
+              <AppRoutes />
+              <NotificationToasts />
+            </BrowserRouter>
+          </NotificationProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </LanguageProvider>
   );
 }

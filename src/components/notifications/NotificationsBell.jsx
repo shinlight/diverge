@@ -5,10 +5,12 @@ import {
   useNotifications,
   notifTime,
 } from "../../lib/notifications/NotificationContext";
+import { useI18n } from "../../lib/i18n/LanguageContext";
 
 export default function NotificationsBell() {
   const { items, unreadCount, remove, markAllRead, clearAll } =
     useNotifications();
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
 
   function toggle() {
@@ -23,7 +25,7 @@ export default function NotificationsBell() {
         whileHover={{ y: -1 }}
         whileTap={{ scale: 0.95 }}
         onClick={toggle}
-        aria-label="Notifiche"
+        aria-label={t("notifications.title")}
         className="relative grid h-10 w-10 place-items-center rounded-xl text-muted
           transition-colors hover:bg-surface-2/60 hover:text-content"
       >
@@ -54,20 +56,20 @@ export default function NotificationsBell() {
                 border border-line bg-surface shadow-2xl shadow-black/40"
             >
               <div className="flex items-center justify-between border-b border-line px-4 py-3">
-                <h3 className="text-sm font-semibold">Notifiche</h3>
+                <h3 className="text-sm font-semibold">{t("notifications.title")}</h3>
                 {items.length > 0 && (
                   <button
                     onClick={clearAll}
                     className="flex items-center gap-1 text-xs text-muted hover:text-content"
                   >
-                    <Trash2 size={13} /> Svuota
+                    <Trash2 size={13} /> {t("notifications.clearAll")}
                   </button>
                 )}
               </div>
 
               {items.length === 0 ? (
                 <p className="px-4 py-10 text-center text-sm text-muted">
-                  Nessuna notifica 🎉
+                  {t("notifications.empty")}
                 </p>
               ) : (
                 <ul className="max-h-96 overflow-y-auto">
@@ -94,7 +96,7 @@ export default function NotificationsBell() {
                       </div>
                       <button
                         onClick={() => remove(n.id)}
-                        aria-label="Rimuovi notifica"
+                        aria-label={t("common.delete")}
                         className="shrink-0 text-muted opacity-0 transition-opacity
                           hover:text-content group-hover:opacity-100"
                       >

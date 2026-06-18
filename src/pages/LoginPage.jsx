@@ -4,6 +4,7 @@ import { Mail, Loader2 } from "lucide-react";
 import Logo from "../components/ui/Logo";
 import Button from "../components/ui/Button";
 import { useAuth } from "../lib/auth/AuthContext";
+import { useI18n } from "../lib/i18n/LanguageContext";
 
 // Inline brand glyphs (no extra dependency).
 function GoogleIcon() {
@@ -28,6 +29,7 @@ function MetaIcon() {
 export default function LoginPage() {
   const { signInWithProvider, signInWithEmail, signUpWithEmail, loading } =
     useAuth();
+  const { t } = useI18n();
   const [mode, setMode] = useState("signin"); // signin | signup
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -56,9 +58,8 @@ export default function LoginPage() {
       >
         <div className="mb-8 flex flex-col items-center text-center">
           <Logo size={36} />
-          <p className="mt-4 text-sm text-muted">
-            Il tuo spazio, a modo tuo. <br />
-            Una dashboard che asseconda il tuo modo di pensare.
+          <p className="mt-4 whitespace-pre-line text-sm text-muted">
+            {t("login.tagline")}
           </p>
         </div>
 
@@ -71,7 +72,7 @@ export default function LoginPage() {
               disabled={loading}
               onClick={() => signInWithProvider("google")}
             >
-              <GoogleIcon /> Continua con Google
+              <GoogleIcon /> {t("login.continueGoogle")}
             </Button>
             <Button
               variant="surface"
@@ -80,12 +81,12 @@ export default function LoginPage() {
               disabled={loading}
               onClick={() => signInWithProvider("meta")}
             >
-              <MetaIcon /> Continua con Meta
+              <MetaIcon /> {t("login.continueMeta")}
             </Button>
           </div>
 
           <div className="my-5 flex items-center gap-3 text-xs text-muted">
-            <span className="h-px flex-1 bg-line" /> oppure
+            <span className="h-px flex-1 bg-line" /> {t("login.or")}
             <span className="h-px flex-1 bg-line" />
           </div>
 
@@ -94,7 +95,7 @@ export default function LoginPage() {
               <input
                 type="text"
                 required
-                placeholder="Nickname"
+                placeholder={t("login.nickname")}
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
                 className="w-full rounded-xl border border-line bg-surface-2/40 px-4 py-3
@@ -104,7 +105,7 @@ export default function LoginPage() {
             <input
               type="email"
               required
-              placeholder="Email"
+              placeholder={t("login.email")}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full rounded-xl border border-line bg-surface-2/40 px-4 py-3
@@ -113,7 +114,7 @@ export default function LoginPage() {
             <input
               type="password"
               required
-              placeholder="Password"
+              placeholder={t("login.password")}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full rounded-xl border border-line bg-surface-2/40 px-4 py-3
@@ -131,23 +132,23 @@ export default function LoginPage() {
               ) : (
                 <Mail size={18} />
               )}
-              {mode === "signup" ? "Crea account" : "Accedi"}
+              {mode === "signup" ? t("login.createAccount") : t("login.signIn")}
             </Button>
           </form>
 
           <p className="mt-5 text-center text-sm text-muted">
-            {mode === "signup" ? "Hai già un account?" : "Non hai un account?"}{" "}
+            {mode === "signup" ? t("login.haveAccount") : t("login.noAccount")}{" "}
             <button
               onClick={() => setMode(mode === "signup" ? "signin" : "signup")}
               className="font-medium text-accent hover:underline"
             >
-              {mode === "signup" ? "Accedi" : "Registrati"}
+              {mode === "signup" ? t("login.signIn") : t("login.signUp")}
             </button>
           </p>
         </div>
 
         <p className="mt-6 text-center text-xs text-muted/70">
-          Modalità demo · nessun dato reale viene inviato
+          {t("login.demo")}
         </p>
       </motion.div>
     </div>

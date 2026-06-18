@@ -13,6 +13,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus } from "lucide-react";
 import WidgetCard from "./WidgetCard";
+import { useI18n } from "../../lib/i18n/LanguageContext";
 
 export default function WidgetGrid({
   layout,
@@ -22,6 +23,7 @@ export default function WidgetGrid({
   onRename,
   onAdd,
 }) {
+  const { t } = useI18n();
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } })
   );
@@ -73,7 +75,7 @@ export default function WidgetGrid({
               transition-colors hover:border-accent hover:text-content"
           >
             <Plus size={24} />
-            <span className="text-sm font-medium">Aggiungi widget</span>
+            <span className="text-sm font-medium">{t("dashboard.addWidget")}</span>
           </motion.button>
         </div>
       </SortableContext>

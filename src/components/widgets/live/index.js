@@ -5,10 +5,16 @@ import GmailWidget from "./GmailWidget";
 import CalendarWidget from "./CalendarWidget";
 import FocusWidget from "./FocusWidget";
 import AIWidget from "./AIWidget";
+import WeatherWidget from "./WeatherWidget";
+import NotesWidget from "./NotesWidget";
+import ClipboardWidget from "./ClipboardWidget";
 
 export const LIVE_WIDGETS = {
   gmail: GmailWidget,
   calendar: CalendarWidget,
   focus: FocusWidget,
   ai: AIWidget,
+  weather: WeatherWidget,
+  notes: NotesWidget,
+  clipboard: ClipboardWidget,
 };

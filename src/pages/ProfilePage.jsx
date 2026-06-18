@@ -7,10 +7,12 @@ import Avatar from "../components/ui/Avatar";
 import Button from "../components/ui/Button";
 import ThemePanel from "../components/panels/ThemePanel";
 import { useAuth } from "../lib/auth/AuthContext";
+import { useI18n } from "../lib/i18n/LanguageContext";
 import { PLANS, PAYMENT_METHODS, startCheckout } from "../lib/payments/plans";
 
 export default function ProfilePage() {
   const { user, updateProfile, signOut } = useAuth();
+  const { t } = useI18n();
   const [name, setName] = useState(user?.name ?? "");
   const [nickname, setNickname] = useState(user?.nickname ?? "");
   const [saved, setSaved] = useState(false);
@@ -45,7 +47,7 @@ export default function ProfilePage() {
           to="/"
           className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted hover:text-content"
         >
-          <ArrowLeft size={16} /> Torna alla dashboard
+          <ArrowLeft size={16} /> {t("profile.back")}
         </Link>
 
         <motion.section
@@ -58,7 +60,7 @@ export default function ProfilePage() {
               <Avatar user={user} size={88} />
               <button
                 onClick={() => fileRef.current?.click()}
-                aria-label="Cambia immagine"
+                aria-label={t("profile.changeImage")}
                 className="absolute -bottom-1 -right-1 grid h-9 w-9 place-items-center
                   rounded-full bg-accent text-accent-contrast ring-4 ring-surface
                   transition-transform hover:scale-105"
@@ -77,7 +79,7 @@ export default function ProfilePage() {
             <div className="flex-1 text-center sm:text-left">
               <p className="text-sm text-muted">{user?.email}</p>
               <span className="mt-1 inline-flex items-center rounded-full bg-surface-2 px-2.5 py-1 text-xs font-medium capitalize text-muted">
-                Piano {user?.plan}
+                {t("profile.plan", { plan: user?.plan })}
               </span>
             </div>
           </div>
@@ -85,24 +87,24 @@ export default function ProfilePage() {
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-2 block text-sm font-medium text-muted">
-                Nome
+                {t("profile.name")}
               </label>
               <input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Il tuo nome"
+                placeholder={t("profile.namePlaceholder")}
                 className="w-full rounded-xl border border-line bg-surface-2/40 px-4 py-3
                   text-sm outline-none focus:border-accent"
               />
             </div>
             <div>
               <label className="mb-2 block text-sm font-medium text-muted">
-                Nickname
+                {t("profile.nickname")}
               </label>
               <input
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
-                placeholder="Il tuo nickname"
+                placeholder={t("profile.nicknamePlaceholder")}
                 className="w-full rounded-xl border border-line bg-surface-2/40 px-4 py-3
                   text-sm outline-none focus:border-accent"
               />
@@ -111,13 +113,13 @@ export default function ProfilePage() {
 
           <div className="mt-5">
             <label className="mb-2 block text-sm font-medium text-muted">
-              Mostra nella barra
+              {t("profile.showInBar")}
             </label>
             <div className="flex items-center gap-2">
               <div className="flex rounded-xl border border-line bg-surface-2/40 p-1">
                 {[
-                  { id: "nickname", label: "Nickname" },
-                  { id: "name", label: "Nome" },
+                  { id: "nickname", labelKey: "profile.nickname" },
+                  { id: "name", labelKey: "profile.name" },
                 ].map((opt) => (
                   <button
                     key={opt.id}
@@ -128,12 +130,12 @@ export default function ProfilePage() {
                         : "text-muted hover:text-content"
                     }`}
                   >
-                    {opt.label}
+                    {t(opt.labelKey)}
                   </button>
                 ))}
               </div>
               <Button variant="accent" className="ml-auto" onClick={saveIdentity}>
-                {saved ? <Check size={18} /> : "Salva"}
+                {saved ? <Check size={18} /> : t("common.save")}
               </Button>
             </div>
           </div>
@@ -141,10 +143,8 @@ export default function ProfilePage() {
 
         {/* SaaS predisposition */}
         <section className="mt-8">
-          <h2 className="mb-1 text-lg font-semibold">Abbonamento</h2>
-          <p className="mb-4 text-sm text-muted">
-            Predisposizione pronta · pagamenti in arrivo (Stripe & Crypto).
-          </p>
+          <h2 className="mb-1 text-lg font-semibold">{t("profile.subscription")}</h2>
+          <p className="mb-4 text-sm text-muted">{t("profile.subscriptionDesc")}</p>
 
           <div className="grid gap-4 sm:grid-cols-2">
             {PLANS.map((plan) => (
@@ -194,7 +194,7 @@ export default function ProfilePage() {
 
         <div className="mt-8">
           <Button variant="ghost" onClick={signOut}>
-            <LogOut size={18} /> Esci
+            <LogOut size={18} /> {t("profile.logout")}
           </Button>
         </div>
       </main>
