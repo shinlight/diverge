@@ -4,9 +4,11 @@
 import GmailWidget from "./GmailWidget";
 import CalendarWidget from "./CalendarWidget";
 import FocusWidget from "./FocusWidget";
+import AIWidget from "./AIWidget";
 
 export const LIVE_WIDGETS = {
   gmail: GmailWidget,
   calendar: CalendarWidget,
   focus: FocusWidget,
+  ai: AIWidget,
 };

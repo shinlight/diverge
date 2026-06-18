@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 import TopBar from "../components/layout/TopBar";
 import WidgetGrid from "../components/widgets/WidgetGrid";
 import AddWidgetSheet from "../components/widgets/AddWidgetSheet";
 import ThemePanel from "../components/panels/ThemePanel";
-import { useAuth } from "../lib/auth/AuthContext";
-import { DEFAULT_LAYOUT } from "../lib/widgets/registry";
+import {
+  DEFAULT_LAYOUT,
+  isMultiInstance,
+  newInstanceId,
+} from "../lib/widgets/registry";
 
 const LAYOUT_KEY = "diverge.layout";
 const TITLES_KEY = "diverge.titles";
@@ -30,16 +32,7 @@ function loadTitles() {
   return {};
 }
 
-function greeting() {
-  const h = new Date().getHours();
-  if (h < 6) return "Notte fonda";
-  if (h < 12) return "Buongiorno";
-  if (h < 18) return "Buon pomeriggio";
-  return "Buonasera";
-}
-
 export default function DashboardPage() {
-  const { user } = useAuth();
   const [layout, setLayout] = useState(loadLayout);
   const [titles, setTitles] = useState(loadTitles);
   const [themeOpen, setThemeOpen] = useState(false);
@@ -55,9 +48,16 @@ export default function DashboardPage() {
 
   const renameWidget = (id, title) =>
     setTitles((t) => ({ ...t, [id]: title }));
+
   const removeWidget = (id) => setLayout((l) => l.filter((w) => w !== id));
-  const addWidget = (id) => {
-    setLayout((l) => (l.includes(id) ? l : [...l, id]));
+
+  // type = the widget kind chosen in the picker. Multi-instance types (AI)
+  // get a fresh unique instance id so several can coexist.
+  const addWidget = (type) => {
+    setLayout((l) => {
+      if (isMultiInstance(type)) return [...l, newInstanceId(type)];
+      return l.includes(type) ? l : [...l, type];
+    });
     setAddOpen(false);
   };
 
@@ -65,18 +65,7 @@ export default function DashboardPage() {
     <div className="min-h-screen">
       <TopBar onOpenTheme={() => setThemeOpen(true)} />
 
-      <main className="px-4 py-8 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="mb-6"
-        >
-          <h1 className="text-lg font-semibold tracking-tight">
-            {greeting()}, {user?.nickname}
-          </h1>
-        </motion.div>
-
+      <main className="px-4 py-6 sm:px-6 lg:px-8">
         <WidgetGrid
           layout={layout}
           titles={titles}

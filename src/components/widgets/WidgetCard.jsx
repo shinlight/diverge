@@ -1,12 +1,13 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, X } from "lucide-react";
-import { WIDGETS } from "../../lib/widgets/registry";
+import { WIDGETS, instanceType } from "../../lib/widgets/registry";
 import { LIVE_WIDGETS } from "./live";
 import WidgetHeader from "./WidgetHeader";
 
 export default function WidgetCard({ id, titleOverride, onRemove, onRename }) {
-  const widget = WIDGETS[id];
+  const type = instanceType(id);
+  const widget = WIDGETS[type];
   const {
     attributes,
     listeners,
@@ -17,7 +18,7 @@ export default function WidgetCard({ id, titleOverride, onRemove, onRename }) {
   } = useSortable({ id });
 
   if (!widget) return null;
-  const Live = LIVE_WIDGETS[id];
+  const Live = LIVE_WIDGETS[type];
   const title = titleOverride ?? widget.name;
   const rename = (next) => onRename?.(id, next);
 
@@ -58,7 +59,7 @@ export default function WidgetCard({ id, titleOverride, onRemove, onRename }) {
       </div>
 
       {Live ? (
-        <Live title={title} onRename={rename} />
+        <Live instanceId={id} title={title} onRename={rename} />
       ) : (
         <PlaceholderBody widget={widget} title={title} onRename={rename} />
       )}

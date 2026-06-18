@@ -3,7 +3,10 @@ import { X } from "lucide-react";
 import { WIDGET_LIST } from "../../lib/widgets/registry";
 
 export default function AddWidgetSheet({ open, onClose, layout, onAdd }) {
-  const available = WIDGET_LIST.filter((w) => !layout.includes(w.id));
+  // Multi-instance widgets (AI) stay available so you can add several.
+  const available = WIDGET_LIST.filter(
+    (w) => w.multiInstance || !layout.includes(w.id)
+  );
 
   return (
     <AnimatePresence>

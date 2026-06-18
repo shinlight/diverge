@@ -34,15 +34,27 @@ function loadUser() {
 }
 
 function makeMockUser(partial) {
+  const nickname =
+    partial.nickname ?? partial.email?.split("@")[0] ?? "Esploratore";
   return {
     id: crypto.randomUUID(),
     email: partial.email ?? "ospite@diverge.app",
-    nickname: partial.nickname ?? partial.email?.split("@")[0] ?? "Esploratore",
+    name: partial.name ?? nickname,
+    nickname,
+    displayMode: "nickname", // what the toolbar shows: "name" | "nickname"
     avatarUrl: partial.avatarUrl ?? null,
     provider: partial.provider ?? "email",
     plan: "free", // predisposition for SaaS tiers (free | pro)
     createdAt: new Date().toISOString(),
   };
+}
+
+// The name shown next to the avatar, honouring the user's choice.
+export function displayName(user) {
+  if (!user) return "";
+  return user.displayMode === "name"
+    ? user.name || user.nickname
+    : user.nickname || user.name;
 }
 
 // Tiny delay so the UI's loading states feel real (and are easy to test).

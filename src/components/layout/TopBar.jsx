@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import Logo from "../ui/Logo";
 import Avatar from "../ui/Avatar";
 import NotificationsBell from "../notifications/NotificationsBell";
-import { useAuth } from "../../lib/auth/AuthContext";
+import { useAuth, displayName } from "../../lib/auth/AuthContext";
 
 export default function TopBar({ onOpenTheme }) {
   const { user } = useAuth();
@@ -33,8 +33,11 @@ export default function TopBar({ onOpenTheme }) {
           <Link
             to="/profilo"
             aria-label="Vai al profilo"
-            className="rounded-full transition-transform hover:scale-105"
+            className="flex items-center gap-2.5 rounded-full pl-2 transition-opacity hover:opacity-80"
           >
+            <span className="hidden max-w-[140px] truncate text-sm font-medium sm:block">
+              {displayName(user)}
+            </span>
             <Avatar user={user} size={38} />
           </Link>
         </div>

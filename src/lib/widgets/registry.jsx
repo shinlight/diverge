@@ -1,4 +1,4 @@
-import { Mail, Calendar, CheckSquare, StickyNote, Cloud, Clock } from "lucide-react";
+import { Mail, Calendar, CheckSquare, StickyNote, Cloud, Clock, Sparkles } from "lucide-react";
 
 /*
   DiVerge — Widget registry.
@@ -66,9 +66,38 @@ export const WIDGETS = {
     status: "live",
     size: "sm",
   },
+  ai: {
+    id: "ai",
+    name: "Assistente AI",
+    description: "Chatta con un modello AI a tua scelta. Aggiungine più di uno!",
+    icon: Sparkles,
+    accent: "#7c5cff",
+    status: "live",
+    size: "md",
+    multiInstance: true, // the user can add several, each with its own model
+  },
 };
 
 export const WIDGET_LIST = Object.values(WIDGETS);
 
 // Which widgets a brand-new user starts with.
-export const DEFAULT_LAYOUT = ["gmail", "calendar", "tasks", "focus"];
+export const DEFAULT_LAYOUT = ["gmail", "calendar", "ai::main", "focus"];
+
+/*
+  Instance ids vs. types.
+  Most widgets are singletons: their instance id IS the type ("gmail").
+  Multi-instance widgets (AI) use "<type>::<uuid>" so several can coexist.
+*/
+export function instanceType(instanceId) {
+  return instanceId.includes("::") ? instanceId.split("::")[0] : instanceId;
+}
+
+export function isMultiInstance(type) {
+  return Boolean(WIDGETS[type]?.multiInstance);
+}
+
+export function newInstanceId(type) {
+  return isMultiInstance(type)
+    ? `${type}::${crypto.randomUUID().slice(0, 8)}`
+    : type;
+}

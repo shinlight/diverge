@@ -11,10 +11,13 @@ import { PLANS, PAYMENT_METHODS, startCheckout } from "../lib/payments/plans";
 
 export default function ProfilePage() {
   const { user, updateProfile, signOut } = useAuth();
+  const [name, setName] = useState(user?.name ?? "");
   const [nickname, setNickname] = useState(user?.nickname ?? "");
   const [saved, setSaved] = useState(false);
   const [themeOpen, setThemeOpen] = useState(false);
   const fileRef = useRef(null);
+
+  const displayMode = user?.displayMode ?? "nickname";
 
   function handleAvatar(e) {
     const file = e.target.files?.[0];
@@ -24,8 +27,11 @@ export default function ProfilePage() {
     reader.readAsDataURL(file); // local preview; Phase 2 -> Supabase Storage
   }
 
-  function saveNickname() {
-    updateProfile({ nickname: nickname.trim() || user?.nickname });
+  function saveIdentity() {
+    updateProfile({
+      name: name.trim() || user?.name,
+      nickname: nickname.trim() || user?.nickname,
+    });
     setSaved(true);
     setTimeout(() => setSaved(false), 1500);
   }
@@ -76,18 +82,57 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <div className="mt-8">
-            <label className="mb-2 block text-sm font-medium text-muted">
-              Nickname
-            </label>
-            <div className="flex gap-2">
+          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="mb-2 block text-sm font-medium text-muted">
+                Nome
+              </label>
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Il tuo nome"
+                className="w-full rounded-xl border border-line bg-surface-2/40 px-4 py-3
+                  text-sm outline-none focus:border-accent"
+              />
+            </div>
+            <div>
+              <label className="mb-2 block text-sm font-medium text-muted">
+                Nickname
+              </label>
               <input
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
-                className="flex-1 rounded-xl border border-line bg-surface-2/40 px-4 py-3
+                placeholder="Il tuo nickname"
+                className="w-full rounded-xl border border-line bg-surface-2/40 px-4 py-3
                   text-sm outline-none focus:border-accent"
               />
-              <Button variant="accent" onClick={saveNickname}>
+            </div>
+          </div>
+
+          <div className="mt-5">
+            <label className="mb-2 block text-sm font-medium text-muted">
+              Mostra nella barra
+            </label>
+            <div className="flex items-center gap-2">
+              <div className="flex rounded-xl border border-line bg-surface-2/40 p-1">
+                {[
+                  { id: "nickname", label: "Nickname" },
+                  { id: "name", label: "Nome" },
+                ].map((opt) => (
+                  <button
+                    key={opt.id}
+                    onClick={() => updateProfile({ displayMode: opt.id })}
+                    className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                      displayMode === opt.id
+                        ? "bg-accent text-accent-contrast"
+                        : "text-muted hover:text-content"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+              <Button variant="accent" className="ml-auto" onClick={saveIdentity}>
                 {saved ? <Check size={18} /> : "Salva"}
               </Button>
             </div>
