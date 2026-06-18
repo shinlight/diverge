@@ -7,7 +7,7 @@
   <html> to apply themes and the user's custom accent color live.
 */
 @theme {
-  --color-base: #0e0f13;
+  --color-bg: #0e0f13;
   --color-surface: #16181f;
   --color-surface-2: #1e212a;
   --color-line: #282c38;
@@ -31,7 +31,7 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
-  background-color: var(--color-base);
+  background-color: var(--color-bg);
   color: var(--color-content);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;

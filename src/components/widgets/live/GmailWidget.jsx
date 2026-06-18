@@ -59,7 +59,7 @@ export default function GmailWidget({ title = "Gmail", onRename }) {
               <button
                 onClick={() => openFocus({ compose: true })}
                 aria-label="Scrivi email"
-                className="grid h-8 w-8 place-items-center rounded-lg text-muted
+                className="grid h-7 w-7 place-items-center rounded-lg text-muted
                   transition-colors hover:bg-surface-2 hover:text-content"
               >
                 <PenSquare size={16} />
@@ -68,7 +68,7 @@ export default function GmailWidget({ title = "Gmail", onRename }) {
                 onClick={gmail.refresh}
                 disabled={status === "loading"}
                 aria-label="Aggiorna"
-                className="grid h-8 w-8 place-items-center rounded-lg text-muted
+                className="grid h-7 w-7 place-items-center rounded-lg text-muted
                   transition-colors hover:bg-surface-2 hover:text-content disabled:opacity-50"
               >
                 <RefreshCw
@@ -79,7 +79,7 @@ export default function GmailWidget({ title = "Gmail", onRename }) {
               <button
                 onClick={() => openFocus()}
                 aria-label="Espandi"
-                className="grid h-8 w-8 place-items-center rounded-lg text-muted
+                className="grid h-7 w-7 place-items-center rounded-lg text-muted
                   transition-colors hover:bg-surface-2 hover:text-content"
               >
                 <Maximize2 size={15} />

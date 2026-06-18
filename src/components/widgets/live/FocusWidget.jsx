@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Play, Pause, RotateCcw, SkipForward, Maximize2, Settings2, Target } from "lucide-react";
 import { useFocus } from "../../../lib/widgets/focus/useFocus";
 import { formatTime } from "../../../lib/widgets/focus/focusService";
+import { useTheme } from "../../../lib/theme/ThemeContext";
 import FocusPanel from "./FocusPanel";
 import WidgetHeader from "../WidgetHeader";
 
@@ -29,6 +30,8 @@ export default function FocusWidget({ title = "Focus", onRename }) {
     selectPhase,
   } = focus;
   const [panel, setPanel] = useState({ open: false, tab: "tasks" });
+  const { mono } = useTheme();
+  const acc = mono ? "#ffffff" : ACCENT;
 
   const isFocus = phase === "focus";
 
@@ -45,7 +48,7 @@ export default function FocusWidget({ title = "Focus", onRename }) {
             <button
               onClick={() => setPanel({ open: true, tab: "settings" })}
               aria-label="Impostazioni"
-              className="grid h-8 w-8 place-items-center rounded-lg text-muted
+              className="grid h-7 w-7 place-items-center rounded-lg text-muted
                 transition-colors hover:bg-surface-2 hover:text-content"
             >
               <Settings2 size={16} />
@@ -53,7 +56,7 @@ export default function FocusWidget({ title = "Focus", onRename }) {
             <button
               onClick={() => setPanel({ open: true, tab: "tasks" })}
               aria-label="Espandi"
-              className="grid h-8 w-8 place-items-center rounded-lg text-muted
+              className="grid h-7 w-7 place-items-center rounded-lg text-muted
                 transition-colors hover:bg-surface-2 hover:text-content"
             >
               <Maximize2 size={15} />
@@ -89,7 +92,7 @@ export default function FocusWidget({ title = "Focus", onRename }) {
         >
           <div
             className="font-semibold tabular-nums tracking-tight"
-            style={{ fontSize: "3rem", lineHeight: 1.1, color: isFocus ? ACCENT : undefined }}
+            style={{ fontSize: "3rem", lineHeight: 1.1, color: isFocus ? acc : undefined }}
           >
             {formatTime(secondsLeft)}
           </div>
@@ -111,9 +114,11 @@ export default function FocusWidget({ title = "Focus", onRename }) {
           <button
             onClick={running ? pause : start}
             aria-label={running ? "Pausa" : "Avvia"}
-            className="grid h-14 w-14 place-items-center rounded-full text-white
-              shadow-lg transition-transform hover:scale-105 active:scale-95"
-            style={{ backgroundColor: ACCENT }}
+            className={`grid h-14 w-14 place-items-center rounded-full
+              shadow-lg transition-transform hover:scale-105 active:scale-95 ${
+                mono ? "text-black" : "text-white"
+              }`}
+            style={{ backgroundColor: acc }}
           >
             {running ? <Pause size={24} /> : <Play size={24} className="ml-0.5" />}
           </button>

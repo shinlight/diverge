@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Pencil } from "lucide-react";
+import { useTheme } from "../../lib/theme/ThemeContext";
 
 /*
   Shared header for every widget (live and placeholder).
@@ -17,6 +18,7 @@ export default function WidgetHeader({
   badge,
   actions,
 }) {
+  const { mono } = useTheme();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(title);
   const inputRef = useRef(null);
@@ -35,12 +37,15 @@ export default function WidgetHeader({
   }
 
   return (
-    <div className="mb-3 flex items-start gap-3 pr-16">
+    <div className="mb-3 flex items-start gap-2.5 pr-12">
       <span
-        className="grid h-11 w-11 shrink-0 place-items-center rounded-xl"
-        style={{ backgroundColor: `${iconColor}1a`, color: iconColor }}
+        className="grid h-9 w-9 shrink-0 place-items-center rounded-lg"
+        style={{
+          backgroundColor: mono ? "rgba(255,255,255,0.1)" : `${iconColor}1a`,
+          color: mono ? "#ffffff" : iconColor,
+        }}
       >
-        <Icon size={22} />
+        <Icon size={18} />
       </span>
 
       <div className="min-w-0 flex-1">
@@ -78,7 +83,9 @@ export default function WidgetHeader({
         )}
       </div>
 
-      {actions && <div className="flex items-center gap-1">{actions}</div>}
+      {actions && (
+        <div className="hidden items-center gap-1 group-hover:flex">{actions}</div>
+      )}
     </div>
   );
 }

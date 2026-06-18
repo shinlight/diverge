@@ -54,6 +54,7 @@ export function ThemeProvider({ children }) {
       theme,
       accent,
       reducedMotion,
+      mono: THEMES[theme]?.mono ?? false,
       setTheme: (t) => setState((s) => ({ ...s, theme: t })),
       setAccent: (a) => setState((s) => ({ ...s, accent: a })),
       toggleReducedMotion: () =>

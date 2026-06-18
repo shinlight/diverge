@@ -13,6 +13,7 @@ import {
   Hash,
 } from "lucide-react";
 import { formatTime, TAG_COLORS } from "../../../lib/widgets/focus/focusService";
+import { useTheme } from "../../../lib/theme/ThemeContext";
 
 const ACCENT = "#e864c4";
 
@@ -24,6 +25,8 @@ const TABS = [
 
 export default function FocusPanel({ open, onClose, focus, initialTab = "tasks" }) {
   const [tab, setTab] = useState(initialTab);
+  const { mono } = useTheme();
+  const acc = mono ? "#ffffff" : ACCENT;
 
   return (
     <AnimatePresence>
@@ -51,7 +54,10 @@ export default function FocusPanel({ open, onClose, focus, initialTab = "tasks" 
             <div className="flex shrink-0 items-center gap-4 border-b border-line px-5 py-4">
               <span
                 className="grid h-10 w-10 place-items-center rounded-xl"
-                style={{ backgroundColor: `${ACCENT}1a`, color: ACCENT }}
+                style={{
+                  backgroundColor: mono ? "rgba(255,255,255,0.1)" : `${ACCENT}1a`,
+                  color: acc,
+                }}
               >
                 <Target size={20} />
               </span>
@@ -64,9 +70,11 @@ export default function FocusPanel({ open, onClose, focus, initialTab = "tasks" 
               <button
                 onClick={focus.running ? focus.pause : focus.start}
                 aria-label={focus.running ? "Pausa" : "Avvia"}
-                className="grid h-11 w-11 place-items-center rounded-full text-white
-                  transition-transform hover:scale-105 active:scale-95"
-                style={{ backgroundColor: ACCENT }}
+                className={`grid h-11 w-11 place-items-center rounded-full
+                  transition-transform hover:scale-105 active:scale-95 ${
+                    mono ? "text-black" : "text-white"
+                  }`}
+                style={{ backgroundColor: acc }}
               >
                 {focus.running ? <Pause size={20} /> : <Play size={20} className="ml-0.5" />}
               </button>
@@ -95,7 +103,7 @@ export default function FocusPanel({ open, onClose, focus, initialTab = "tasks" 
                     <motion.span
                       layoutId="focus-tab"
                       className="absolute inset-x-3 -bottom-px h-0.5 rounded-full"
-                      style={{ backgroundColor: ACCENT }}
+                      style={{ backgroundColor: acc }}
                     />
                   )}
                 </button>
@@ -359,9 +367,14 @@ function RecapTab({ focus }) {
 }
 
 function StatCard({ icon: Icon, label, value }) {
+  const { mono } = useTheme();
   return (
     <div className="rounded-2xl border border-line bg-surface-2/30 p-4">
-      <Icon size={18} className="mb-2 text-accent" />
+      <Icon
+        size={18}
+        className={`mb-2 ${mono ? "" : "text-accent"}`}
+        style={mono ? { color: "#ffffff" } : undefined}
+      />
       <p className="text-2xl font-semibold tabular-nums">{value}</p>
       <p className="text-xs text-muted">{label}</p>
     </div>

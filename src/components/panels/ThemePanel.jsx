@@ -67,7 +67,7 @@ export default function ThemePanel({ open, onClose }) {
                       >
                         <div className="mb-2 flex gap-1.5">
                           {[
-                            t.colors["--color-base"],
+                            t.colors["--color-bg"],
                             t.colors["--color-surface-2"],
                             t.colors["--color-content"],
                           ].map((c, i) => (

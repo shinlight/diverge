@@ -57,7 +57,7 @@ export default function CalendarWidget({ title = "Calendario", onRename }) {
               <button
                 onClick={() => openFocus({ create: true })}
                 aria-label="Nuovo evento"
-                className="grid h-8 w-8 place-items-center rounded-lg text-muted
+                className="grid h-7 w-7 place-items-center rounded-lg text-muted
                   transition-colors hover:bg-surface-2 hover:text-content"
               >
                 <CalendarPlus size={16} />
@@ -66,7 +66,7 @@ export default function CalendarWidget({ title = "Calendario", onRename }) {
                 onClick={calendar.refresh}
                 disabled={status === "loading"}
                 aria-label="Aggiorna"
-                className="grid h-8 w-8 place-items-center rounded-lg text-muted
+                className="grid h-7 w-7 place-items-center rounded-lg text-muted
                   transition-colors hover:bg-surface-2 hover:text-content disabled:opacity-50"
               >
                 <RefreshCw
@@ -77,7 +77,7 @@ export default function CalendarWidget({ title = "Calendario", onRename }) {
               <button
                 onClick={() => openFocus()}
                 aria-label="Espandi"
-                className="grid h-8 w-8 place-items-center rounded-lg text-muted
+                className="grid h-7 w-7 place-items-center rounded-lg text-muted
                   transition-colors hover:bg-surface-2 hover:text-content"
               >
                 <Maximize2 size={15} />

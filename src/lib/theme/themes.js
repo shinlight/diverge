@@ -6,13 +6,15 @@ export const THEMES = {
   totalBlack: {
     label: "Total Black",
     isDark: true,
+    // High-contrast: everything white (icons, logo, text) on pure black.
+    mono: true,
     colors: {
-      "--color-base": "#000000",
+      "--color-bg": "#000000",
       "--color-surface": "#0a0a0a",
       "--color-surface-2": "#161616",
-      "--color-line": "#242424",
+      "--color-line": "#2c2c2c",
       "--color-content": "#ffffff",
-      "--color-muted": "#b3b3b3",
+      "--color-muted": "#ffffff",
       "--color-accent-contrast": "#ffffff",
     },
   },
@@ -20,7 +22,7 @@ export const THEMES = {
     label: "Midnight",
     isDark: true,
     colors: {
-      "--color-base": "#0e0f13",
+      "--color-bg": "#0e0f13",
       "--color-surface": "#16181f",
       "--color-surface-2": "#1e212a",
       "--color-line": "#282c38",
@@ -33,7 +35,7 @@ export const THEMES = {
     label: "Slate",
     isDark: true,
     colors: {
-      "--color-base": "#0c1116",
+      "--color-bg": "#0c1116",
       "--color-surface": "#141b22",
       "--color-surface-2": "#1c2630",
       "--color-line": "#26323d",
@@ -46,7 +48,7 @@ export const THEMES = {
     label: "Forest",
     isDark: true,
     colors: {
-      "--color-base": "#0c1310",
+      "--color-bg": "#0c1310",
       "--color-surface": "#121d18",
       "--color-surface-2": "#1a2a22",
       "--color-line": "#24362c",
@@ -59,7 +61,7 @@ export const THEMES = {
     label: "Daylight",
     isDark: false,
     colors: {
-      "--color-base": "#f6f7f9",
+      "--color-bg": "#f6f7f9",
       "--color-surface": "#ffffff",
       "--color-surface-2": "#eef0f4",
       "--color-line": "#e2e5eb",
@@ -72,7 +74,7 @@ export const THEMES = {
     label: "Sand",
     isDark: false,
     colors: {
-      "--color-base": "#f7f4ef",
+      "--color-bg": "#f7f4ef",
       "--color-surface": "#fffdf9",
       "--color-surface-2": "#efe9df",
       "--color-line": "#e4ddd0",

@@ -37,23 +37,23 @@ export default function WidgetCard({ id, titleOverride, onRemove, onRename }) {
         }`}
     >
       {/* Hover controls — float above the widget's own content. */}
-      <div className="absolute right-3 top-3 z-20 flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+      <div className="absolute right-2 top-2 z-20 flex items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
         <button
           onClick={() => onRemove(id)}
           aria-label={`Rimuovi ${title}`}
-          className="grid h-8 w-8 place-items-center rounded-lg bg-surface/80 text-muted
+          className="grid h-7 w-7 place-items-center rounded-lg bg-surface/80 text-muted
             backdrop-blur hover:bg-surface-2 hover:text-content"
         >
-          <X size={16} />
+          <X size={15} />
         </button>
         <button
           {...attributes}
           {...listeners}
           aria-label={`Sposta ${title}`}
-          className="grid h-8 w-8 cursor-grab place-items-center rounded-lg bg-surface/80
+          className="grid h-7 w-7 cursor-grab place-items-center rounded-lg bg-surface/80
             text-muted backdrop-blur hover:bg-surface-2 hover:text-content active:cursor-grabbing"
         >
-          <GripVertical size={16} />
+          <GripVertical size={15} />
         </button>
       </div>
 
