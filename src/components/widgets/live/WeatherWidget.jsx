@@ -48,7 +48,7 @@ export default function WeatherWidget({ title, onRename }) {
     });
 
   return (
-    <div className="flex h-full flex-col p-5">
+    <div className="flex min-h-full flex-col p-5">
       <WidgetHeader
         icon={Cloud}
         iconColor={ACCENT}

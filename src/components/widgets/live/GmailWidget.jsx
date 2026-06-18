@@ -38,7 +38,7 @@ export default function GmailWidget({ title = "Gmail", onRename }) {
   const preview = messages.slice(0, 5);
 
   return (
-    <div className="flex h-full flex-col p-5">
+    <div className="flex min-h-full flex-col p-5">
       <WidgetHeader
         icon={Mail}
         iconColor={ACCENT}

@@ -50,6 +50,7 @@ export default function WidgetGrid({
               <motion.div
                 key={id}
                 layout
+                className="aspect-square"
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
@@ -70,7 +71,7 @@ export default function WidgetGrid({
             onClick={onAdd}
             whileHover={{ y: -2 }}
             whileTap={{ scale: 0.98 }}
-            className="flex min-h-[160px] flex-col items-center justify-center gap-2
+            className="flex aspect-square flex-col items-center justify-center gap-2
               rounded-2xl border border-dashed border-line text-muted
               transition-colors hover:border-accent hover:text-content"
           >

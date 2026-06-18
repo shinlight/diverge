@@ -34,7 +34,7 @@ export default function WidgetCard({ id, titleOverride, onRemove, onRename }) {
     <div
       ref={setNodeRef}
       style={style}
-      className={`group relative flex h-full flex-col rounded-2xl border border-line
+      className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border border-line
         bg-surface transition-shadow ${
           isDragging ? "shadow-2xl shadow-black/40" : ""
         }`}
@@ -60,11 +60,13 @@ export default function WidgetCard({ id, titleOverride, onRemove, onRename }) {
         </button>
       </div>
 
-      {Live ? (
-        <Live instanceId={id} title={title} onRename={rename} />
-      ) : (
-        <PlaceholderBody widget={widget} title={title} desc={t(widget.descKey)} onRename={rename} />
-      )}
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        {Live ? (
+          <Live instanceId={id} title={title} onRename={rename} />
+        ) : (
+          <PlaceholderBody widget={widget} title={title} desc={t(widget.descKey)} onRename={rename} />
+        )}
+      </div>
     </div>
   );
 }
@@ -72,7 +74,7 @@ export default function WidgetCard({ id, titleOverride, onRemove, onRename }) {
 function PlaceholderBody({ widget, title, desc, onRename }) {
   const { t } = useI18n();
   return (
-    <div className="flex flex-col p-5">
+    <div className="flex min-h-full flex-col p-5">
       <WidgetHeader
         icon={widget.icon}
         iconColor={widget.accent}

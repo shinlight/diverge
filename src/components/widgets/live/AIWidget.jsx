@@ -16,7 +16,7 @@ export default function AIWidget({ instanceId, title, onRename }) {
   const messages = ai.current?.messages ?? [];
 
   return (
-    <div className="flex h-full flex-col p-5">
+    <div className="flex min-h-full flex-col p-5">
       <WidgetHeader
         icon={Sparkles}
         iconColor={ACCENT}
@@ -56,7 +56,7 @@ export default function AIWidget({ instanceId, title, onRename }) {
         )}
       </div>
 
-      <div className="flex h-56 min-h-0 flex-col">
+      <div className="flex min-h-[12rem] flex-1 flex-col">
         <ChatThread
           messages={messages}
           sending={ai.sending}
