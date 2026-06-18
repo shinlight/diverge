@@ -3,6 +3,7 @@ import { Palette } from "lucide-react";
 import { motion } from "framer-motion";
 import Logo from "../ui/Logo";
 import Avatar from "../ui/Avatar";
+import NotificationsBell from "../notifications/NotificationsBell";
 import { useAuth } from "../../lib/auth/AuthContext";
 
 export default function TopBar({ onOpenTheme }) {
@@ -10,7 +11,7 @@ export default function TopBar({ onOpenTheme }) {
 
   return (
     <header className="sticky top-0 z-30 border-b border-line/70 bg-base/80 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
+      <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link to="/" className="rounded-lg">
           <Logo />
         </Link>
@@ -26,6 +27,8 @@ export default function TopBar({ onOpenTheme }) {
           >
             <Palette size={20} />
           </motion.button>
+
+          <NotificationsBell />
 
           <Link
             to="/profilo"

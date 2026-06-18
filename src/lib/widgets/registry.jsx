@@ -63,7 +63,7 @@ export const WIDGETS = {
     description: "Sessioni di concentrazione in stile Pomodoro.",
     icon: Clock,
     accent: "#e864c4",
-    status: "soon",
+    status: "live",
     size: "sm",
   },
 };

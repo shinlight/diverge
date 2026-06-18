@@ -14,7 +14,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Plus } from "lucide-react";
 import WidgetCard from "./WidgetCard";
 
-export default function WidgetGrid({ layout, onReorder, onRemove, onAdd }) {
+export default function WidgetGrid({
+  layout,
+  titles = {},
+  onReorder,
+  onRemove,
+  onRename,
+  onAdd,
+}) {
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } })
   );
@@ -35,7 +42,7 @@ export default function WidgetGrid({ layout, onReorder, onRemove, onAdd }) {
       onDragEnd={handleDragEnd}
     >
       <SortableContext items={layout} strategy={rectSortingStrategy}>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
           <AnimatePresence mode="popLayout">
             {layout.map((id) => (
               <motion.div
@@ -46,7 +53,12 @@ export default function WidgetGrid({ layout, onReorder, onRemove, onAdd }) {
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ type: "spring", stiffness: 350, damping: 30 }}
               >
-                <WidgetCard id={id} onRemove={onRemove} />
+                <WidgetCard
+                  id={id}
+                  titleOverride={titles[id]}
+                  onRemove={onRemove}
+                  onRename={onRename}
+                />
               </motion.div>
             ))}
           </AnimatePresence>

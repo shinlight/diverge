@@ -8,6 +8,7 @@ import { useAuth } from "../lib/auth/AuthContext";
 import { DEFAULT_LAYOUT } from "../lib/widgets/registry";
 
 const LAYOUT_KEY = "diverge.layout";
+const TITLES_KEY = "diverge.titles";
 
 function loadLayout() {
   try {
@@ -17,6 +18,16 @@ function loadLayout() {
     // ignore
   }
   return DEFAULT_LAYOUT;
+}
+
+function loadTitles() {
+  try {
+    const raw = localStorage.getItem(TITLES_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {
+    // ignore
+  }
+  return {};
 }
 
 function greeting() {
@@ -30,6 +41,7 @@ function greeting() {
 export default function DashboardPage() {
   const { user } = useAuth();
   const [layout, setLayout] = useState(loadLayout);
+  const [titles, setTitles] = useState(loadTitles);
   const [themeOpen, setThemeOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
 
@@ -37,6 +49,12 @@ export default function DashboardPage() {
     localStorage.setItem(LAYOUT_KEY, JSON.stringify(layout));
   }, [layout]);
 
+  useEffect(() => {
+    localStorage.setItem(TITLES_KEY, JSON.stringify(titles));
+  }, [titles]);
+
+  const renameWidget = (id, title) =>
+    setTitles((t) => ({ ...t, [id]: title }));
   const removeWidget = (id) => setLayout((l) => l.filter((w) => w !== id));
   const addWidget = (id) => {
     setLayout((l) => (l.includes(id) ? l : [...l, id]));
@@ -47,25 +65,24 @@ export default function DashboardPage() {
     <div className="min-h-screen">
       <TopBar onOpenTheme={() => setThemeOpen(true)} />
 
-      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      <main className="px-4 py-8 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="mb-8"
+          className="mb-6"
         >
-          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-            {greeting()}, {user?.nickname} 👋
+          <h1 className="text-lg font-semibold tracking-tight">
+            {greeting()}, {user?.nickname}
           </h1>
-          <p className="mt-1 text-muted">
-            Ecco il tuo spazio. Trascina i widget per riordinarli.
-          </p>
         </motion.div>
 
         <WidgetGrid
           layout={layout}
+          titles={titles}
           onReorder={setLayout}
           onRemove={removeWidget}
+          onRename={renameWidget}
           onAdd={() => setAddOpen(true)}
         />
       </main>

@@ -1,5 +1,5 @@
 // DiVerge mark: two paths diverging from a single point.
-export default function Logo({ size = 28 }) {
+export default function Logo({ size = 34 }) {
   return (
     <span className="inline-flex items-center gap-2">
       <svg
@@ -31,7 +31,7 @@ export default function Logo({ size = 28 }) {
           opacity="0.55"
         />
       </svg>
-      <span className="text-lg font-semibold tracking-tight">
+      <span className="text-xl font-semibold tracking-tight">
         Di<span className="text-accent">Verge</span>
       </span>
     </span>

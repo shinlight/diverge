@@ -3,6 +3,19 @@
 // The user can additionally override just the accent colour on top of any theme.
 
 export const THEMES = {
+  totalBlack: {
+    label: "Total Black",
+    isDark: true,
+    colors: {
+      "--color-base": "#000000",
+      "--color-surface": "#0a0a0a",
+      "--color-surface-2": "#161616",
+      "--color-line": "#242424",
+      "--color-content": "#ffffff",
+      "--color-muted": "#b3b3b3",
+      "--color-accent-contrast": "#ffffff",
+    },
+  },
   midnight: {
     label: "Midnight",
     isDark: true,

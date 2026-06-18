@@ -14,10 +14,11 @@ import {
   dayLabel,
 } from "../../../lib/widgets/calendar/calendarService";
 import CalendarFocus from "./CalendarFocus";
+import WidgetHeader from "../WidgetHeader";
 
 const ACCENT = "#4285f4";
 
-export default function CalendarWidget() {
+export default function CalendarWidget({ title = "Calendario", onRename }) {
   const calendar = useCalendar();
   const { connected, connecting, status, upcoming, connect } = calendar;
   const [focus, setFocus] = useState({
@@ -38,58 +39,53 @@ export default function CalendarWidget() {
 
   return (
     <div className="flex h-full flex-col p-5">
-      {/* Header */}
-      <div className="mb-4 flex items-center gap-3 pr-20">
-        <span
-          className="grid h-11 w-11 shrink-0 place-items-center rounded-xl"
-          style={{ backgroundColor: `${ACCENT}1a`, color: ACCENT }}
-        >
-          <Calendar size={22} />
-        </span>
-        <div className="min-w-0 flex-1">
-          <h3 className="text-base font-semibold">Calendario</h3>
-          <p className="truncate text-xs text-muted">
-            {connected
-              ? upcoming.length > 0
-                ? `${upcoming.length} impegni in arrivo`
-                : "Nessun impegno"
-              : "Non connesso"}
-          </p>
-        </div>
-
-        {connected && (
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => openFocus({ create: true })}
-              aria-label="Nuovo evento"
-              className="grid h-8 w-8 place-items-center rounded-lg text-muted
-                transition-colors hover:bg-surface-2 hover:text-content"
-            >
-              <CalendarPlus size={16} />
-            </button>
-            <button
-              onClick={calendar.refresh}
-              disabled={status === "loading"}
-              aria-label="Aggiorna"
-              className="grid h-8 w-8 place-items-center rounded-lg text-muted
-                transition-colors hover:bg-surface-2 hover:text-content disabled:opacity-50"
-            >
-              <RefreshCw
-                size={15}
-                className={status === "loading" ? "animate-spin" : ""}
-              />
-            </button>
-            <button
-              onClick={() => openFocus()}
-              aria-label="Espandi"
-              className="grid h-8 w-8 place-items-center rounded-lg text-muted
-                transition-colors hover:bg-surface-2 hover:text-content"
-            >
-              <Maximize2 size={15} />
-            </button>
-          </div>
-        )}
-      </div>
+      <WidgetHeader
+        icon={Calendar}
+        iconColor={ACCENT}
+        title={title}
+        onRename={onRename}
+        subtitle={
+          connected
+            ? upcoming.length > 0
+              ? `${upcoming.length} impegni in arrivo`
+              : "Nessun impegno"
+            : "Non connesso"
+        }
+        actions={
+          connected ? (
+            <>
+              <button
+                onClick={() => openFocus({ create: true })}
+                aria-label="Nuovo evento"
+                className="grid h-8 w-8 place-items-center rounded-lg text-muted
+                  transition-colors hover:bg-surface-2 hover:text-content"
+              >
+                <CalendarPlus size={16} />
+              </button>
+              <button
+                onClick={calendar.refresh}
+                disabled={status === "loading"}
+                aria-label="Aggiorna"
+                className="grid h-8 w-8 place-items-center rounded-lg text-muted
+                  transition-colors hover:bg-surface-2 hover:text-content disabled:opacity-50"
+              >
+                <RefreshCw
+                  size={15}
+                  className={status === "loading" ? "animate-spin" : ""}
+                />
+              </button>
+              <button
+                onClick={() => openFocus()}
+                aria-label="Espandi"
+                className="grid h-8 w-8 place-items-center rounded-lg text-muted
+                  transition-colors hover:bg-surface-2 hover:text-content"
+              >
+                <Maximize2 size={15} />
+              </button>
+            </>
+          ) : null
+        }
+      />
 
       {/* Body */}
       <div className="min-h-[140px] flex-1">

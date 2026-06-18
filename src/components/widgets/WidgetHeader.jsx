@@ -1,0 +1,84 @@
+import { useEffect, useRef, useState } from "react";
+import { Pencil } from "lucide-react";
+
+/*
+  Shared header for every widget (live and placeholder).
+  Shows: icon + editable title (+ optional badge) + optional subtitle + actions.
+  The title is renamed inline; onRename persists the user's custom name.
+
+  pr-16 keeps the row clear of the card's floating remove/drag controls.
+*/
+export default function WidgetHeader({
+  icon: Icon,
+  iconColor,
+  title,
+  onRename,
+  subtitle,
+  badge,
+  actions,
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(title);
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (editing) {
+      setDraft(title);
+      inputRef.current?.select();
+    }
+  }, [editing, title]);
+
+  function commit() {
+    const next = draft.trim();
+    if (next && next !== title) onRename?.(next);
+    setEditing(false);
+  }
+
+  return (
+    <div className="mb-3 flex items-start gap-3 pr-16">
+      <span
+        className="grid h-11 w-11 shrink-0 place-items-center rounded-xl"
+        style={{ backgroundColor: `${iconColor}1a`, color: iconColor }}
+      >
+        <Icon size={22} />
+      </span>
+
+      <div className="min-w-0 flex-1">
+        {editing ? (
+          <input
+            ref={inputRef}
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onBlur={commit}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") commit();
+              if (e.key === "Escape") setEditing(false);
+            }}
+            className="w-full rounded-md border border-line bg-surface-2/60 px-1.5 py-0.5
+              text-base font-semibold outline-none focus:border-accent"
+          />
+        ) : (
+          <div className="flex items-center gap-1.5">
+            <h3 className="truncate text-base font-semibold">{title}</h3>
+            {badge}
+            {onRename && (
+              <button
+                onClick={() => setEditing(true)}
+                aria-label="Rinomina widget"
+                className="shrink-0 text-muted opacity-0 transition-opacity
+                  hover:text-content group-hover:opacity-100"
+              >
+                <Pencil size={13} />
+              </button>
+            )}
+          </div>
+        )}
+        {subtitle && (
+          <p className="truncate text-xs text-muted">{subtitle}</p>
+        )}
+      </div>
+
+      {actions && <div className="flex items-center gap-1">{actions}</div>}
+    </div>
+  );
+}

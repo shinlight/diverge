@@ -12,10 +12,11 @@ import {
 import { useGmail } from "../../../lib/widgets/gmail/useGmail";
 import { relativeTime } from "../../../lib/widgets/gmail/gmailService";
 import GmailFocus from "./GmailFocus";
+import WidgetHeader from "../WidgetHeader";
 
 const ACCENT = "#ea4335";
 
-export default function GmailWidget() {
+export default function GmailWidget({ title = "Gmail", onRename }) {
   const gmail = useGmail();
   const { connected, connecting, status, messages, unread, connect } = gmail;
   const [focus, setFocus] = useState({
@@ -36,64 +37,57 @@ export default function GmailWidget() {
 
   return (
     <div className="flex h-full flex-col p-5">
-      {/* Header */}
-      <div className="mb-4 flex items-center gap-3 pr-20">
-        <span
-          className="grid h-11 w-11 shrink-0 place-items-center rounded-xl"
-          style={{ backgroundColor: `${ACCENT}1a`, color: ACCENT }}
-        >
-          <Mail size={22} />
-        </span>
-        <div className="min-w-0 flex-1">
-          <h3 className="flex items-center gap-2 text-base font-semibold">
-            Gmail
-            {connected && unread > 0 && (
-              <span
-                className="rounded-full px-2 py-0.5 text-xs font-semibold text-white"
-                style={{ backgroundColor: ACCENT }}
+      <WidgetHeader
+        icon={Mail}
+        iconColor={ACCENT}
+        title={title}
+        onRename={onRename}
+        subtitle={connected ? "Posta in arrivo" : "Non connesso"}
+        badge={
+          connected && unread > 0 ? (
+            <span
+              className="rounded-full px-2 py-0.5 text-xs font-semibold text-white"
+              style={{ backgroundColor: ACCENT }}
+            >
+              {unread}
+            </span>
+          ) : null
+        }
+        actions={
+          connected ? (
+            <>
+              <button
+                onClick={() => openFocus({ compose: true })}
+                aria-label="Scrivi email"
+                className="grid h-8 w-8 place-items-center rounded-lg text-muted
+                  transition-colors hover:bg-surface-2 hover:text-content"
               >
-                {unread}
-              </span>
-            )}
-          </h3>
-          <p className="truncate text-xs text-muted">
-            {connected ? "Posta in arrivo" : "Non connesso"}
-          </p>
-        </div>
-
-        {connected && (
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => openFocus({ compose: true })}
-              aria-label="Scrivi email"
-              className="grid h-8 w-8 place-items-center rounded-lg text-muted
-                transition-colors hover:bg-surface-2 hover:text-content"
-            >
-              <PenSquare size={16} />
-            </button>
-            <button
-              onClick={gmail.refresh}
-              disabled={status === "loading"}
-              aria-label="Aggiorna"
-              className="grid h-8 w-8 place-items-center rounded-lg text-muted
-                transition-colors hover:bg-surface-2 hover:text-content disabled:opacity-50"
-            >
-              <RefreshCw
-                size={15}
-                className={status === "loading" ? "animate-spin" : ""}
-              />
-            </button>
-            <button
-              onClick={() => openFocus()}
-              aria-label="Espandi"
-              className="grid h-8 w-8 place-items-center rounded-lg text-muted
-                transition-colors hover:bg-surface-2 hover:text-content"
-            >
-              <Maximize2 size={15} />
-            </button>
-          </div>
-        )}
-      </div>
+                <PenSquare size={16} />
+              </button>
+              <button
+                onClick={gmail.refresh}
+                disabled={status === "loading"}
+                aria-label="Aggiorna"
+                className="grid h-8 w-8 place-items-center rounded-lg text-muted
+                  transition-colors hover:bg-surface-2 hover:text-content disabled:opacity-50"
+              >
+                <RefreshCw
+                  size={15}
+                  className={status === "loading" ? "animate-spin" : ""}
+                />
+              </button>
+              <button
+                onClick={() => openFocus()}
+                aria-label="Espandi"
+                className="grid h-8 w-8 place-items-center rounded-lg text-muted
+                  transition-colors hover:bg-surface-2 hover:text-content"
+              >
+                <Maximize2 size={15} />
+              </button>
+            </>
+          ) : null
+        }
+      />
 
       {/* Body */}
       <div className="min-h-[140px] flex-1">
