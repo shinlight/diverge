@@ -4,18 +4,20 @@ import { Play, Pause, RotateCcw, SkipForward, Maximize2, Settings2, Target } fro
 import { useFocus } from "../../../lib/widgets/focus/useFocus";
 import { formatTime } from "../../../lib/widgets/focus/focusService";
 import { useTheme } from "../../../lib/theme/ThemeContext";
+import { useI18n } from "../../../lib/i18n/LanguageContext";
 import FocusPanel from "./FocusPanel";
 import WidgetHeader from "../WidgetHeader";
 
 const ACCENT = "#e864c4";
 
 const PHASE_TABS = [
-  { key: "focus", label: "Focus" },
-  { key: "short", label: "Pausa" },
-  { key: "long", label: "Lunga" },
+  { key: "focus", labelKey: "focus.tabFocus" },
+  { key: "short", labelKey: "focus.tabShort" },
+  { key: "long", labelKey: "focus.tabLong" },
 ];
 
 export default function FocusWidget({ title = "Focus", onRename }) {
+  const { t } = useI18n();
   const focus = useFocus();
   const {
     phase,
@@ -42,12 +44,12 @@ export default function FocusWidget({ title = "Focus", onRename }) {
         iconColor={ACCENT}
         title={title}
         onRename={onRename}
-        subtitle={`🍅 ${pomodoroCount} oggi`}
+        subtitle={t("focus.todayCount", { n: pomodoroCount })}
         actions={
           <>
             <button
               onClick={() => setPanel({ open: true, tab: "settings" })}
-              aria-label="Impostazioni"
+              aria-label={t("focus.settings")}
               className="grid h-7 w-7 place-items-center rounded-lg text-muted
                 transition-colors hover:bg-surface-2 hover:text-content"
             >
@@ -55,7 +57,7 @@ export default function FocusWidget({ title = "Focus", onRename }) {
             </button>
             <button
               onClick={() => setPanel({ open: true, tab: "tasks" })}
-              aria-label="Espandi"
+              aria-label={t("common.expand")}
               className="grid h-7 w-7 place-items-center rounded-lg text-muted
                 transition-colors hover:bg-surface-2 hover:text-content"
             >
@@ -67,17 +69,17 @@ export default function FocusWidget({ title = "Focus", onRename }) {
 
       {/* Phase tabs */}
       <div className="mb-3 flex gap-1 rounded-xl bg-surface-2/50 p-1">
-        {PHASE_TABS.map((t) => (
+        {PHASE_TABS.map((tab) => (
           <button
-            key={t.key}
-            onClick={() => selectPhase(t.key)}
+            key={tab.key}
+            onClick={() => selectPhase(tab.key)}
             className={`flex-1 rounded-lg py-1.5 text-xs font-medium transition-colors ${
-              phase === t.key
+              phase === tab.key
                 ? "bg-surface text-content shadow-sm"
                 : "text-muted hover:text-content"
             }`}
           >
-            {t.label}
+            {t(tab.labelKey)}
           </button>
         ))}
       </div>
@@ -97,7 +99,7 @@ export default function FocusWidget({ title = "Focus", onRename }) {
             {formatTime(secondsLeft)}
           </div>
           <p className="mt-1 text-sm text-muted">
-            {currentTask ? currentTask.title : "Nessun task selezionato"}
+            {currentTask ? currentTask.title : t("focus.noTask")}
           </p>
         </motion.div>
 

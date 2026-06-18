@@ -1,8 +1,10 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, X, Plus, Trash2, MessageSquare } from "lucide-react";
 import { ChatThread, ModelSelect } from "./aiChat";
+import { useI18n } from "../../../lib/i18n/LanguageContext";
 
 export default function AIPanel({ open, onClose, ai, title }) {
+  const { t } = useI18n();
   const messages = ai.current?.messages ?? [];
 
   return (
@@ -40,7 +42,7 @@ export default function AIPanel({ open, onClose, ai, title }) {
                 <ModelSelect model={ai.model} onSelect={ai.setModel} align="right" />
                 <button
                   onClick={onClose}
-                  aria-label="Chiudi"
+                  aria-label={t("common.close")}
                   className="grid h-9 w-9 place-items-center rounded-xl text-muted
                     hover:bg-surface-2 hover:text-content"
                 >
@@ -60,13 +62,13 @@ export default function AIPanel({ open, onClose, ai, title }) {
                       bg-accent px-3 py-2.5 text-sm font-medium text-accent-contrast
                       hover:brightness-110"
                   >
-                    <Plus size={16} /> Nuova chat
+                    <Plus size={16} /> {t("ai.newChat")}
                   </button>
                 </div>
                 <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-2">
                   {ai.conversations.length === 0 ? (
                     <p className="px-2 py-6 text-center text-xs text-muted">
-                      Nessuna chat. Inizia a scrivere!
+                      {t("ai.noChats")}
                     </p>
                   ) : (
                     ai.conversations.map((c) => (
@@ -102,6 +104,7 @@ export default function AIPanel({ open, onClose, ai, title }) {
 }
 
 function HistoryRow({ conv, active, onOpen, onDelete }) {
+  const { t } = useI18n();
   return (
     <div
       onClick={onOpen}
@@ -109,13 +112,15 @@ function HistoryRow({ conv, active, onOpen, onDelete }) {
         transition-colors ${active ? "bg-surface-2" : "hover:bg-surface-2/50"}`}
     >
       <MessageSquare size={14} className="shrink-0 text-muted" />
-      <span className="min-w-0 flex-1 truncate text-sm">{conv.title}</span>
+      <span className="min-w-0 flex-1 truncate text-sm">
+        {conv.title || t("ai.newChatTitle")}
+      </span>
       <button
         onClick={(e) => {
           e.stopPropagation();
           onDelete();
         }}
-        aria-label="Elimina chat"
+        aria-label={t("common.delete")}
         className="shrink-0 text-muted opacity-0 transition-opacity hover:text-content group-hover:opacity-100"
       >
         <Trash2 size={14} />

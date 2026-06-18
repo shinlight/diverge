@@ -225,22 +225,22 @@ function daysAgo(n) {
   return hoursAgo(n * 24);
 }
 
-// Compact Italian relative time, e.g. "8 min", "3 h", "ieri".
-export function relativeTime(iso) {
+// Compact relative time, e.g. "8 min", "3 h", "yesterday".
+export function relativeTime(iso, lang = "en") {
   const diff = Date.now() - new Date(iso).getTime();
   const min = Math.round(diff / 60_000);
-  if (min < 1) return "ora";
+  if (min < 1) return lang === "it" ? "ora" : "now";
   if (min < 60) return `${min} min`;
   const hours = Math.round(min / 60);
   if (hours < 24) return `${hours} h`;
   const days = Math.round(hours / 24);
-  if (days === 1) return "ieri";
-  return `${days} g`;
+  if (days === 1) return lang === "it" ? "ieri" : "yesterday";
+  return lang === "it" ? `${days} g` : `${days} d`;
 }
 
-// Full date for the reading pane, e.g. "17 giu 2026, 09:52".
-export function fullDate(iso) {
-  return new Date(iso).toLocaleString("it-IT", {
+// Full date for the reading pane, e.g. "17 Jun 2026, 09:52".
+export function fullDate(iso, lang = "en") {
+  return new Date(iso).toLocaleString(lang === "it" ? "it-IT" : "en-US", {
     day: "numeric",
     month: "short",
     year: "numeric",

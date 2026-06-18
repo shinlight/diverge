@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNotifications } from "../../notifications/NotificationContext";
+import { useI18n } from "../../i18n/LanguageContext";
 import {
   loadSettings,
   saveSettings,
@@ -14,15 +15,16 @@ import {
   uid,
 } from "./focusService";
 
-// Phases of the Pomodoro cycle.
-const PHASES = {
-  focus: { label: "Concentrazione", key: "focus" },
-  short: { label: "Pausa breve", key: "short" },
-  long: { label: "Pausa lunga", key: "long" },
+// Phase -> translation key for its label.
+const PHASE_KEY = {
+  focus: "focus.phaseFocus",
+  short: "focus.phaseShort",
+  long: "focus.phaseLong",
 };
 
 export function useFocus() {
   const { addNotification } = useNotifications();
+  const { t } = useI18n();
   const [settings, setSettings] = useState(loadSettings);
   const [tags, setTags] = useState(loadTags);
   const [tasks, setTasks] = useState(loadTasks);
@@ -82,8 +84,10 @@ export function useFocus() {
       const newCount = pomodoroCount + 1;
       setPomodoroCount(newCount);
       addNotification({
-        title: "Pomodoro completato 🍅",
-        message: task ? `+1 su "${task.title}"` : "Ottimo lavoro, fai una pausa!",
+        title: t("focus.notifTitle"),
+        message: task
+          ? t("focus.notifTask", { task: task.title })
+          : t("focus.notifGeneric"),
         color: "#e864c4",
       });
       const nextPhase = newCount % settings.longEvery === 0 ? "long" : "short";
@@ -95,7 +99,7 @@ export function useFocus() {
       setSecondsLeft(settings.focusMin * 60);
       setRunning(settings.autoStart);
     }
-  }, [phaseSeconds, addNotification]);
+  }, [phaseSeconds, addNotification, t]);
 
   // The 1-second tick.
   useEffect(() => {
@@ -235,7 +239,7 @@ export function useFocus() {
     tags,
     tasks,
     phase,
-    phaseLabel: PHASES[phase].label,
+    phaseLabel: t(PHASE_KEY[phase]),
     running,
     secondsLeft,
     pomodoroCount,

@@ -11,12 +11,14 @@ import {
 } from "lucide-react";
 import { useGmail } from "../../../lib/widgets/gmail/useGmail";
 import { relativeTime } from "../../../lib/widgets/gmail/gmailService";
+import { useI18n } from "../../../lib/i18n/LanguageContext";
 import GmailFocus from "./GmailFocus";
 import WidgetHeader from "../WidgetHeader";
 
 const ACCENT = "#ea4335";
 
 export default function GmailWidget({ title = "Gmail", onRename }) {
+  const { t, lang } = useI18n();
   const gmail = useGmail();
   const { connected, connecting, status, messages, unread, connect } = gmail;
   const [focus, setFocus] = useState({
@@ -42,7 +44,7 @@ export default function GmailWidget({ title = "Gmail", onRename }) {
         iconColor={ACCENT}
         title={title}
         onRename={onRename}
-        subtitle={connected ? "Posta in arrivo" : "Non connesso"}
+        subtitle={connected ? t("gmail.inbox") : t("common.notConnected")}
         badge={
           connected && unread > 0 ? (
             <span
@@ -58,7 +60,7 @@ export default function GmailWidget({ title = "Gmail", onRename }) {
             <>
               <button
                 onClick={() => openFocus({ compose: true })}
-                aria-label="Scrivi email"
+                aria-label={t("gmail.composeEmail")}
                 className="grid h-7 w-7 place-items-center rounded-lg text-muted
                   transition-colors hover:bg-surface-2 hover:text-content"
               >
@@ -67,7 +69,7 @@ export default function GmailWidget({ title = "Gmail", onRename }) {
               <button
                 onClick={gmail.refresh}
                 disabled={status === "loading"}
-                aria-label="Aggiorna"
+                aria-label={t("common.refresh")}
                 className="grid h-7 w-7 place-items-center rounded-lg text-muted
                   transition-colors hover:bg-surface-2 hover:text-content disabled:opacity-50"
               >
@@ -78,7 +80,7 @@ export default function GmailWidget({ title = "Gmail", onRename }) {
               </button>
               <button
                 onClick={() => openFocus()}
-                aria-label="Espandi"
+                aria-label={t("common.expand")}
                 className="grid h-7 w-7 place-items-center rounded-lg text-muted
                   transition-colors hover:bg-surface-2 hover:text-content"
               >
@@ -96,23 +98,23 @@ export default function GmailWidget({ title = "Gmail", onRename }) {
         ) : status === "loading" && messages.length === 0 ? (
           <CenteredState>
             <Loader2 size={20} className="animate-spin text-muted" />
-            <span>Carico le email…</span>
+            <span>{t("gmail.loading")}</span>
           </CenteredState>
         ) : status === "error" ? (
           <CenteredState>
             <AlertCircle size={20} className="text-muted" />
-            <span>Qualcosa è andato storto.</span>
+            <span>{t("common.error")}</span>
             <button
               onClick={gmail.refresh}
               className="mt-1 text-sm font-medium text-accent hover:underline"
             >
-              Riprova
+              {t("common.retry")}
             </button>
           </CenteredState>
         ) : messages.length === 0 ? (
           <CenteredState>
             <Inbox size={20} className="text-muted" />
-            <span>Nessuna email.</span>
+            <span>{t("gmail.empty")}</span>
           </CenteredState>
         ) : (
           <>
@@ -149,7 +151,7 @@ export default function GmailWidget({ title = "Gmail", onRename }) {
                             {m.from}
                           </span>
                           <span className="shrink-0 text-xs text-muted">
-                            {relativeTime(m.date)}
+                            {relativeTime(m.date, lang)}
                           </span>
                         </span>
                         <span
@@ -172,7 +174,7 @@ export default function GmailWidget({ title = "Gmail", onRename }) {
                 className="mt-2 w-full rounded-lg py-1.5 text-center text-xs font-medium
                   text-muted hover:bg-surface-2/60 hover:text-content"
               >
-                Vedi tutte ({messages.length})
+                {t("gmail.seeAll", { n: messages.length })}
               </button>
             )}
           </>
@@ -191,11 +193,11 @@ export default function GmailWidget({ title = "Gmail", onRename }) {
 }
 
 function ConnectPrompt({ onConnect, connecting }) {
+  const { t } = useI18n();
   return (
     <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
-      <p className="text-sm text-muted">
-        Collega il tuo account per vedere
-        <br />e gestire le email qui.
+      <p className="whitespace-pre-line text-sm text-muted">
+        {t("gmail.connectPrompt")}
       </p>
       <button
         onClick={onConnect}
@@ -210,7 +212,7 @@ function ConnectPrompt({ onConnect, connecting }) {
         ) : (
           <GoogleGlyph />
         )}
-        {connecting ? "Connessione…" : "Connetti Gmail"}
+        {connecting ? t("common.connecting") : t("gmail.connect")}
       </button>
     </div>
   );

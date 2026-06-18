@@ -14,6 +14,7 @@ import {
   Inbox,
 } from "lucide-react";
 import { relativeTime, fullDate } from "../../../lib/widgets/gmail/gmailService";
+import { useI18n } from "../../../lib/i18n/LanguageContext";
 
 const ACCENT = "#ea4335";
 
@@ -24,6 +25,7 @@ export default function GmailFocus({
   initialSelectedId,
   initialCompose,
 }) {
+  const { t } = useI18n();
   const { messages, unread, status, refresh, markRead, toggleStar, remove, send } =
     gmail;
   const [selectedId, setSelectedId] = useState(initialSelectedId ?? null);
@@ -31,7 +33,6 @@ export default function GmailFocus({
   const [replyTo, setReplyTo] = useState(null);
   const selected = messages.find((m) => m.id === selectedId) ?? null;
 
-  // Sync state with how the focus view was opened (email vs. compose).
   useEffect(() => {
     if (!open) return;
     if (initialCompose) {
@@ -113,12 +114,12 @@ export default function GmailFocus({
                   className="inline-flex items-center gap-2 rounded-xl bg-accent px-3.5 py-2
                     text-sm font-medium text-accent-contrast hover:brightness-110"
                 >
-                  <PenSquare size={16} /> Scrivi
+                  <PenSquare size={16} /> {t("gmail.compose")}
                 </button>
                 <button
                   onClick={refresh}
                   disabled={status === "loading"}
-                  aria-label="Aggiorna"
+                  aria-label={t("common.refresh")}
                   className="grid h-9 w-9 place-items-center rounded-xl text-muted
                     hover:bg-surface-2 hover:text-content disabled:opacity-50"
                 >
@@ -129,7 +130,7 @@ export default function GmailFocus({
                 </button>
                 <button
                   onClick={onClose}
-                  aria-label="Chiudi"
+                  aria-label={t("common.close")}
                   className="grid h-9 w-9 place-items-center rounded-xl text-muted
                     hover:bg-surface-2 hover:text-content"
                 >
@@ -148,7 +149,7 @@ export default function GmailFocus({
                 {messages.length === 0 ? (
                   <div className="flex h-full flex-col items-center justify-center gap-2 text-sm text-muted">
                     <Inbox size={20} />
-                    Posta vuota
+                    {t("gmail.emptyInbox")}
                   </div>
                 ) : (
                   <ul>
@@ -192,7 +193,7 @@ export default function GmailFocus({
                 ) : (
                   <div className="flex h-full flex-col items-center justify-center gap-2 text-sm text-muted">
                     <MailOpen size={22} />
-                    Seleziona un'email per leggerla
+                    {t("gmail.selectEmail")}
                   </div>
                 )}
               </div>
@@ -205,6 +206,7 @@ export default function GmailFocus({
 }
 
 function ListRow({ message, active, onOpen, onStar, onDelete }) {
+  const { t, lang } = useI18n();
   return (
     <li
       onClick={onOpen}
@@ -216,7 +218,7 @@ function ListRow({ message, active, onOpen, onStar, onDelete }) {
           e.stopPropagation();
           onStar();
         }}
-        aria-label="Segna importante"
+        aria-label={t("gmail.important")}
         className="mt-0.5 shrink-0 text-muted hover:text-content"
       >
         <Star
@@ -235,7 +237,7 @@ function ListRow({ message, active, onOpen, onStar, onDelete }) {
             {message.from}
           </span>
           <span className="shrink-0 text-xs text-muted">
-            {relativeTime(message.date)}
+            {relativeTime(message.date, lang)}
           </span>
         </div>
         <p
@@ -252,7 +254,7 @@ function ListRow({ message, active, onOpen, onStar, onDelete }) {
           e.stopPropagation();
           onDelete();
         }}
-        aria-label="Elimina"
+        aria-label={t("common.delete")}
         className="mt-0.5 shrink-0 text-muted opacity-0 transition-opacity
           hover:text-content group-hover:opacity-100"
       >
@@ -262,21 +264,15 @@ function ListRow({ message, active, onOpen, onStar, onDelete }) {
   );
 }
 
-function ReaderPane({
-  message,
-  onBack,
-  onReply,
-  onToggleStar,
-  onMarkUnread,
-  onDelete,
-}) {
+function ReaderPane({ message, onBack, onReply, onToggleStar, onMarkUnread, onDelete }) {
+  const { t, lang } = useI18n();
   return (
     <div className="flex h-full flex-col">
       {/* toolbar */}
       <div className="flex shrink-0 items-center gap-1 border-b border-line px-4 py-2.5">
         <button
           onClick={onBack}
-          aria-label="Indietro"
+          aria-label={t("common.back")}
           className="grid h-8 w-8 place-items-center rounded-lg text-muted hover:bg-surface-2 hover:text-content sm:hidden"
         >
           <ArrowLeft size={16} />
@@ -285,17 +281,17 @@ function ReaderPane({
           onClick={onReply}
           className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm text-muted hover:bg-surface-2 hover:text-content"
         >
-          <Reply size={16} /> Rispondi
+          <Reply size={16} /> {t("gmail.reply")}
         </button>
         <button
           onClick={onMarkUnread}
           className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm text-muted hover:bg-surface-2 hover:text-content"
         >
-          <MailOpen size={16} /> Non letta
+          <MailOpen size={16} /> {t("gmail.markUnread")}
         </button>
         <button
           onClick={onToggleStar}
-          aria-label="Importante"
+          aria-label={t("gmail.important")}
           className="grid h-8 w-8 place-items-center rounded-lg text-muted hover:bg-surface-2 hover:text-content"
         >
           <Star
@@ -306,7 +302,7 @@ function ReaderPane({
         </button>
         <button
           onClick={onDelete}
-          aria-label="Elimina"
+          aria-label={t("common.delete")}
           className="ml-auto grid h-8 w-8 place-items-center rounded-lg text-muted hover:bg-surface-2 hover:text-content"
         >
           <Trash2 size={16} />
@@ -328,7 +324,7 @@ function ReaderPane({
             <p className="truncate text-xs text-muted">{message.email}</p>
           </div>
           <span className="ml-auto shrink-0 text-xs text-muted">
-            {fullDate(message.date)}
+            {fullDate(message.date, lang)}
           </span>
         </div>
         <p className="mt-5 whitespace-pre-line text-sm leading-relaxed text-content/90">
@@ -340,12 +336,11 @@ function ReaderPane({
 }
 
 function ComposePane({ replyTo, onCancel, onSend }) {
+  const { t } = useI18n();
   const [to, setTo] = useState(replyTo?.email ?? "");
-  const [subject, setSubject] = useState(
-    replyTo ? `Re: ${replyTo.subject}` : ""
-  );
+  const [subject, setSubject] = useState(replyTo ? `Re: ${replyTo.subject}` : "");
   const [body, setBody] = useState(
-    replyTo ? `\n\n— In risposta a:\n${replyTo.snippet}` : ""
+    replyTo ? `\n\n${t("gmail.inReplyTo")}\n${replyTo.snippet}` : ""
   );
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
@@ -369,7 +364,7 @@ function ComposePane({ replyTo, onCancel, onSend }) {
         >
           <Send size={20} />
         </span>
-        <p className="text-sm font-medium">Email inviata!</p>
+        <p className="text-sm font-medium">{t("gmail.sent")}</p>
       </div>
     );
   }
@@ -378,32 +373,32 @@ function ComposePane({ replyTo, onCancel, onSend }) {
     <form onSubmit={handleSend} className="flex h-full flex-col">
       <div className="flex shrink-0 items-center border-b border-line px-5 py-3">
         <h3 className="text-sm font-semibold">
-          {replyTo ? "Rispondi" : "Nuova email"}
+          {replyTo ? t("gmail.reply") : t("gmail.newEmail")}
         </h3>
       </div>
       <div className="flex-1 space-y-3 overflow-y-auto px-5 py-4">
-        <Field label="A">
+        <Field label={t("gmail.to")}>
           <input
             type="email"
             required
             value={to}
             onChange={(e) => setTo(e.target.value)}
-            placeholder="destinatario@email.com"
+            placeholder={t("gmail.recipient")}
             className="w-full bg-transparent text-sm outline-none placeholder:text-muted"
           />
         </Field>
-        <Field label="Oggetto">
+        <Field label={t("gmail.subject")}>
           <input
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
-            placeholder="Oggetto"
+            placeholder={t("gmail.subject")}
             className="w-full bg-transparent text-sm outline-none placeholder:text-muted"
           />
         </Field>
         <textarea
           value={body}
           onChange={(e) => setBody(e.target.value)}
-          placeholder="Scrivi il tuo messaggio…"
+          placeholder={t("gmail.messagePlaceholder")}
           rows={10}
           className="w-full resize-none rounded-xl border border-line bg-surface-2/40 px-4 py-3
             text-sm leading-relaxed outline-none placeholder:text-muted focus:border-accent"
@@ -421,14 +416,14 @@ function ComposePane({ replyTo, onCancel, onSend }) {
           ) : (
             <Send size={16} />
           )}
-          Invia
+          {t("gmail.send")}
         </button>
         <button
           type="button"
           onClick={onCancel}
           className="rounded-xl px-4 py-2.5 text-sm text-muted hover:bg-surface-2 hover:text-content"
         >
-          Annulla
+          {t("common.cancel")}
         </button>
       </div>
     </form>

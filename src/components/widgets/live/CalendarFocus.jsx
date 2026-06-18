@@ -19,6 +19,7 @@ import {
   defaultNewEvent,
   EVENT_COLORS,
 } from "../../../lib/widgets/calendar/calendarService";
+import { useI18n } from "../../../lib/i18n/LanguageContext";
 
 const ACCENT = "#4285f4";
 
@@ -29,6 +30,7 @@ export default function CalendarFocus({
   initialSelectedId,
   initialCreate,
 }) {
+  const { t, lang } = useI18n();
   const { events, status, refresh, create, update, remove } = calendar;
   const [selectedId, setSelectedId] = useState(initialSelectedId ?? null);
   const [mode, setMode] = useState("idle"); // idle | detail | create
@@ -61,7 +63,7 @@ export default function CalendarFocus({
     }
   }
 
-  const groups = groupByDay(events);
+  const groups = groupByDay(events, lang);
   const paneActive = mode === "create" || (mode === "detail" && selected);
 
   return (
@@ -94,7 +96,7 @@ export default function CalendarFocus({
               >
                 <Calendar size={18} />
               </span>
-              <h2 className="text-base font-semibold">Calendario</h2>
+              <h2 className="text-base font-semibold">{t("widgets.calendar.name")}</h2>
 
               <div className="ml-auto flex items-center gap-1.5">
                 <button
@@ -102,12 +104,12 @@ export default function CalendarFocus({
                   className="inline-flex items-center gap-2 rounded-xl bg-accent px-3.5 py-2
                     text-sm font-medium text-accent-contrast hover:brightness-110"
                 >
-                  <Plus size={16} /> Nuovo evento
+                  <Plus size={16} /> {t("calendar.newEvent")}
                 </button>
                 <button
                   onClick={refresh}
                   disabled={status === "loading"}
-                  aria-label="Aggiorna"
+                  aria-label={t("common.refresh")}
                   className="grid h-9 w-9 place-items-center rounded-xl text-muted
                     hover:bg-surface-2 hover:text-content disabled:opacity-50"
                 >
@@ -118,7 +120,7 @@ export default function CalendarFocus({
                 </button>
                 <button
                   onClick={onClose}
-                  aria-label="Chiudi"
+                  aria-label={t("common.close")}
                   className="grid h-9 w-9 place-items-center rounded-xl text-muted
                     hover:bg-surface-2 hover:text-content"
                 >
@@ -137,7 +139,7 @@ export default function CalendarFocus({
                 {events.length === 0 ? (
                   <div className="flex h-full flex-col items-center justify-center gap-2 text-sm text-muted">
                     <Calendar size={20} />
-                    Nessun evento
+                    {t("calendar.emptyAgenda")}
                   </div>
                 ) : (
                   groups.map((g) => (
@@ -190,7 +192,7 @@ export default function CalendarFocus({
                 ) : (
                   <div className="flex h-full flex-col items-center justify-center gap-2 text-sm text-muted">
                     <CalendarClock size={22} />
-                    Seleziona un evento o creane uno nuovo
+                    {t("calendar.selectOrCreate")}
                   </div>
                 )}
               </div>
@@ -203,6 +205,7 @@ export default function CalendarFocus({
 }
 
 function AgendaRow({ event, active, onOpen }) {
+  const { lang } = useI18n();
   return (
     <li
       onClick={onOpen}
@@ -216,7 +219,7 @@ function AgendaRow({ event, active, onOpen }) {
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium">{event.title}</p>
         <p className="flex items-center gap-1.5 text-xs text-muted">
-          <Clock size={12} /> {timeRange(event.start, event.end)}
+          <Clock size={12} /> {timeRange(event.start, event.end, lang)}
           {event.location && (
             <>
               <span className="opacity-50">·</span>
@@ -230,6 +233,7 @@ function AgendaRow({ event, active, onOpen }) {
 }
 
 function EventEditor({ initial, onSave, onDelete, onCancel }) {
+  const { t } = useI18n();
   const [title, setTitle] = useState(initial.title);
   const [start, setStart] = useState(toLocalInput(initial.start));
   const [end, setEnd] = useState(toLocalInput(initial.end));
@@ -257,13 +261,13 @@ function EventEditor({ initial, onSave, onDelete, onCancel }) {
     <form onSubmit={handleSubmit} className="flex h-full flex-col">
       <div className="flex shrink-0 items-center justify-between border-b border-line px-5 py-3">
         <h3 className="text-sm font-semibold">
-          {isEdit ? "Modifica evento" : "Nuovo evento"}
+          {isEdit ? t("calendar.editEvent") : t("calendar.newEvent")}
         </h3>
         {isEdit && (
           <button
             type="button"
             onClick={onDelete}
-            aria-label="Elimina evento"
+            aria-label={t("common.delete")}
             className="grid h-8 w-8 place-items-center rounded-lg text-muted hover:bg-surface-2 hover:text-content"
           >
             <Trash2 size={16} />
@@ -275,13 +279,13 @@ function EventEditor({ initial, onSave, onDelete, onCancel }) {
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="Titolo dell'evento"
+          placeholder={t("calendar.titlePlaceholder")}
           autoFocus
           className="w-full bg-transparent text-lg font-semibold outline-none placeholder:text-muted"
         />
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <LabeledField label="Inizio" icon={Clock}>
+          <LabeledField label={t("calendar.start")} icon={Clock}>
             <input
               type="datetime-local"
               value={start}
@@ -289,7 +293,7 @@ function EventEditor({ initial, onSave, onDelete, onCancel }) {
               className="w-full bg-transparent text-sm outline-none [color-scheme:dark]"
             />
           </LabeledField>
-          <LabeledField label="Fine" icon={CalendarClock}>
+          <LabeledField label={t("calendar.end")} icon={CalendarClock}>
             <input
               type="datetime-local"
               value={end}
@@ -299,17 +303,17 @@ function EventEditor({ initial, onSave, onDelete, onCancel }) {
           </LabeledField>
         </div>
 
-        <LabeledField label="Luogo" icon={MapPin}>
+        <LabeledField label={t("calendar.location")} icon={MapPin}>
           <input
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            placeholder="Aggiungi luogo o link"
+            placeholder={t("calendar.locationPlaceholder")}
             className="w-full bg-transparent text-sm outline-none placeholder:text-muted"
           />
         </LabeledField>
 
         <div>
-          <p className="mb-2 text-xs font-medium text-muted">Colore</p>
+          <p className="mb-2 text-xs font-medium text-muted">{t("calendar.color")}</p>
           <div className="flex gap-2">
             {EVENT_COLORS.map((c) => (
               <button
@@ -329,7 +333,7 @@ function EventEditor({ initial, onSave, onDelete, onCancel }) {
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          placeholder="Note…"
+          placeholder={t("calendar.notesPlaceholder")}
           rows={4}
           className="w-full resize-none rounded-xl border border-line bg-surface-2/40 px-4 py-3
             text-sm outline-none placeholder:text-muted focus:border-accent"
@@ -348,14 +352,14 @@ function EventEditor({ initial, onSave, onDelete, onCancel }) {
           ) : (
             <Save size={16} />
           )}
-          {isEdit ? "Salva modifiche" : "Crea evento"}
+          {isEdit ? t("calendar.saveChanges") : t("calendar.create")}
         </button>
         <button
           type="button"
           onClick={onCancel}
           className="rounded-xl px-4 py-2.5 text-sm text-muted hover:bg-surface-2 hover:text-content"
         >
-          Annulla
+          {t("common.cancel")}
         </button>
       </div>
     </form>

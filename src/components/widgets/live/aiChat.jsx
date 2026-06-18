@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, ChevronDown, Check, Sparkles } from "lucide-react";
 import { MODELS, modelById } from "../../../lib/widgets/ai/aiService";
+import { useI18n } from "../../../lib/i18n/LanguageContext";
 
 /* ----------------------- Model selector (the "link") ---------------------- */
 
@@ -67,6 +68,7 @@ export function ModelSelect({ model, onSelect, align = "left" }) {
 /* ------------------------------- Chat thread ------------------------------ */
 
 export function ChatThread({ messages, sending, onSend, model, autoFocus }) {
+  const { t } = useI18n();
   const [text, setText] = useState("");
   const endRef = useRef(null);
   const m = modelById(model);
@@ -93,9 +95,7 @@ export function ChatThread({ messages, sending, onSend, model, autoFocus }) {
             >
               <Sparkles size={20} />
             </span>
-            <p className="text-sm text-muted">
-              Inizia a chattare con <span className="text-content">{m.name}</span>.
-            </p>
+            <p className="text-sm text-muted">{t("ai.startChat", { model: m.name })}</p>
           </div>
         ) : (
           messages.map((msg) => <Bubble key={msg.id} msg={msg} color={m.color} />)
@@ -113,7 +113,7 @@ export function ChatThread({ messages, sending, onSend, model, autoFocus }) {
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) submit(e);
           }}
-          placeholder={`Scrivi a ${m.name}…`}
+          placeholder={t("ai.inputPlaceholder", { model: m.name })}
           className="max-h-28 min-h-[42px] flex-1 resize-none rounded-xl border border-line
             bg-surface-2/40 px-3.5 py-2.5 text-sm outline-none placeholder:text-muted
             focus:border-accent"
@@ -121,7 +121,7 @@ export function ChatThread({ messages, sending, onSend, model, autoFocus }) {
         <button
           type="submit"
           disabled={!text.trim() || sending}
-          aria-label="Invia"
+          aria-label={t("gmail.send")}
           className="grid h-[42px] w-[42px] shrink-0 place-items-center rounded-xl
             bg-accent text-accent-contrast transition hover:brightness-110
             disabled:opacity-40"

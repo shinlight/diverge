@@ -55,7 +55,7 @@ export function clearState(instanceId) {
 export function newConversation() {
   return {
     id: uid(),
-    title: "Nuova chat",
+    title: "", // shown as the localized "New chat" until the first message
     messages: [],
     createdAt: new Date().toISOString(),
   };
@@ -69,19 +69,19 @@ export function titleFrom(text) {
 }
 
 // Simulated assistant reply (see header for the real-API swap point).
-export async function generateReply(modelId, messages) {
+// `t` is the i18n translate function so the demo text follows the UI language.
+export async function generateReply(modelId, messages, t) {
   await delay(650 + Math.random() * 650);
   const model = modelById(modelId);
   const lastUser = [...messages].reverse().find((m) => m.role === "user");
   const q = lastUser?.content?.trim() ?? "";
+  const vars = { model: model.name, provider: model.provider, q };
 
-  if (!q) return `Sono ${model.name} (${model.provider}). Scrivimi pure!`;
+  if (!q) return t("ai.demoEmpty", vars);
 
   return (
-    `${model.name} · ${model.provider} (demo)\n\n` +
-    `Hai scritto: “${q}”.\n\n` +
-    `In questa versione di DiVerge le risposte sono simulate. Collegando una ` +
-    `vera API ${model.provider}, qui comparirà la risposta autentica del ` +
-    `modello — senza modificare l'interfaccia. ✨`
+    `${t("ai.demoLine1", vars)}\n\n` +
+    `${t("ai.demoYouWrote", vars)}\n\n` +
+    `${t("ai.demoNote", vars)}`
   );
 }

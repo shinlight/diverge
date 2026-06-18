@@ -15,6 +15,8 @@
   The widget UI never changes — only this file does.
 */
 
+import { translate } from "../../i18n/translations";
+
 const CONNECT_KEY = "diverge.calendar.connected";
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -154,24 +156,26 @@ export async function deleteEvent(id) {
 
 export const EVENT_COLORS = COLORS;
 
+const locale = (lang) => (lang === "it" ? "it-IT" : "en-US");
+
 // "10:00 – 10:15"
-export function timeRange(startIso, endIso) {
+export function timeRange(startIso, endIso, lang = "en") {
   const opts = { hour: "2-digit", minute: "2-digit" };
-  const s = new Date(startIso).toLocaleTimeString("it-IT", opts);
-  const e = new Date(endIso).toLocaleTimeString("it-IT", opts);
+  const s = new Date(startIso).toLocaleTimeString(locale(lang), opts);
+  const e = new Date(endIso).toLocaleTimeString(locale(lang), opts);
   return `${s} – ${e}`;
 }
 
-// "Oggi", "Domani", else "gio 19 giu"
-export function dayLabel(iso) {
+// "Today", "Tomorrow", else "Thu 19 Jun"
+export function dayLabel(iso, lang = "en") {
   const d = new Date(iso);
   const today = new Date();
   const startOf = (x) => new Date(x.getFullYear(), x.getMonth(), x.getDate());
   const diffDays = Math.round((startOf(d) - startOf(today)) / 86_400_000);
-  if (diffDays === 0) return "Oggi";
-  if (diffDays === 1) return "Domani";
-  if (diffDays === -1) return "Ieri";
-  return d.toLocaleDateString("it-IT", {
+  if (diffDays === 0) return translate(lang, "calendar.today");
+  if (diffDays === 1) return translate(lang, "calendar.tomorrow");
+  if (diffDays === -1) return translate(lang, "calendar.yesterday");
+  return d.toLocaleDateString(locale(lang), {
     weekday: "short",
     day: "numeric",
     month: "short",
@@ -179,12 +183,13 @@ export function dayLabel(iso) {
 }
 
 // Group a sorted event list into [{ key, label, events }] by calendar day.
-export function groupByDay(list) {
+export function groupByDay(list, lang = "en") {
   const groups = new Map();
   for (const ev of list) {
     const d = new Date(ev.start);
     const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
-    if (!groups.has(key)) groups.set(key, { key, label: dayLabel(ev.start), events: [] });
+    if (!groups.has(key))
+      groups.set(key, { key, label: dayLabel(ev.start, lang), events: [] });
     groups.get(key).events.push(ev);
   }
   return [...groups.values()];

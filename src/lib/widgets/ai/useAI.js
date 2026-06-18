@@ -7,9 +7,11 @@ import {
   generateReply,
   uid,
 } from "./aiService";
+import { useI18n } from "../../i18n/LanguageContext";
 
 // One AI assistant instance: its model + its conversations.
 export function useAI(instanceId) {
+  const { t } = useI18n();
   const [state, setState] = useState(() => loadState(instanceId));
   const [currentId, setCurrentId] = useState(
     () => state.conversations[0]?.id ?? null
@@ -85,7 +87,7 @@ export function useAI(instanceId) {
       setCurrentId(convId);
       setSending(true);
 
-      const reply = await generateReply(state.model, history);
+      const reply = await generateReply(state.model, history, t);
       const aiMsg = {
         id: uid(),
         role: "assistant",
@@ -100,7 +102,7 @@ export function useAI(instanceId) {
       }));
       setSending(false);
     },
-    [sending, currentId, state.conversations, state.model]
+    [sending, currentId, state.conversations, state.model, t]
   );
 
   return {

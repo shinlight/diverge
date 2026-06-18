@@ -14,16 +14,18 @@ import {
 } from "lucide-react";
 import { formatTime, TAG_COLORS } from "../../../lib/widgets/focus/focusService";
 import { useTheme } from "../../../lib/theme/ThemeContext";
+import { useI18n } from "../../../lib/i18n/LanguageContext";
 
 const ACCENT = "#e864c4";
 
 const TABS = [
-  { key: "tasks", label: "Task" },
-  { key: "recap", label: "Recap" },
-  { key: "settings", label: "Impostazioni" },
+  { key: "tasks", labelKey: "focus.tasks" },
+  { key: "recap", labelKey: "focus.recap" },
+  { key: "settings", labelKey: "focus.settings" },
 ];
 
 export default function FocusPanel({ open, onClose, focus, initialTab = "tasks" }) {
+  const { t } = useI18n();
   const [tab, setTab] = useState(initialTab);
   const { mono } = useTheme();
   const acc = mono ? "#ffffff" : ACCENT;
@@ -69,7 +71,6 @@ export default function FocusPanel({ open, onClose, focus, initialTab = "tasks" 
               </div>
               <button
                 onClick={focus.running ? focus.pause : focus.start}
-                aria-label={focus.running ? "Pausa" : "Avvia"}
                 className={`grid h-11 w-11 place-items-center rounded-full
                   transition-transform hover:scale-105 active:scale-95 ${
                     mono ? "text-black" : "text-white"
@@ -80,7 +81,7 @@ export default function FocusPanel({ open, onClose, focus, initialTab = "tasks" 
               </button>
               <button
                 onClick={onClose}
-                aria-label="Chiudi"
+                aria-label={t("common.close")}
                 className="grid h-9 w-9 place-items-center rounded-xl text-muted
                   hover:bg-surface-2 hover:text-content"
               >
@@ -90,16 +91,16 @@ export default function FocusPanel({ open, onClose, focus, initialTab = "tasks" 
 
             {/* Tabs */}
             <div className="flex shrink-0 gap-1 border-b border-line px-3">
-              {TABS.map((t) => (
+              {TABS.map((tb) => (
                 <button
-                  key={t.key}
-                  onClick={() => setTab(t.key)}
+                  key={tb.key}
+                  onClick={() => setTab(tb.key)}
                   className={`relative px-4 py-3 text-sm font-medium transition-colors ${
-                    tab === t.key ? "text-content" : "text-muted hover:text-content"
+                    tab === tb.key ? "text-content" : "text-muted hover:text-content"
                   }`}
                 >
-                  {t.label}
-                  {tab === t.key && (
+                  {t(tb.labelKey)}
+                  {tab === tb.key && (
                     <motion.span
                       layoutId="focus-tab"
                       className="absolute inset-x-3 -bottom-px h-0.5 rounded-full"
@@ -126,6 +127,7 @@ export default function FocusPanel({ open, onClose, focus, initialTab = "tasks" 
 /* ------------------------------- Tasks ------------------------------- */
 
 function TasksTab({ focus }) {
+  const { t } = useI18n();
   const { tags, tasks, currentTaskId, setCurrentTaskId, addTask, toggleTask, deleteTask } = focus;
   const [title, setTitle] = useState("");
   const [tagId, setTagId] = useState(tags[0]?.id ?? null);
@@ -136,10 +138,12 @@ function TasksTab({ focus }) {
     setTitle("");
   }
 
-  // group tasks by tag (plus an "untagged" bucket)
   const groups = [
-    ...tags.map((t) => ({ tag: t, items: tasks.filter((x) => x.tagId === t.id) })),
-    { tag: null, items: tasks.filter((x) => !x.tagId || !tags.some((t) => t.id === x.tagId)) },
+    ...tags.map((tg) => ({ tag: tg, items: tasks.filter((x) => x.tagId === tg.id) })),
+    {
+      tag: null,
+      items: tasks.filter((x) => !x.tagId || !tags.some((tg) => tg.id === x.tagId)),
+    },
   ].filter((g) => g.items.length > 0);
 
   return (
@@ -148,7 +152,7 @@ function TasksTab({ focus }) {
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="Nuovo task…"
+          placeholder={t("focus.newTask")}
           className="flex-1 rounded-xl border border-line bg-surface-2/40 px-4 py-2.5
             text-sm outline-none placeholder:text-muted focus:border-accent"
         />
@@ -157,9 +161,9 @@ function TasksTab({ focus }) {
           onChange={(e) => setTagId(e.target.value || null)}
           className="rounded-xl border border-line bg-surface-2/40 px-3 py-2.5 text-sm outline-none focus:border-accent"
         >
-          {tags.map((t) => (
-            <option key={t.id} value={t.id}>
-              {t.name}
+          {tags.map((tg) => (
+            <option key={tg.id} value={tg.id}>
+              {tg.name}
             </option>
           ))}
         </select>
@@ -167,16 +171,14 @@ function TasksTab({ focus }) {
           type="submit"
           className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-white"
           style={{ backgroundColor: ACCENT }}
-          aria-label="Aggiungi task"
+          aria-label={t("focus.addTask")}
         >
           <Plus size={18} />
         </button>
       </form>
 
       {groups.length === 0 ? (
-        <p className="py-10 text-center text-sm text-muted">
-          Nessun task. Aggiungine uno per iniziare!
-        </p>
+        <p className="py-10 text-center text-sm text-muted">{t("focus.noTasks")}</p>
       ) : (
         <div className="space-y-5">
           {groups.map((g) => (
@@ -187,7 +189,7 @@ function TasksTab({ focus }) {
                   style={{ backgroundColor: g.tag?.color ?? "#9aa0ad" }}
                 />
                 <span className="text-xs font-semibold uppercase tracking-wide text-muted">
-                  {g.tag?.name ?? "Senza tag"}
+                  {g.tag?.name ?? t("focus.noTag")}
                 </span>
               </div>
               <ul className="space-y-1.5">
@@ -213,6 +215,7 @@ function TasksTab({ focus }) {
 }
 
 function TaskRow({ task, active, onSelect, onToggle, onDelete }) {
+  const { t } = useI18n();
   return (
     <li
       className={`group flex items-center gap-3 rounded-xl border px-3 py-2.5 transition-colors ${
@@ -221,7 +224,6 @@ function TaskRow({ task, active, onSelect, onToggle, onDelete }) {
     >
       <button
         onClick={onToggle}
-        aria-label="Completa"
         className={`grid h-5 w-5 shrink-0 place-items-center rounded-md border transition-colors ${
           task.done ? "border-transparent bg-accent text-white" : "border-line"
         }`}
@@ -239,7 +241,7 @@ function TaskRow({ task, active, onSelect, onToggle, onDelete }) {
       {active && <Target size={14} className="shrink-0 text-accent" />}
       <button
         onClick={onDelete}
-        aria-label="Elimina task"
+        aria-label={t("common.delete")}
         className="shrink-0 text-muted opacity-0 transition-opacity hover:text-content group-hover:opacity-100"
       >
         <Trash2 size={15} />
@@ -249,6 +251,7 @@ function TaskRow({ task, active, onSelect, onToggle, onDelete }) {
 }
 
 function TagManager({ focus }) {
+  const { t } = useI18n();
   const { tags, addTag, deleteTag } = focus;
   const [name, setName] = useState("");
   const [color, setColor] = useState(TAG_COLORS[0]);
@@ -256,19 +259,19 @@ function TagManager({ focus }) {
   return (
     <div className="mt-6 border-t border-line pt-4">
       <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">
-        Tag
+        {t("focus.tag")}
       </p>
       <div className="mb-3 flex flex-wrap gap-2">
-        {tags.map((t) => (
+        {tags.map((tg) => (
           <span
-            key={t.id}
+            key={tg.id}
             className="group inline-flex items-center gap-1.5 rounded-full border border-line py-1 pl-2.5 pr-1.5 text-xs"
           >
-            <span className="h-2 w-2 rounded-full" style={{ backgroundColor: t.color }} />
-            {t.name}
+            <span className="h-2 w-2 rounded-full" style={{ backgroundColor: tg.color }} />
+            {tg.name}
             <button
-              onClick={() => deleteTag(t.id)}
-              aria-label={`Elimina tag ${t.name}`}
+              onClick={() => deleteTag(tg.id)}
+              aria-label={t("common.delete")}
               className="text-muted hover:text-content"
             >
               <X size={12} />
@@ -290,7 +293,7 @@ function TagManager({ focus }) {
               key={c}
               type="button"
               onClick={() => setColor(c)}
-              aria-label={`Colore ${c}`}
+              aria-label={c}
               className={`h-5 w-5 rounded-full ${color === c ? "ring-2 ring-offset-1 ring-offset-surface" : ""}`}
               style={{ backgroundColor: c, "--tw-ring-color": c }}
             />
@@ -299,14 +302,14 @@ function TagManager({ focus }) {
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Nuovo tag…"
+          placeholder={t("focus.newTag")}
           className="flex-1 rounded-lg border border-line bg-surface-2/40 px-3 py-2 text-sm outline-none placeholder:text-muted focus:border-accent"
         />
         <button
           type="submit"
           className="rounded-lg px-3 py-2 text-sm font-medium text-muted hover:bg-surface-2 hover:text-content"
         >
-          Aggiungi
+          {t("common.add")}
         </button>
       </form>
     </div>
@@ -316,46 +319,45 @@ function TagManager({ focus }) {
 /* ------------------------------- Recap ------------------------------- */
 
 function RecapTab({ focus }) {
+  const { t } = useI18n();
   const { stats } = focus;
-  const maxCount = Math.max(1, ...stats.byTag.map((t) => t.count));
+  const maxCount = Math.max(1, ...stats.byTag.map((row) => row.count));
 
   return (
     <div className="px-5 py-5">
       <div className="grid grid-cols-2 gap-3">
-        <StatCard icon={Flame} label="Pomodori oggi" value={stats.count} />
-        <StatCard icon={Clock} label="Minuti di focus" value={stats.minutes} />
+        <StatCard icon={Flame} label={t("focus.recapToday")} value={stats.count} />
+        <StatCard icon={Clock} label={t("focus.recapMinutes")} value={stats.minutes} />
       </div>
 
       <h4 className="mb-3 mt-6 flex items-center gap-2 text-sm font-semibold">
-        <Hash size={15} className="text-muted" /> Per tag
+        <Hash size={15} className="text-muted" /> {t("focus.recapByTag")}
       </h4>
 
       {stats.byTag.length === 0 ? (
-        <p className="py-8 text-center text-sm text-muted">
-          Nessun pomodoro completato oggi.
-          <br />
-          Avvia il timer per iniziare! 🍅
+        <p className="whitespace-pre-line py-8 text-center text-sm text-muted">
+          {t("focus.recapEmpty")}
         </p>
       ) : (
         <div className="space-y-3">
-          {stats.byTag.map((t) => (
-            <div key={t.tagId}>
+          {stats.byTag.map((row) => (
+            <div key={row.tagId}>
               <div className="mb-1 flex items-center justify-between text-sm">
                 <span className="flex items-center gap-2">
-                  <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: t.color }} />
-                  {t.name}
+                  <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: row.color }} />
+                  {row.name}
                 </span>
                 <span className="text-muted">
-                  {t.count} 🍅 · {t.minutes} min
+                  {row.count} 🍅 · {row.minutes} min
                 </span>
               </div>
               <div className="h-2 overflow-hidden rounded-full bg-surface-2">
                 <motion.div
                   initial={{ width: 0 }}
-                  animate={{ width: `${(t.count / maxCount) * 100}%` }}
+                  animate={{ width: `${(row.count / maxCount) * 100}%` }}
                   transition={{ type: "spring", stiffness: 120, damping: 20 }}
                   className="h-full rounded-full"
-                  style={{ backgroundColor: t.color }}
+                  style={{ backgroundColor: row.color }}
                 />
               </div>
             </div>
@@ -384,13 +386,14 @@ function StatCard({ icon: Icon, label, value }) {
 /* ----------------------------- Settings ----------------------------- */
 
 function SettingsTab({ focus }) {
+  const { t } = useI18n();
   const { settings, updateSettings } = focus;
 
   const fields = [
-    { key: "focusMin", label: "Durata focus", suffix: "min", min: 1, max: 90 },
-    { key: "shortMin", label: "Pausa breve", suffix: "min", min: 1, max: 30 },
-    { key: "longMin", label: "Pausa lunga", suffix: "min", min: 1, max: 60 },
-    { key: "longEvery", label: "Pausa lunga ogni", suffix: "pomodori", min: 2, max: 8 },
+    { key: "focusMin", label: t("focus.focusDuration"), suffix: t("focus.min"), min: 1, max: 90 },
+    { key: "shortMin", label: t("focus.shortBreak"), suffix: t("focus.min"), min: 1, max: 30 },
+    { key: "longMin", label: t("focus.longBreak"), suffix: t("focus.min"), min: 1, max: 60 },
+    { key: "longEvery", label: t("focus.longEvery"), suffix: t("focus.pomodoros"), min: 2, max: 8 },
   ];
 
   return (
@@ -427,10 +430,8 @@ function SettingsTab({ focus }) {
         className="flex w-full items-center justify-between rounded-xl border border-line bg-surface-2/30 px-4 py-3 text-left"
       >
         <span>
-          <span className="block text-sm">Avvio automatico</span>
-          <span className="block text-xs text-muted">
-            Passa al focus o alla pausa senza premere avvia.
-          </span>
+          <span className="block text-sm">{t("focus.autoStart")}</span>
+          <span className="block text-xs text-muted">{t("focus.autoStartDesc")}</span>
         </span>
         <span
           className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${

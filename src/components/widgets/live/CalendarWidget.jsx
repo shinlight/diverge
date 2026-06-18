@@ -9,16 +9,15 @@ import {
   Maximize2,
 } from "lucide-react";
 import { useCalendar } from "../../../lib/widgets/calendar/useCalendar";
-import {
-  timeRange,
-  dayLabel,
-} from "../../../lib/widgets/calendar/calendarService";
+import { timeRange, dayLabel } from "../../../lib/widgets/calendar/calendarService";
+import { useI18n } from "../../../lib/i18n/LanguageContext";
 import CalendarFocus from "./CalendarFocus";
 import WidgetHeader from "../WidgetHeader";
 
 const ACCENT = "#4285f4";
 
-export default function CalendarWidget({ title = "Calendario", onRename }) {
+export default function CalendarWidget({ title = "Calendar", onRename }) {
+  const { t, lang } = useI18n();
   const calendar = useCalendar();
   const { connected, connecting, status, upcoming, connect } = calendar;
   const [focus, setFocus] = useState({
@@ -47,16 +46,16 @@ export default function CalendarWidget({ title = "Calendario", onRename }) {
         subtitle={
           connected
             ? upcoming.length > 0
-              ? `${upcoming.length} impegni in arrivo`
-              : "Nessun impegno"
-            : "Non connesso"
+              ? t("calendar.upcoming", { n: upcoming.length })
+              : t("calendar.noEvents")
+            : t("common.notConnected")
         }
         actions={
           connected ? (
             <>
               <button
                 onClick={() => openFocus({ create: true })}
-                aria-label="Nuovo evento"
+                aria-label={t("calendar.newEvent")}
                 className="grid h-7 w-7 place-items-center rounded-lg text-muted
                   transition-colors hover:bg-surface-2 hover:text-content"
               >
@@ -65,7 +64,7 @@ export default function CalendarWidget({ title = "Calendario", onRename }) {
               <button
                 onClick={calendar.refresh}
                 disabled={status === "loading"}
-                aria-label="Aggiorna"
+                aria-label={t("common.refresh")}
                 className="grid h-7 w-7 place-items-center rounded-lg text-muted
                   transition-colors hover:bg-surface-2 hover:text-content disabled:opacity-50"
               >
@@ -76,7 +75,7 @@ export default function CalendarWidget({ title = "Calendario", onRename }) {
               </button>
               <button
                 onClick={() => openFocus()}
-                aria-label="Espandi"
+                aria-label={t("common.expand")}
                 className="grid h-7 w-7 place-items-center rounded-lg text-muted
                   transition-colors hover:bg-surface-2 hover:text-content"
               >
@@ -94,28 +93,28 @@ export default function CalendarWidget({ title = "Calendario", onRename }) {
         ) : status === "loading" && upcoming.length === 0 ? (
           <CenteredState>
             <Loader2 size={20} className="animate-spin text-muted" />
-            <span>Carico l'agenda…</span>
+            <span>{t("calendar.loading")}</span>
           </CenteredState>
         ) : status === "error" ? (
           <CenteredState>
             <AlertCircle size={20} className="text-muted" />
-            <span>Qualcosa è andato storto.</span>
+            <span>{t("common.error")}</span>
             <button
               onClick={calendar.refresh}
               className="mt-1 text-sm font-medium text-accent hover:underline"
             >
-              Riprova
+              {t("common.retry")}
             </button>
           </CenteredState>
         ) : preview.length === 0 ? (
           <CenteredState>
             <Calendar size={20} className="text-muted" />
-            <span>Nessun impegno in arrivo.</span>
+            <span>{t("calendar.noUpcoming")}</span>
             <button
               onClick={() => openFocus({ create: true })}
               className="mt-1 text-sm font-medium text-accent hover:underline"
             >
-              Crea un evento
+              {t("calendar.createEvent")}
             </button>
           </CenteredState>
         ) : (
@@ -144,7 +143,7 @@ export default function CalendarWidget({ title = "Calendario", onRename }) {
                         {ev.title}
                       </span>
                       <span className="block truncate text-xs text-muted">
-                        {dayLabel(ev.start)} · {timeRange(ev.start, ev.end)}
+                        {dayLabel(ev.start, lang)} · {timeRange(ev.start, ev.end, lang)}
                       </span>
                     </span>
                   </button>
@@ -167,11 +166,11 @@ export default function CalendarWidget({ title = "Calendario", onRename }) {
 }
 
 function ConnectPrompt({ onConnect, connecting }) {
+  const { t } = useI18n();
   return (
     <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
-      <p className="text-sm text-muted">
-        Collega il calendario per vedere
-        <br />e gestire i tuoi impegni qui.
+      <p className="whitespace-pre-line text-sm text-muted">
+        {t("calendar.connectPrompt")}
       </p>
       <button
         onClick={onConnect}
@@ -186,7 +185,7 @@ function ConnectPrompt({ onConnect, connecting }) {
         ) : (
           <GoogleGlyph />
         )}
-        {connecting ? "Connessione…" : "Connetti Calendar"}
+        {connecting ? t("common.connecting") : t("calendar.connect")}
       </button>
     </div>
   );

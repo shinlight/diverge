@@ -70,6 +70,7 @@ export default function WidgetCard({ id, titleOverride, onRemove, onRename }) {
 }
 
 function PlaceholderBody({ widget, title, desc, onRename }) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-col p-5">
       <WidgetHeader
@@ -81,7 +82,7 @@ function PlaceholderBody({ widget, title, desc, onRename }) {
       <p className="text-sm leading-relaxed text-muted">{desc}</p>
       <div className="mt-4">
         <span className="inline-flex items-center rounded-full bg-surface-2 px-2.5 py-1 text-xs font-medium text-muted">
-          In arrivo
+          {t("common.soon")}
         </span>
       </div>
     </div>
