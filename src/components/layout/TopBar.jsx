@@ -3,6 +3,7 @@ import { Palette } from "lucide-react";
 import { motion } from "framer-motion";
 import Logo from "../ui/Logo";
 import Avatar from "../ui/Avatar";
+import FullscreenButton from "./FullscreenButton";
 import NotificationsBell from "../notifications/NotificationsBell";
 import { useAuth, displayName } from "../../lib/auth/AuthContext";
 import { useI18n } from "../../lib/i18n/LanguageContext";
@@ -19,6 +20,7 @@ export default function TopBar({ onOpenTheme }) {
         </Link>
 
         <div className="flex items-center gap-2">
+          <FullscreenButton />
           <motion.button
             whileHover={{ y: -1 }}
             whileTap={{ scale: 0.95 }}

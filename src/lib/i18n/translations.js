@@ -41,6 +41,8 @@ export const TRANSLATIONS = {
     toolbar: {
       customizeTheme: "Customize theme",
       goToProfile: "Go to profile",
+      fullscreen: "Fullscreen",
+      exitFullscreen: "Exit fullscreen",
     },
     dashboard: {
       addWidget: "Add widget",
@@ -275,6 +277,8 @@ export const TRANSLATIONS = {
     toolbar: {
       customizeTheme: "Personalizza tema",
       goToProfile: "Vai al profilo",
+      fullscreen: "Schermo intero",
+      exitFullscreen: "Esci da schermo intero",
     },
     dashboard: {
       addWidget: "Aggiungi widget",
