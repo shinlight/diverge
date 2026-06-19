@@ -1,29 +1,50 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { supabase, isSupabaseConfigured } from "../supabase/client";
 
 /*
-  DiVerge — Authentication layer (MOCK).
+  DiVerge — Authentication.
 
-  This is a fake, local-only auth system so we can build the whole UI
-  without any backend yet. It deliberately mirrors the shape of a real
-  Supabase auth client, so Phase 2 is a drop-in swap:
+  Uses Supabase when configured (real accounts, persisted sessions); otherwise
+  falls back to the original local MOCK so the app keeps working before the
+  keys are set. The public API is identical either way, so the rest of the app
+  doesn't change.
 
-    signInWithProvider("google")  ->  supabase.auth.signInWithOAuth({ provider: "google" })
-    signInWithEmail(email, pw)     ->  supabase.auth.signInWithPassword({ email, password })
-    signOut()                      ->  supabase.auth.signOut()
-    user                           ->  supabase.auth.getUser()
-
-  Nothing here talks to the network. The "session" lives in localStorage.
+  Profile fields (name, nickname, displayMode, avatarUrl, plan) live in the
+  Supabase user's `user_metadata`.
 */
 
-const STORAGE_KEY = "diverge.user";
+const STORAGE_KEY = "diverge.user"; // mock fallback only
 const AuthContext = createContext(null);
 
-const PROVIDER_LABELS = {
-  google: "Google",
-  meta: "Meta",
-};
+// The name shown next to the avatar, honouring the user's choice.
+export function displayName(user) {
+  if (!user) return "";
+  return user.displayMode === "name"
+    ? user.name || user.nickname
+    : user.nickname || user.name;
+}
 
-function loadUser() {
+// Map a Supabase user object to our app's user shape.
+function fromSupabase(u) {
+  if (!u) return null;
+  const m = u.user_metadata ?? {};
+  const nickname = m.nickname ?? u.email?.split("@")[0] ?? "Esploratore";
+  return {
+    id: u.id,
+    email: u.email,
+    name: m.name ?? nickname,
+    nickname,
+    displayMode: m.displayMode ?? "nickname",
+    avatarUrl: m.avatarUrl ?? null,
+    provider: u.app_metadata?.provider ?? "email",
+    plan: m.plan ?? "free",
+    createdAt: u.created_at,
+  };
+}
+
+// --- mock fallback helpers ------------------------------------------------
+
+function loadMockUser() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) return JSON.parse(raw);
@@ -41,82 +62,128 @@ function makeMockUser(partial) {
     email: partial.email ?? "ospite@diverge.app",
     name: partial.name ?? nickname,
     nickname,
-    displayMode: "nickname", // what the toolbar shows: "name" | "nickname"
+    displayMode: "nickname",
     avatarUrl: partial.avatarUrl ?? null,
     provider: partial.provider ?? "email",
-    plan: "free", // predisposition for SaaS tiers (free | pro)
+    plan: "free",
     createdAt: new Date().toISOString(),
   };
 }
 
-// The name shown next to the avatar, honouring the user's choice.
-export function displayName(user) {
-  if (!user) return "";
-  return user.displayMode === "name"
-    ? user.name || user.nickname
-    : user.nickname || user.name;
-}
-
-// Tiny delay so the UI's loading states feel real (and are easy to test).
 const fakeDelay = (ms = 600) => new Promise((r) => setTimeout(r, ms));
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(loadUser);
-  const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState(() =>
+    isSupabaseConfigured ? null : loadMockUser()
+  );
+  // While Supabase restores the session on first load, we're "loading".
+  const [loading, setLoading] = useState(isSupabaseConfigured);
 
-  // Persist the "session".
+  // Supabase: restore session + subscribe to auth changes.
   useEffect(() => {
+    if (!isSupabaseConfigured) return;
+    let mounted = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (!mounted) return;
+      setUser(fromSupabase(data.session?.user ?? null));
+      setLoading(false);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(fromSupabase(session?.user ?? null));
+    });
+    return () => {
+      mounted = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
+
+  // Mock: persist the fake session.
+  useEffect(() => {
+    if (isSupabaseConfigured) return;
     if (user) localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
     else localStorage.removeItem(STORAGE_KEY);
   }, [user]);
 
   const value = useMemo(() => {
+    async function signInWithEmail(email, password) {
+      if (!isSupabaseConfigured) {
+        setLoading(true);
+        await fakeDelay();
+        setUser(makeMockUser({ email, provider: "email" }));
+        setLoading(false);
+        return {};
+      }
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      return { error: error?.message };
+    }
+
+    async function signUpWithEmail(email, password, nickname) {
+      if (!isSupabaseConfigured) {
+        setLoading(true);
+        await fakeDelay();
+        setUser(makeMockUser({ email, nickname, provider: "email" }));
+        setLoading(false);
+        return {};
+      }
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { nickname, name: nickname, displayMode: "nickname" } },
+      });
+      if (error) return { error: error.message };
+      // No session yet → the project requires email confirmation.
+      if (!data.session) {
+        return { info: "Controlla la tua email per confermare l'account." };
+      }
+      return {};
+    }
+
     async function signInWithProvider(provider) {
-      setLoading(true);
-      await fakeDelay();
-      const label = PROVIDER_LABELS[provider] ?? provider;
-      setUser(
-        makeMockUser({
-          provider,
-          email: `utente@${provider}.com`,
-          nickname: `${label}User`,
-        })
-      );
-      setLoading(false);
-    }
-
-    async function signInWithEmail(email) {
-      setLoading(true);
-      await fakeDelay();
-      setUser(makeMockUser({ email, provider: "email" }));
-      setLoading(false);
-    }
-
-    async function signUpWithEmail(email, _password, nickname) {
-      setLoading(true);
-      await fakeDelay();
-      setUser(makeMockUser({ email, nickname, provider: "email" }));
-      setLoading(false);
+      if (!isSupabaseConfigured) {
+        setLoading(true);
+        await fakeDelay();
+        setUser(
+          makeMockUser({ provider, email: `utente@${provider}.com`, nickname: `${provider}User` })
+        );
+        setLoading(false);
+        return {};
+      }
+      // Meta is the "facebook" provider in Supabase.
+      const supaProvider = provider === "meta" ? "facebook" : provider;
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: supaProvider,
+        options: { redirectTo: window.location.origin },
+      });
+      return { error: error?.message };
     }
 
     async function signOut() {
-      setLoading(true);
-      await fakeDelay(300);
-      setUser(null);
-      setLoading(false);
+      if (!isSupabaseConfigured) {
+        setUser(null);
+        return;
+      }
+      await supabase.auth.signOut();
     }
 
-    function updateProfile(updates) {
+    async function updateProfile(updates) {
+      // Optimistic update for snappy UI.
       setUser((u) => (u ? { ...u, ...updates } : u));
+      if (isSupabaseConfigured) {
+        await supabase.auth.updateUser({ data: updates });
+      }
     }
 
     return {
       user,
       loading,
       isAuthenticated: Boolean(user),
-      signInWithProvider,
+      supabaseReady: isSupabaseConfigured,
       signInWithEmail,
       signUpWithEmail,
+      signInWithProvider,
       signOut,
       updateProfile,
     };

@@ -34,11 +34,29 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [nickname, setNickname] = useState("");
+  const [msg, setMsg] = useState(null); // { type: "error" | "info", text }
+  const [busy, setBusy] = useState(false);
+  const disabled = loading || busy;
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    if (mode === "signup") signUpWithEmail(email, password, nickname);
-    else signInWithEmail(email, password);
+    setMsg(null);
+    setBusy(true);
+    const res =
+      mode === "signup"
+        ? await signUpWithEmail(email, password, nickname)
+        : await signInWithEmail(email, password);
+    setBusy(false);
+    if (res?.error) setMsg({ type: "error", text: res.error });
+    else if (res?.info) setMsg({ type: "info", text: res.info });
+  }
+
+  async function oauth(provider) {
+    setMsg(null);
+    setBusy(true);
+    const res = await signInWithProvider(provider);
+    setBusy(false);
+    if (res?.error) setMsg({ type: "error", text: res.error });
   }
 
   return (
@@ -69,8 +87,8 @@ export default function LoginPage() {
               variant="surface"
               size="lg"
               className="w-full"
-              disabled={loading}
-              onClick={() => signInWithProvider("google")}
+              disabled={disabled}
+              onClick={() => oauth("google")}
             >
               <GoogleIcon /> {t("login.continueGoogle")}
             </Button>
@@ -78,8 +96,8 @@ export default function LoginPage() {
               variant="surface"
               size="lg"
               className="w-full"
-              disabled={loading}
-              onClick={() => signInWithProvider("meta")}
+              disabled={disabled}
+              onClick={() => oauth("meta")}
             >
               <MetaIcon /> {t("login.continueMeta")}
             </Button>
@@ -125,9 +143,9 @@ export default function LoginPage() {
               variant="accent"
               size="lg"
               className="w-full"
-              disabled={loading}
+              disabled={disabled}
             >
-              {loading ? (
+              {disabled ? (
                 <Loader2 size={18} className="animate-spin" />
               ) : (
                 <Mail size={18} />
@@ -135,6 +153,18 @@ export default function LoginPage() {
               {mode === "signup" ? t("login.createAccount") : t("login.signIn")}
             </Button>
           </form>
+
+          {msg && (
+            <p
+              className={`mt-4 rounded-xl px-3 py-2 text-center text-sm ${
+                msg.type === "error"
+                  ? "bg-red-500/10 text-red-400"
+                  : "bg-accent/10 text-accent"
+              }`}
+            >
+              {msg.text}
+            </p>
+          )}
 
           <p className="mt-5 text-center text-sm text-muted">
             {mode === "signup" ? t("login.haveAccount") : t("login.noAccount")}{" "}
