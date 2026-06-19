@@ -53,8 +53,22 @@ function gatePage(error, status = 200) {
   });
 }
 
+// Public assets the browser must read ungated to offer PWA install.
+const OPEN_PATHS = [
+  "/manifest.webmanifest",
+  "/sw.js",
+  "/icon.svg",
+  "/icon-192.png",
+  "/icon-512.png",
+  "/favicon.svg",
+];
+
 export default async function middleware(request) {
   const url = new URL(request.url);
+
+  // Let manifest / icons / service worker through, so Chrome can evaluate
+  // installability even before the gate is passed.
+  if (OPEN_PATHS.includes(url.pathname)) return next();
 
   // Handle the login form submission.
   if (request.method === "POST" && url.pathname === "/__auth") {
