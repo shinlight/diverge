@@ -7,11 +7,12 @@ import Avatar from "../components/ui/Avatar";
 import Button from "../components/ui/Button";
 import ThemePanel from "../components/panels/ThemePanel";
 import { useAuth } from "../lib/auth/AuthContext";
+import { supabase } from "../lib/supabase/client";
 import { useI18n } from "../lib/i18n/LanguageContext";
 import { PLANS, PAYMENT_METHODS, startCheckout } from "../lib/payments/plans";
 
 export default function ProfilePage() {
-  const { user, updateProfile, signOut } = useAuth();
+  const { user, updateProfile, signOut, supabaseReady } = useAuth();
   const { t } = useI18n();
   const [name, setName] = useState(user?.name ?? "");
   const [nickname, setNickname] = useState(user?.nickname ?? "");
@@ -21,12 +22,27 @@ export default function ProfilePage() {
 
   const displayMode = user?.displayMode ?? "nickname";
 
-  function handleAvatar(e) {
+  async function handleAvatar(e) {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // With Supabase: upload to the 'avatars' bucket (folder = user id).
+    if (supabaseReady && user?.id) {
+      const path = `${user.id}/avatar`;
+      const { error } = await supabase.storage
+        .from("avatars")
+        .upload(path, file, { upsert: true, contentType: file.type });
+      if (!error) {
+        const { data } = supabase.storage.from("avatars").getPublicUrl(path);
+        updateProfile({ avatarUrl: `${data.publicUrl}?t=${Date.now()}` });
+      }
+      return;
+    }
+
+    // Mock fallback: keep a local data URL.
     const reader = new FileReader();
     reader.onload = () => updateProfile({ avatarUrl: reader.result });
-    reader.readAsDataURL(file); // local preview; Phase 2 -> Supabase Storage
+    reader.readAsDataURL(file);
   }
 
   function saveIdentity() {

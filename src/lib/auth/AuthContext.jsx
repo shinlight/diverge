@@ -24,21 +24,34 @@ export function displayName(user) {
     : user.nickname || user.name;
 }
 
-// Map a Supabase user object to our app's user shape.
-function fromSupabase(u) {
-  if (!u) return null;
-  const m = u.user_metadata ?? {};
-  const nickname = m.nickname ?? u.email?.split("@")[0] ?? "Esploratore";
+// Build our app's user from the Supabase auth user + the profiles table row.
+// Falls back to user_metadata when the profile row isn't there yet.
+async function buildUser(authUser) {
+  if (!authUser) return null;
+  const m = authUser.user_metadata ?? {};
+
+  let profile = null;
+  if (supabase) {
+    const { data } = await supabase
+      .from("profiles")
+      .select("nickname, name, display_mode, avatar_url, plan")
+      .eq("id", authUser.id)
+      .maybeSingle();
+    profile = data;
+  }
+
+  const nickname =
+    profile?.nickname ?? m.nickname ?? authUser.email?.split("@")[0] ?? "Esploratore";
   return {
-    id: u.id,
-    email: u.email,
-    name: m.name ?? nickname,
+    id: authUser.id,
+    email: authUser.email,
+    name: profile?.name ?? m.name ?? nickname,
     nickname,
-    displayMode: m.displayMode ?? "nickname",
-    avatarUrl: m.avatarUrl ?? null,
-    provider: u.app_metadata?.provider ?? "email",
-    plan: m.plan ?? "free",
-    createdAt: u.created_at,
+    displayMode: profile?.display_mode ?? m.displayMode ?? "nickname",
+    avatarUrl: profile?.avatar_url ?? m.avatarUrl ?? null,
+    provider: authUser.app_metadata?.provider ?? "email",
+    plan: profile?.plan ?? "free",
+    createdAt: authUser.created_at,
   };
 }
 
@@ -83,13 +96,16 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     if (!isSupabaseConfigured) return;
     let mounted = true;
-    supabase.auth.getSession().then(({ data }) => {
+    supabase.auth.getSession().then(async ({ data }) => {
+      const u = await buildUser(data.session?.user ?? null);
       if (!mounted) return;
-      setUser(fromSupabase(data.session?.user ?? null));
+      setUser(u);
       setLoading(false);
     });
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(fromSupabase(session?.user ?? null));
+      buildUser(session?.user ?? null).then((u) => {
+        if (mounted) setUser(u);
+      });
     });
     return () => {
       mounted = false;
@@ -171,8 +187,13 @@ export function AuthProvider({ children }) {
     async function updateProfile(updates) {
       // Optimistic update for snappy UI.
       setUser((u) => (u ? { ...u, ...updates } : u));
-      if (isSupabaseConfigured) {
-        await supabase.auth.updateUser({ data: updates });
+      if (isSupabaseConfigured && user?.id) {
+        const row = { id: user.id, updated_at: new Date().toISOString() };
+        if ("name" in updates) row.name = updates.name;
+        if ("nickname" in updates) row.nickname = updates.nickname;
+        if ("displayMode" in updates) row.display_mode = updates.displayMode;
+        if ("avatarUrl" in updates) row.avatar_url = updates.avatarUrl;
+        await supabase.from("profiles").upsert(row);
       }
     }
 
