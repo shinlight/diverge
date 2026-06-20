@@ -176,8 +176,12 @@ export async function fetchGoogleEvents(token) {
   }
   if (!res.ok) throw new Error("google calendar request failed");
   const j = await res.json();
+  // Skip the noise Google injects into the primary feed: contact birthdays
+  // and "working location" all-day markers. Keep real events, focus time, OOO.
+  const SKIP_TYPES = new Set(["birthday", "workingLocation"]);
   return (j.items || [])
     .filter((e) => e.start && (e.start.dateTime || e.start.date))
+    .filter((e) => !SKIP_TYPES.has(e.eventType))
     .map((e, i) => {
       const start = e.start.dateTime || e.start.date;
       const end = e.end?.dateTime || e.end?.date || start;
