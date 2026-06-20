@@ -86,15 +86,50 @@ function makeMockUser(partial) {
 
 const fakeDelay = (ms = 600) => new Promise((r) => setTimeout(r, ms));
 
+// --- Google token broker (serverless /api/google-token) -------------------
+// The serverless function stores the Google refresh token server-side and
+// mints fresh access tokens. The browser only ever sees short-lived access
+// tokens — never the refresh token.
+
+async function apiStoreRefreshToken(jwt, refreshToken) {
+  if (!jwt || !refreshToken) return;
+  try {
+    await fetch("/api/google-token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwt}`,
+      },
+      body: JSON.stringify({ refresh_token: refreshToken }),
+    });
+  } catch {
+    // ignore — persistence is best-effort
+  }
+}
+
+async function apiFetchGoogleToken(jwt) {
+  if (!jwt) return null;
+  try {
+    const res = await fetch("/api/google-token", {
+      headers: { Authorization: `Bearer ${jwt}` },
+    });
+    if (!res.ok) return null;
+    const j = await res.json();
+    return j.access_token || null;
+  } catch {
+    return null;
+  }
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() =>
     isSupabaseConfigured ? null : loadMockUser()
   );
   // While Supabase restores the session on first load, we're "loading".
   const [loading, setLoading] = useState(isSupabaseConfigured);
-  // Google OAuth access token for calling Google APIs (Calendar). It's
-  // ephemeral — only present right after an OAuth sign-in. Persistent refresh
-  // (refresh token + a serverless function) is a later step.
+  // Google OAuth access token for calling Google APIs (Calendar, Gmail).
+  // Short-lived. After the first offline consent it's renewed in the
+  // background via the serverless token broker, so it survives across sessions.
   const [googleToken, setGoogleToken] = useState(() => {
     try {
       return sessionStorage.getItem("diverge.gtoken");
@@ -103,29 +138,44 @@ export function AuthProvider({ children }) {
     }
   });
 
+  const applyGoogleToken = (token) => {
+    if (!token) return;
+    try {
+      sessionStorage.setItem("diverge.gtoken", token);
+    } catch {
+      // ignore
+    }
+    setGoogleToken(token);
+  };
+
   // Supabase: restore session + subscribe to auth changes.
   useEffect(() => {
     if (!isSupabaseConfigured) return;
     let mounted = true;
-    const grabToken = (session) => {
-      if (session?.provider_token) {
-        try {
-          sessionStorage.setItem("diverge.gtoken", session.provider_token);
-        } catch {
-          // ignore
-        }
-        setGoogleToken(session.provider_token);
+    // Right after an OAuth redirect the session carries the Google tokens.
+    // Use the access token now; hand the refresh token to the broker to store.
+    const handleSession = (session) => {
+      if (session?.provider_token) applyGoogleToken(session.provider_token);
+      if (session?.provider_refresh_token) {
+        apiStoreRefreshToken(session.access_token, session.provider_refresh_token);
       }
     };
     supabase.auth.getSession().then(async ({ data }) => {
-      grabToken(data.session);
-      const u = await buildUser(data.session?.user ?? null);
+      const session = data.session;
+      handleSession(session);
+      // Normal reload: the session has no Google token → mint one from the
+      // stored refresh token (no "Connect" needed).
+      if (session && !session.provider_token) {
+        const fresh = await apiFetchGoogleToken(session.access_token);
+        if (mounted && fresh) applyGoogleToken(fresh);
+      }
+      const u = await buildUser(session?.user ?? null);
       if (!mounted) return;
       setUser(u);
       setLoading(false);
     });
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      grabToken(session);
+      handleSession(session);
       buildUser(session?.user ?? null).then((u) => {
         if (mounted) setUser(u);
       });
@@ -208,6 +258,18 @@ export function AuthProvider({ children }) {
       setGoogleToken(null);
     }
 
+    // Mint a fresh Google access token from the stored refresh token. Used on
+    // load and when a Google API call returns 401. Returns the token or null
+    // (null → the user needs to re-connect Google).
+    async function refreshGoogleToken() {
+      if (!isSupabaseConfigured) return null;
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) return null;
+      const fresh = await apiFetchGoogleToken(data.session.access_token);
+      if (fresh) applyGoogleToken(fresh);
+      return fresh;
+    }
+
     // Ask Google for additional scopes (e.g. Calendar). Redirects to Google,
     // then back with a provider_token. Best for users already signed in with
     // Google (same account gets the extra scope).
@@ -258,6 +320,7 @@ export function AuthProvider({ children }) {
       googleToken,
       connectGoogle,
       clearGoogleToken,
+      refreshGoogleToken,
       signInWithEmail,
       signUpWithEmail,
       signInWithProvider,

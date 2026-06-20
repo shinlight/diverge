@@ -18,7 +18,7 @@ const CALENDAR_SCOPE = "https://www.googleapis.com/auth/calendar.readonly";
 // - Real mode: a Google token is present → read the user's real calendars.
 // - Mock mode (no Supabase, local dev): the in-memory demo calendar.
 export function useCalendar() {
-  const { supabaseReady, googleToken, connectGoogle, clearGoogleToken, user } =
+  const { supabaseReady, googleToken, connectGoogle, clearGoogleToken, refreshGoogleToken, user } =
     useAuth();
   const realMode = Boolean(googleToken);
 
@@ -69,13 +69,17 @@ export function useCalendar() {
           : null;
         setSelectedIds(fromStore && fromStore.length ? fromStore : defaults);
       } catch (e) {
-        if (e?.code === 401 || e?.code === 403) clearGoogleToken();
+        if (e?.code === 401 || e?.code === 403) {
+          // Token expired → try a silent refresh; if that fails, disconnect.
+          const fresh = await refreshGoogleToken?.();
+          if (!fresh) clearGoogleToken();
+        }
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, [realMode, googleToken, storageKey, clearGoogleToken]);
+  }, [realMode, googleToken, storageKey, clearGoogleToken, refreshGoogleToken]);
 
   const refresh = useCallback(async () => {
     if (realMode && selectedIds == null) {
@@ -94,10 +98,15 @@ export function useCalendar() {
       }
       setStatus("ready");
     } catch (e) {
-      if (e?.code === 401 || e?.code === 403) clearGoogleToken();
+      if (e?.code === 401 || e?.code === 403) {
+        // Try a silent token refresh; success re-runs this via googleToken dep.
+        const fresh = await refreshGoogleToken?.();
+        if (fresh) return;
+        clearGoogleToken();
+      }
       setStatus("error");
     }
-  }, [realMode, googleToken, selectedIds, calendars, clearGoogleToken]);
+  }, [realMode, googleToken, selectedIds, calendars, clearGoogleToken, refreshGoogleToken]);
 
   useEffect(() => {
     if (connected) refresh();
