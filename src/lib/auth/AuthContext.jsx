@@ -45,10 +45,11 @@ async function buildUser(authUser) {
   return {
     id: authUser.id,
     email: authUser.email,
-    name: profile?.name ?? m.name ?? nickname,
+    // OAuth providers (Google) use name/full_name + avatar_url/picture keys.
+    name: profile?.name ?? m.name ?? m.full_name ?? nickname,
     nickname,
     displayMode: profile?.display_mode ?? m.displayMode ?? "nickname",
-    avatarUrl: profile?.avatar_url ?? m.avatarUrl ?? null,
+    avatarUrl: profile?.avatar_url ?? m.avatarUrl ?? m.avatar_url ?? m.picture ?? null,
     provider: authUser.app_metadata?.provider ?? "email",
     plan: profile?.plan ?? "free",
     createdAt: authUser.created_at,
