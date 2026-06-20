@@ -8,6 +8,7 @@ import AIWidget from "./AIWidget";
 import WeatherWidget from "./WeatherWidget";
 import NotesWidget from "./NotesWidget";
 import ClipboardWidget from "./ClipboardWidget";
+import MessagingWidget from "./MessagingWidget";
 
 export const LIVE_WIDGETS = {
   gmail: GmailWidget,
@@ -17,4 +18,5 @@ export const LIVE_WIDGETS = {
   weather: WeatherWidget,
   notes: NotesWidget,
   clipboard: ClipboardWidget,
+  messaging: MessagingWidget,
 };

@@ -1,4 +1,4 @@
-import { Mail, Calendar, CheckSquare, StickyNote, Cloud, Clock, Sparkles, ClipboardList } from "lucide-react";
+import { Mail, Calendar, CheckSquare, StickyNote, Cloud, Clock, Sparkles, ClipboardList, MessageCircle } from "lucide-react";
 
 /*
   DiVerge — Widget registry.
@@ -84,6 +84,16 @@ export const WIDGETS = {
     accent: "#14b8a6",
     status: "live",
     size: "md",
+  },
+  messaging: {
+    id: "messaging",
+    nameKey: "widgets.messaging.name",
+    descKey: "widgets.messaging.desc",
+    icon: MessageCircle,
+    accent: "#0ea5e9",
+    status: "live",
+    size: "md",
+    multiInstance: true, // one widget per channel; several can coexist
   },
 };
 

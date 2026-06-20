@@ -111,6 +111,7 @@ export const TRANSLATIONS = {
       focus: { name: "Focus Timer", desc: "Pomodoro-style focus sessions." },
       ai: { name: "AI Assistant", desc: "Chat with an LLM of your choice. Add more than one!" },
       clipboard: { name: "Clipboard History", desc: "Reuse anything you've copied recently." },
+      messaging: { name: "Messages", desc: "Chat with other DiVerge users. More channels soon!" },
     },
     weather: {
       shareTitle: "See your local weather",
@@ -251,6 +252,19 @@ export const TRANSLATIONS = {
         "In this version of DiVerge replies are simulated. Connect a real {provider} API and the model's genuine answer will appear here — without changing the interface. ✨",
       demoEmpty: "I'm {model} ({provider}). Type something!",
     },
+    messaging: {
+      live: "Live",
+      soonLong: "This channel is coming soon.",
+      unavailableWeb: "Not available on the web",
+      unavailableWebLong: "Apple offers no web API for iMessage — it works only on Apple devices.",
+      newChat: "New chat",
+      search: "Search people…",
+      empty: "No conversations yet.",
+      messagePlaceholder: "Write a message…",
+      send: "Send",
+      selectConversation: "Select a conversation",
+      startConversation: "Start chatting with {name}.",
+    },
   },
 
   it: {
@@ -347,6 +361,7 @@ export const TRANSLATIONS = {
       focus: { name: "Timer Focus", desc: "Sessioni di concentrazione in stile Pomodoro." },
       ai: { name: "Assistente AI", desc: "Chatta con un LLM a tua scelta. Aggiungine più di uno!" },
       clipboard: { name: "Cronologia Appunti", desc: "Riutilizza tutto ciò che hai copiato di recente." },
+      messaging: { name: "Messaggi", desc: "Chatta con altri utenti DiVerge. Altri canali in arrivo!" },
     },
     weather: {
       shareTitle: "Vedi il meteo locale",
@@ -486,6 +501,19 @@ export const TRANSLATIONS = {
       demoNote:
         "In questa versione di DiVerge le risposte sono simulate. Collegando una vera API {provider}, qui comparirà la risposta autentica del modello — senza modificare l'interfaccia. ✨",
       demoEmpty: "Sono {model} ({provider}). Scrivimi pure!",
+    },
+    messaging: {
+      live: "Attivo",
+      soonLong: "Questo canale è in arrivo.",
+      unavailableWeb: "Non disponibile sul web",
+      unavailableWebLong: "Apple non offre API web per iMessage — funziona solo sui dispositivi Apple.",
+      newChat: "Nuova chat",
+      search: "Cerca persone…",
+      empty: "Nessuna conversazione.",
+      messagePlaceholder: "Scrivi un messaggio…",
+      send: "Invia",
+      selectConversation: "Seleziona una conversazione",
+      startConversation: "Inizia a chattare con {name}.",
     },
   },
 };
