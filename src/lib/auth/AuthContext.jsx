@@ -92,18 +92,40 @@ export function AuthProvider({ children }) {
   );
   // While Supabase restores the session on first load, we're "loading".
   const [loading, setLoading] = useState(isSupabaseConfigured);
+  // Google OAuth access token for calling Google APIs (Calendar). It's
+  // ephemeral — only present right after an OAuth sign-in. Persistent refresh
+  // (refresh token + a serverless function) is a later step.
+  const [googleToken, setGoogleToken] = useState(() => {
+    try {
+      return sessionStorage.getItem("diverge.gtoken");
+    } catch {
+      return null;
+    }
+  });
 
   // Supabase: restore session + subscribe to auth changes.
   useEffect(() => {
     if (!isSupabaseConfigured) return;
     let mounted = true;
+    const grabToken = (session) => {
+      if (session?.provider_token) {
+        try {
+          sessionStorage.setItem("diverge.gtoken", session.provider_token);
+        } catch {
+          // ignore
+        }
+        setGoogleToken(session.provider_token);
+      }
+    };
     supabase.auth.getSession().then(async ({ data }) => {
+      grabToken(data.session);
       const u = await buildUser(data.session?.user ?? null);
       if (!mounted) return;
       setUser(u);
       setLoading(false);
     });
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      grabToken(session);
       buildUser(session?.user ?? null).then((u) => {
         if (mounted) setUser(u);
       });
@@ -177,7 +199,37 @@ export function AuthProvider({ children }) {
       return { error: error?.message };
     }
 
+    function clearGoogleToken() {
+      try {
+        sessionStorage.removeItem("diverge.gtoken");
+      } catch {
+        // ignore
+      }
+      setGoogleToken(null);
+    }
+
+    // Ask Google for additional scopes (e.g. Calendar). Redirects to Google,
+    // then back with a provider_token. Best for users already signed in with
+    // Google (same account gets the extra scope).
+    async function connectGoogle(scopes) {
+      if (!isSupabaseConfigured) return { error: "Supabase not configured" };
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          scopes,
+          redirectTo: window.location.origin + "/",
+          queryParams: {
+            access_type: "offline",
+            prompt: "consent",
+            include_granted_scopes: "true",
+          },
+        },
+      });
+      return { error: error?.message };
+    }
+
     async function signOut() {
+      clearGoogleToken();
       if (!isSupabaseConfigured) {
         setUser(null);
         return;
@@ -203,13 +255,16 @@ export function AuthProvider({ children }) {
       loading,
       isAuthenticated: Boolean(user),
       supabaseReady: isSupabaseConfigured,
+      googleToken,
+      connectGoogle,
+      clearGoogleToken,
       signInWithEmail,
       signUpWithEmail,
       signInWithProvider,
       signOut,
       updateProfile,
     };
-  }, [user, loading]);
+  }, [user, loading, googleToken]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

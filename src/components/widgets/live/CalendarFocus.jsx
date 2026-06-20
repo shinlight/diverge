@@ -29,6 +29,7 @@ export default function CalendarFocus({
   calendar,
   initialSelectedId,
   initialCreate,
+  readOnly = false,
 }) {
   const { t, lang } = useI18n();
   const { events, status, refresh, create, update, remove } = calendar;
@@ -99,13 +100,15 @@ export default function CalendarFocus({
               <h2 className="text-base font-semibold">{t("widgets.calendar.name")}</h2>
 
               <div className="ml-auto flex items-center gap-1.5">
-                <button
-                  onClick={startCreate}
-                  className="inline-flex items-center gap-2 rounded-xl bg-accent px-3.5 py-2
-                    text-sm font-medium text-accent-contrast hover:brightness-110"
-                >
-                  <Plus size={16} /> {t("calendar.newEvent")}
-                </button>
+                {!readOnly && (
+                  <button
+                    onClick={startCreate}
+                    className="inline-flex items-center gap-2 rounded-xl bg-accent px-3.5 py-2
+                      text-sm font-medium text-accent-contrast hover:brightness-110"
+                  >
+                    <Plus size={16} /> {t("calendar.newEvent")}
+                  </button>
+                )}
                 <button
                   onClick={refresh}
                   disabled={status === "loading"}
@@ -182,8 +185,9 @@ export default function CalendarFocus({
                   <EventEditor
                     key={selected.id}
                     initial={selected}
+                    readOnly={readOnly}
                     onSave={(data) => update(selected.id, data)}
-                    onDelete={() => handleDelete(selected.id)}
+                    onDelete={readOnly ? undefined : () => handleDelete(selected.id)}
                     onCancel={() => {
                       setSelectedId(null);
                       setMode("idle");
@@ -232,7 +236,7 @@ function AgendaRow({ event, active, onOpen }) {
   );
 }
 
-function EventEditor({ initial, onSave, onDelete, onCancel }) {
+function EventEditor({ initial, onSave, onDelete, onCancel, readOnly = false }) {
   const { t } = useI18n();
   const [title, setTitle] = useState(initial.title);
   const [start, setStart] = useState(toLocalInput(initial.start));
@@ -245,6 +249,7 @@ function EventEditor({ initial, onSave, onDelete, onCancel }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    if (readOnly) return;
     setSaving(true);
     await onSave({
       title,
@@ -260,8 +265,12 @@ function EventEditor({ initial, onSave, onDelete, onCancel }) {
   return (
     <form onSubmit={handleSubmit} className="flex h-full flex-col">
       <div className="flex shrink-0 items-center justify-between border-b border-line px-5 py-3">
-        <h3 className="text-sm font-semibold">
-          {isEdit ? t("calendar.editEvent") : t("calendar.newEvent")}
+        <h3 className="truncate text-sm font-semibold">
+          {readOnly
+            ? initial.title
+            : isEdit
+              ? t("calendar.editEvent")
+              : t("calendar.newEvent")}
         </h3>
         {isEdit && (
           <button
@@ -280,8 +289,9 @@ function EventEditor({ initial, onSave, onDelete, onCancel }) {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder={t("calendar.titlePlaceholder")}
-          autoFocus
-          className="w-full bg-transparent text-lg font-semibold outline-none placeholder:text-muted"
+          autoFocus={!readOnly}
+          disabled={readOnly}
+          className="w-full bg-transparent text-lg font-semibold outline-none placeholder:text-muted disabled:opacity-100"
         />
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -289,78 +299,100 @@ function EventEditor({ initial, onSave, onDelete, onCancel }) {
             <input
               type="datetime-local"
               value={start}
+              disabled={readOnly}
               onChange={(e) => setStart(e.target.value)}
-              className="w-full bg-transparent text-sm outline-none [color-scheme:dark]"
+              className="w-full bg-transparent text-sm outline-none [color-scheme:dark] disabled:opacity-100"
             />
           </LabeledField>
           <LabeledField label={t("calendar.end")} icon={CalendarClock}>
             <input
               type="datetime-local"
               value={end}
+              disabled={readOnly}
               onChange={(e) => setEnd(e.target.value)}
-              className="w-full bg-transparent text-sm outline-none [color-scheme:dark]"
+              className="w-full bg-transparent text-sm outline-none [color-scheme:dark] disabled:opacity-100"
             />
           </LabeledField>
         </div>
 
-        <LabeledField label={t("calendar.location")} icon={MapPin}>
-          <input
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            placeholder={t("calendar.locationPlaceholder")}
-            className="w-full bg-transparent text-sm outline-none placeholder:text-muted"
-          />
-        </LabeledField>
+        {(!readOnly || location) && (
+          <LabeledField label={t("calendar.location")} icon={MapPin}>
+            <input
+              value={location}
+              disabled={readOnly}
+              onChange={(e) => setLocation(e.target.value)}
+              placeholder={t("calendar.locationPlaceholder")}
+              className="w-full bg-transparent text-sm outline-none placeholder:text-muted disabled:opacity-100"
+            />
+          </LabeledField>
+        )}
 
-        <div>
-          <p className="mb-2 text-xs font-medium text-muted">{t("calendar.color")}</p>
-          <div className="flex gap-2">
-            {EVENT_COLORS.map((c) => (
-              <button
-                key={c}
-                type="button"
-                onClick={() => setColor(c)}
-                aria-label={`Colore ${c}`}
-                className={`h-7 w-7 rounded-full transition-transform hover:scale-110 ${
-                  color === c ? "ring-2 ring-offset-2 ring-offset-surface" : ""
-                }`}
-                style={{ backgroundColor: c, "--tw-ring-color": c }}
-              />
-            ))}
+        {!readOnly && (
+          <div>
+            <p className="mb-2 text-xs font-medium text-muted">{t("calendar.color")}</p>
+            <div className="flex gap-2">
+              {EVENT_COLORS.map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => setColor(c)}
+                  aria-label={`Colore ${c}`}
+                  className={`h-7 w-7 rounded-full transition-transform hover:scale-110 ${
+                    color === c ? "ring-2 ring-offset-2 ring-offset-surface" : ""
+                  }`}
+                  style={{ backgroundColor: c, "--tw-ring-color": c }}
+                />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
-        <textarea
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          placeholder={t("calendar.notesPlaceholder")}
-          rows={4}
-          className="w-full resize-none rounded-xl border border-line bg-surface-2/40 px-4 py-3
-            text-sm outline-none placeholder:text-muted focus:border-accent"
-        />
+        {(!readOnly || notes) && (
+          <textarea
+            value={notes}
+            disabled={readOnly}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder={t("calendar.notesPlaceholder")}
+            rows={4}
+            className="w-full resize-none rounded-xl border border-line bg-surface-2/40 px-4 py-3
+              text-sm outline-none placeholder:text-muted focus:border-accent disabled:opacity-100"
+          />
+        )}
       </div>
 
       <div className="flex shrink-0 items-center gap-2 border-t border-line px-5 py-3">
-        <button
-          type="submit"
-          disabled={saving}
-          className="inline-flex items-center gap-2 rounded-xl bg-accent px-4 py-2.5
-            text-sm font-medium text-accent-contrast hover:brightness-110 disabled:opacity-50"
-        >
-          {saving ? (
-            <RefreshCw size={16} className="animate-spin" />
-          ) : (
-            <Save size={16} />
-          )}
-          {isEdit ? t("calendar.saveChanges") : t("calendar.create")}
-        </button>
-        <button
-          type="button"
-          onClick={onCancel}
-          className="rounded-xl px-4 py-2.5 text-sm text-muted hover:bg-surface-2 hover:text-content"
-        >
-          {t("common.cancel")}
-        </button>
+        {readOnly ? (
+          <button
+            type="button"
+            onClick={onCancel}
+            className="rounded-xl bg-surface-2 px-4 py-2.5 text-sm font-medium hover:bg-surface-2/70"
+          >
+            {t("common.close")}
+          </button>
+        ) : (
+          <>
+            <button
+              type="submit"
+              disabled={saving}
+              className="inline-flex items-center gap-2 rounded-xl bg-accent px-4 py-2.5
+                text-sm font-medium text-accent-contrast hover:brightness-110 disabled:opacity-50"
+            >
+              {saving ? (
+                <RefreshCw size={16} className="animate-spin" />
+              ) : (
+                <Save size={16} />
+              )}
+              {isEdit ? t("calendar.saveChanges") : t("calendar.create")}
+            </button>
+            <button
+              type="button"
+              onClick={onCancel}
+              className="rounded-xl px-4 py-2.5 text-sm text-muted hover:bg-surface-2 hover:text-content"
+            >
+              {t("common.cancel")}
+            </button>
+          </>
+        )}
       </div>
     </form>
   );

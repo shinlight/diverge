@@ -156,6 +156,43 @@ export async function deleteEvent(id) {
 
 export const EVENT_COLORS = COLORS;
 
+// Real Google Calendar read (MVP, read-only). Maps to our event shape.
+// `token` is the Google OAuth access token (from the Supabase session).
+const GCAL = "https://www.googleapis.com/calendar/v3";
+export async function fetchGoogleEvents(token) {
+  const params = new URLSearchParams({
+    singleEvents: "true",
+    orderBy: "startTime",
+    timeMin: new Date().toISOString(),
+    maxResults: "25",
+  });
+  const res = await fetch(`${GCAL}/calendars/primary/events?${params}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (res.status === 401 || res.status === 403) {
+    const err = new Error("auth");
+    err.code = res.status;
+    throw err;
+  }
+  if (!res.ok) throw new Error("google calendar request failed");
+  const j = await res.json();
+  return (j.items || [])
+    .filter((e) => e.start && (e.start.dateTime || e.start.date))
+    .map((e, i) => {
+      const start = e.start.dateTime || e.start.date;
+      const end = e.end?.dateTime || e.end?.date || start;
+      return {
+        id: e.id,
+        title: e.summary || "(no title)",
+        start: new Date(start).toISOString(),
+        end: new Date(end).toISOString(),
+        location: e.location || "",
+        notes: e.description || "",
+        color: COLORS[i % COLORS.length],
+      };
+    });
+}
+
 const locale = (lang) => (lang === "it" ? "it-IT" : "en-US");
 
 // "10:00 – 10:15"
