@@ -6,13 +6,18 @@ import {
   fetchEvents,
   fetchGoogleEvents,
   fetchCalendarList,
+  createGoogleEvent,
+  updateGoogleEvent,
+  deleteGoogleEvent,
   createEvent as svcCreate,
   updateEvent as svcUpdate,
   deleteEvent as svcDelete,
 } from "./calendarService";
 
-// Read-only Google Calendar scope for the MVP.
-const CALENDAR_SCOPE = "https://www.googleapis.com/auth/calendar.readonly";
+// Calendar scopes: read the calendar list + read/write events.
+const CALENDAR_SCOPE =
+  "https://www.googleapis.com/auth/calendar.readonly " +
+  "https://www.googleapis.com/auth/calendar.events";
 
 // One source of truth for the Calendar widget + its focus view.
 // - Real mode: a Google token is present → read the user's real calendars.
@@ -144,21 +149,52 @@ export function useCalendar() {
     setMockConnected(true);
   }, [supabaseReady, connectGoogle]);
 
+  // On a write that 401s, refresh the token once and retry the operation.
+  const withRetry = useCallback(
+    async (op) => {
+      try {
+        return await op();
+      } catch (e) {
+        if (e?.code === 401) {
+          const fresh = await refreshGoogleToken?.();
+          if (fresh) return op(fresh);
+          clearGoogleToken();
+        }
+        throw e;
+      }
+    },
+    [refreshGoogleToken, clearGoogleToken]
+  );
+
   const create = useCallback(
     async (data) => {
-      if (realMode) return null; // read-only in the Google MVP
+      if (realMode) {
+        const created = await withRetry((tok = googleToken) =>
+          createGoogleEvent(tok, data)
+        );
+        await refresh(); // resync from Google (source of truth)
+        return created; // { id } → focus selects the new event
+      }
       const created = await svcCreate(data);
       setEvents((list) =>
         [...list, created].sort((a, b) => new Date(a.start) - new Date(b.start))
       );
       return created;
     },
-    [realMode]
+    [realMode, googleToken, withRetry, refresh]
   );
 
   const update = useCallback(
     async (id, patch) => {
-      if (realMode) return null;
+      if (realMode) {
+        const ev = events.find((e) => e.id === id);
+        if (!ev) return null;
+        await withRetry((tok = googleToken) =>
+          updateGoogleEvent(tok, ev.calendarId, ev.gid, patch)
+        );
+        await refresh();
+        return { id };
+      }
       const updated = await svcUpdate(id, patch);
       setEvents((list) =>
         list
@@ -167,16 +203,24 @@ export function useCalendar() {
       );
       return updated;
     },
-    [realMode]
+    [realMode, googleToken, events, withRetry, refresh]
   );
 
   const remove = useCallback(
     async (id) => {
-      if (realMode) return;
+      if (realMode) {
+        const ev = events.find((e) => e.id === id);
+        if (!ev) return;
+        setEvents((list) => list.filter((e) => e.id !== id)); // optimistic
+        await withRetry((tok = googleToken) =>
+          deleteGoogleEvent(tok, ev.calendarId, ev.gid)
+        );
+        return;
+      }
       await svcDelete(id);
       setEvents((list) => list.filter((e) => e.id !== id));
     },
-    [realMode]
+    [realMode, googleToken, events, withRetry]
   );
 
   // Events that haven't ended yet, soonest first.

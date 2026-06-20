@@ -53,16 +53,14 @@ export default function CalendarWidget({ title = "Calendar", onRename }) {
         actions={
           connected ? (
             <>
-              {!realMode && (
-                <button
-                  onClick={() => openFocus({ create: true })}
-                  aria-label={t("calendar.newEvent")}
-                  className="grid h-7 w-7 place-items-center rounded-lg text-muted
-                    transition-colors hover:bg-surface-2 hover:text-content"
-                >
-                  <CalendarPlus size={16} />
-                </button>
-              )}
+              <button
+                onClick={() => openFocus({ create: true })}
+                aria-label={t("calendar.newEvent")}
+                className="grid h-7 w-7 place-items-center rounded-lg text-muted
+                  transition-colors hover:bg-surface-2 hover:text-content"
+              >
+                <CalendarPlus size={16} />
+              </button>
               <button
                 onClick={calendar.refresh}
                 disabled={status === "loading"}
@@ -112,14 +110,12 @@ export default function CalendarWidget({ title = "Calendar", onRename }) {
           <CenteredState>
             <Calendar size={20} className="text-muted" />
             <span>{t("calendar.noUpcoming")}</span>
-            {!realMode && (
-              <button
-                onClick={() => openFocus({ create: true })}
-                className="mt-1 text-sm font-medium text-accent hover:underline"
-              >
-                {t("calendar.createEvent")}
-              </button>
-            )}
+            <button
+              onClick={() => openFocus({ create: true })}
+              className="mt-1 text-sm font-medium text-accent hover:underline"
+            >
+              {t("calendar.createEvent")}
+            </button>
           </CenteredState>
         ) : (
           <ul className="space-y-1.5">
@@ -164,7 +160,7 @@ export default function CalendarWidget({ title = "Calendar", onRename }) {
         calendar={calendar}
         initialSelectedId={focus.selectedId}
         initialCreate={focus.create}
-        readOnly={realMode}
+        realMode={realMode}
       />
     </div>
   );

@@ -245,6 +245,7 @@ async function fetchOneCalendar(token, cal, params, eventColors) {
         // Composite id: event ids are only unique within one calendar.
         id: `${cal.id}::${e.id}`,
         calendarId: cal.id,
+        gid: e.id, // raw Google event id (for write calls)
         title: e.summary || "(no title)",
         start: new Date(start).toISOString(),
         end: new Date(end).toISOString(),
@@ -277,6 +278,61 @@ export async function fetchGoogleEvents(token, calendars) {
     .filter((r) => r.status === "fulfilled")
     .flatMap((r) => r.value)
     .sort((a, b) => new Date(a.start) - new Date(b.start));
+}
+
+// --- write operations (scope: calendar.events) ---------------------------
+
+// Map our editor data → a Google Calendar event resource body.
+function eventBody(data) {
+  return {
+    summary: data.title?.trim() || "(senza titolo)",
+    location: data.location || undefined,
+    description: data.notes || undefined,
+    start: { dateTime: data.start },
+    end: { dateTime: data.end },
+  };
+}
+
+async function gcalWrite(token, path, method, body) {
+  const res = await fetch(`${GCAL}${path}`, {
+    method,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (res.status === 401 || res.status === 403) throw authError(res.status);
+  if (!res.ok) throw new Error("calendar write failed");
+  return res.status === 204 ? null : res.json();
+}
+
+// New events land on the user's primary calendar.
+export async function createGoogleEvent(token, data, calendarId = "primary") {
+  const created = await gcalWrite(
+    token,
+    `/calendars/${encodeURIComponent(calendarId)}/events`,
+    "POST",
+    eventBody(data)
+  );
+  return { id: `${calendarId}::${created.id}` };
+}
+
+export async function updateGoogleEvent(token, calendarId, gid, data) {
+  await gcalWrite(
+    token,
+    `/calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(gid)}`,
+    "PATCH",
+    eventBody(data)
+  );
+}
+
+export async function deleteGoogleEvent(token, calendarId, gid) {
+  await gcalWrite(
+    token,
+    `/calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(gid)}`,
+    "DELETE"
+  );
 }
 
 const locale = (lang) => (lang === "it" ? "it-IT" : "en-US");
