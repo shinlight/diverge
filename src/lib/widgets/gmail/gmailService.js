@@ -213,14 +213,17 @@ export async function sendMessage({ to, subject, body }) {
   return { ok: true };
 }
 
-// --- real Gmail (read-only) ----------------------------------------------
+// --- real Gmail (read + write) -------------------------------------------
 //
 // Uses the shared Google access token (same one as Calendar). Needs the
-// gmail.readonly scope; a 403 means the user hasn't granted it yet.
+// gmail.modify + gmail.send scopes; a 403 means the user hasn't granted them.
 
 const GMAIL = "https://gmail.googleapis.com/gmail/v1/users/me";
-const GMAIL_READONLY_SCOPE = "https://www.googleapis.com/auth/gmail.readonly";
-export { GMAIL_READONLY_SCOPE };
+const GMAIL_SCOPES = [
+  "https://www.googleapis.com/auth/gmail.modify",
+  "https://www.googleapis.com/auth/gmail.send",
+].join(" ");
+export { GMAIL_SCOPES };
 
 function gmailAuthError(status) {
   const err = new Error("auth");
@@ -237,6 +240,20 @@ async function gmailGet(token, path) {
   return res.json();
 }
 
+async function gmailPost(token, path, body) {
+  const res = await fetch(`${GMAIL}${path}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (res.status === 401 || res.status === 403) throw gmailAuthError(res.status);
+  if (!res.ok) throw new Error("gmail request failed");
+  return res.json();
+}
+
 // INBOX list with light metadata (sender, subject, date, snippet, flags).
 // Bodies are loaded lazily (getGmailBody) when a message is opened.
 export async function fetchGmailMessages(token, max = 15) {
@@ -246,7 +263,9 @@ export async function fetchGmailMessages(token, max = 15) {
   );
   const ids = (list.messages || []).map((m) => m.id);
   const metaPath =
-    "?format=metadata&metadataHeaders=From&metadataHeaders=Subject&metadataHeaders=Date";
+    "?format=metadata&metadataHeaders=From&metadataHeaders=To&metadataHeaders=Cc" +
+    "&metadataHeaders=Subject&metadataHeaders=Date&metadataHeaders=Message-Id" +
+    "&metadataHeaders=References";
   const results = await Promise.allSettled(
     ids.map((id) => gmailGet(token, `/messages/${id}${metaPath}`))
   );
@@ -260,10 +279,51 @@ export async function fetchGmailMessages(token, max = 15) {
     .map((r) => mapGmailMeta(r.value));
 }
 
-// Full plain-text body for one message (lazy).
+// Full plain-text body + attachment list for one message (lazy).
 export async function getGmailBody(token, id) {
   const msg = await gmailGet(token, `/messages/${id}?format=full`);
-  return extractPlainText(msg.payload) || msg.snippet || "";
+  return {
+    body: extractPlainText(msg.payload) || msg.snippet || "",
+    attachments: extractAttachments(msg.payload),
+  };
+}
+
+// Download one attachment; returns a base64url string of its bytes.
+export async function getAttachment(token, messageId, attachmentId) {
+  const j = await gmailGet(
+    token,
+    `/messages/${messageId}/attachments/${attachmentId}`
+  );
+  return j.data || "";
+}
+
+// --- write operations (gmail.modify / gmail.send) ------------------------
+
+export async function modifyLabels(token, id, { add = [], remove = [] }) {
+  await gmailPost(token, `/messages/${id}/modify`, {
+    addLabelIds: add,
+    removeLabelIds: remove,
+  });
+}
+
+export async function trashGmail(token, id) {
+  await gmailPost(token, `/messages/${id}/trash`);
+}
+
+// Build an RFC-822 message and send it. `attachments` are
+// { filename, mimeType, contentBase64 } (standard base64). Returns the API
+// response (includes the new message + thread id).
+export async function sendGmail(
+  token,
+  { to, cc, subject, body, attachments = [], threadId, inReplyTo, references }
+) {
+  const raw = toBase64Url(
+    buildMime({ to, cc, subject, body, attachments, inReplyTo, references })
+  );
+  return gmailPost(token, "/messages/send", {
+    raw,
+    ...(threadId ? { threadId } : {}),
+  });
 }
 
 function mapGmailMeta(msg) {
@@ -274,11 +334,17 @@ function mapGmailMeta(msg) {
   const labels = msg.labelIds || [];
   return {
     id: msg.id,
+    threadId: msg.threadId,
     from: name,
     email,
+    to: headers.to || "",
+    cc: headers.cc || "",
+    messageId: headers["message-id"] || "",
+    references: headers.references || "",
     subject: headers.subject || "(nessun oggetto)",
     snippet: decodeEntities(msg.snippet || ""),
     body: null, // loaded on open
+    attachments: [], // loaded on open
     date: msg.internalDate
       ? new Date(Number(msg.internalDate)).toISOString()
       : new Date().toISOString(),
@@ -286,6 +352,37 @@ function mapGmailMeta(msg) {
     starred: labels.includes("STARRED"),
     link: `https://mail.google.com/mail/u/0/#all/${msg.id}`,
   };
+}
+
+// Collect downloadable attachments (parts that carry a filename + id).
+function extractAttachments(payload) {
+  const out = [];
+  const walk = (part) => {
+    if (!part) return;
+    if (part.filename && part.body?.attachmentId) {
+      out.push({
+        id: part.body.attachmentId,
+        filename: part.filename,
+        mimeType: part.mimeType || "application/octet-stream",
+        size: part.body.size || 0,
+      });
+    }
+    for (const child of part.parts || []) walk(child);
+  };
+  walk(payload);
+  return out;
+}
+
+// Parse a header address list into bare email addresses.
+export function parseAddressList(value) {
+  if (!value) return [];
+  return value
+    .split(",")
+    .map((chunk) => {
+      const m = chunk.match(/<([^>]+)>/);
+      return (m ? m[1] : chunk).trim().toLowerCase();
+    })
+    .filter(Boolean);
 }
 
 // "Mario Rossi <mario@x.com>" → { name, email }
@@ -349,6 +446,77 @@ function decodeEntities(s) {
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
     .replace(/&nbsp;/g, " ");
+}
+
+// --- outgoing MIME -------------------------------------------------------
+
+// UTF-8 string → standard base64.
+function b64Utf8(str) {
+  return btoa(unescape(encodeURIComponent(str)));
+}
+
+// Standard base64 → web-safe base64url (for the Gmail `raw` field).
+function toBase64Url(str) {
+  return b64Utf8(str).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+// RFC 2047 encoded-word so non-ASCII headers (subject) travel safely.
+function encodeHeader(value) {
+  // eslint-disable-next-line no-control-regex
+  if (/^[\x00-\x7F]*$/.test(value)) return value;
+  return `=?UTF-8?B?${b64Utf8(value)}?=`;
+}
+
+// Chunk base64 into 76-char lines (RFC compliant).
+function chunk76(b64) {
+  return b64.replace(/.{1,76}/g, "$&\r\n").trim();
+}
+
+// Build an RFC-822 message; multipart/mixed when there are attachments.
+function buildMime({ to, cc, subject, body, attachments, inReplyTo, references }) {
+  const headers = [
+    `To: ${to}`,
+    cc ? `Cc: ${cc}` : null,
+    `Subject: ${encodeHeader(subject || "")}`,
+    inReplyTo ? `In-Reply-To: ${inReplyTo}` : null,
+    references ? `References: ${references}` : null,
+    "MIME-Version: 1.0",
+  ].filter(Boolean);
+
+  const textPart = [
+    'Content-Type: text/plain; charset="UTF-8"',
+    "Content-Transfer-Encoding: base64",
+    "",
+    chunk76(b64Utf8(body || "")),
+  ].join("\r\n");
+
+  if (!attachments || attachments.length === 0) {
+    return [...headers, textPart].join("\r\n");
+  }
+
+  const boundary = `dvg_${Math.random().toString(36).slice(2)}`;
+  const parts = [
+    `--${boundary}`,
+    textPart,
+    ...attachments.map((a) =>
+      [
+        `--${boundary}`,
+        `Content-Type: ${a.mimeType}; name="${a.filename}"`,
+        `Content-Disposition: attachment; filename="${a.filename}"`,
+        "Content-Transfer-Encoding: base64",
+        "",
+        chunk76(a.contentBase64),
+      ].join("\r\n")
+    ),
+    `--${boundary}--`,
+  ];
+
+  return [
+    ...headers,
+    `Content-Type: multipart/mixed; boundary="${boundary}"`,
+    "",
+    parts.join("\r\n"),
+  ].join("\r\n");
 }
 
 // --- helpers -------------------------------------------------------------

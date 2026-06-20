@@ -20,7 +20,7 @@ const ACCENT = "#ea4335";
 export default function GmailWidget({ title = "Gmail", onRename }) {
   const { t, lang } = useI18n();
   const gmail = useGmail();
-  const { connected, connecting, status, messages, unread, connect, realMode } = gmail;
+  const { connected, connecting, status, messages, unread, connect } = gmail;
   const [focus, setFocus] = useState({
     open: false,
     selectedId: null,
@@ -58,16 +58,14 @@ export default function GmailWidget({ title = "Gmail", onRename }) {
         actions={
           connected ? (
             <>
-              {!realMode && (
-                <button
-                  onClick={() => openFocus({ compose: true })}
-                  aria-label={t("gmail.composeEmail")}
-                  className="grid h-7 w-7 place-items-center rounded-lg text-muted
-                    transition-colors hover:bg-surface-2 hover:text-content"
-                >
-                  <PenSquare size={16} />
-                </button>
-              )}
+              <button
+                onClick={() => openFocus({ compose: true })}
+                aria-label={t("gmail.composeEmail")}
+                className="grid h-7 w-7 place-items-center rounded-lg text-muted
+                  transition-colors hover:bg-surface-2 hover:text-content"
+              >
+                <PenSquare size={16} />
+              </button>
               <button
                 onClick={gmail.refresh}
                 disabled={status === "loading"}
@@ -189,7 +187,6 @@ export default function GmailWidget({ title = "Gmail", onRename }) {
         gmail={gmail}
         initialSelectedId={focus.selectedId}
         initialCompose={focus.compose}
-        readOnly={realMode}
       />
     </div>
   );

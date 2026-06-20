@@ -6,16 +6,20 @@ import {
   fetchMessages,
   fetchGmailMessages,
   getGmailBody,
+  getAttachment,
+  modifyLabels,
+  trashGmail,
+  sendGmail,
   markRead as svcMarkRead,
   toggleStar as svcToggleStar,
   deleteMessage as svcDelete,
   sendMessage as svcSend,
-  GMAIL_READONLY_SCOPE,
+  GMAIL_SCOPES,
 } from "./gmailService";
 
 // One source of truth for the Gmail widget + its focus view.
-// - Real mode (Supabase): read the user's real inbox with the shared Google
-//   token. Read-only — gmail.readonly scope only.
+// - Real mode (Supabase): the user's real inbox via the shared Google token,
+//   fully interactive (read / star / mark / trash / send) — gmail.modify+send.
 // - Mock mode (local dev): the in-memory demo inbox, fully interactive.
 export function useGmail() {
   const {
@@ -24,17 +28,18 @@ export function useGmail() {
     connectGoogle,
     clearGoogleToken,
     refreshGoogleToken,
+    user,
   } = useAuth();
   const realMode = supabaseReady;
+  const selfEmail = user?.email ?? "";
 
   const [mockConnected, setMockConnected] = useState(isConnected);
   const [connecting, setConnecting] = useState(false);
-  const [gmailReady, setGmailReady] = useState(false); // real: scope granted & fetch ok
+  const [gmailReady, setGmailReady] = useState(false); // real: scopes granted & fetch ok
   const [messages, setMessages] = useState([]);
   const [status, setStatus] = useState("idle"); // idle | loading | ready | error
 
-  // In real mode "connected" means the inbox actually loaded (gmail scope
-  // granted). In mock mode it's the local flag.
+  // In real mode "connected" means the inbox actually loaded (scopes granted).
   const connected = realMode ? gmailReady : mockConnected;
 
   const refresh = useCallback(async () => {
@@ -60,7 +65,7 @@ export function useGmail() {
         clearGoogleToken();
       }
       if (realMode && e?.code === 403) {
-        // The token is valid but lacks gmail.readonly → ask to connect Gmail.
+        // The token lacks the Gmail scopes → ask the user to connect Gmail.
         setGmailReady(false);
         setStatus("idle");
         return;
@@ -81,7 +86,7 @@ export function useGmail() {
   const connect = useCallback(async () => {
     if (realMode) {
       setConnecting(true);
-      await connectGoogle(GMAIL_READONLY_SCOPE); // redirects to Google
+      await connectGoogle(GMAIL_SCOPES); // redirects to Google
       setConnecting(false);
       return;
     }
@@ -91,16 +96,16 @@ export function useGmail() {
     setMockConnected(true);
   }, [realMode, connectGoogle]);
 
-  // Lazy-load a message body when it's opened (real mode only; mock has it).
+  // Lazy-load a message body + attachments when it's opened (real mode).
   const loadBody = useCallback(
     async (id) => {
       if (!realMode || !googleToken) return;
       const msg = messages.find((m) => m.id === id);
       if (!msg || msg.body != null) return;
       try {
-        const body = await getGmailBody(googleToken, id);
+        const { body, attachments } = await getGmailBody(googleToken, id);
         setMessages((list) =>
-          list.map((m) => (m.id === id ? { ...m, body } : m))
+          list.map((m) => (m.id === id ? { ...m, body, attachments } : m))
         );
       } catch {
         // leave body null → reader falls back to the snippet
@@ -109,40 +114,91 @@ export function useGmail() {
     [realMode, googleToken, messages]
   );
 
-  // Mark read: real mode is read-only, so update locally only (visual).
-  const markRead = useCallback(
-    async (id, read = true) => {
-      if (!realMode) await svcMarkRead(id, read);
-      setMessages((m) => m.map((x) => (x.id === id ? { ...x, unread: !read } : x)));
+  // Open an attachment in a new tab (downloads if the browser can't render it).
+  const openAttachment = useCallback(
+    async (messageId, att) => {
+      if (!realMode || !googleToken) return;
+      try {
+        const b64url = await getAttachment(googleToken, messageId, att.id);
+        const bin = atob(b64url.replace(/-/g, "+").replace(/_/g, "/"));
+        const bytes = Uint8Array.from(bin, (c) => c.charCodeAt(0));
+        const url = URL.createObjectURL(
+          new Blob([bytes], { type: att.mimeType })
+        );
+        window.open(url, "_blank", "noopener");
+        setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      } catch {
+        // ignore
+      }
     },
-    [realMode]
+    [realMode, googleToken]
   );
 
-  // Star / delete / send are disabled in real mode (read-only).
+  const markRead = useCallback(
+    async (id, read = true) => {
+      setMessages((m) => m.map((x) => (x.id === id ? { ...x, unread: !read } : x)));
+      try {
+        if (realMode) {
+          await modifyLabels(googleToken, id, {
+            [read ? "remove" : "add"]: ["UNREAD"],
+          });
+        } else {
+          await svcMarkRead(id, read);
+        }
+      } catch {
+        // best-effort; visual state already applied
+      }
+    },
+    [realMode, googleToken]
+  );
+
   const toggleStar = useCallback(
     async (id) => {
-      if (realMode) return;
-      await svcToggleStar(id);
-      setMessages((m) => m.map((x) => (x.id === id ? { ...x, starred: !x.starred } : x)));
+      const msg = messages.find((x) => x.id === id);
+      const next = !msg?.starred;
+      setMessages((m) => m.map((x) => (x.id === id ? { ...x, starred: next } : x)));
+      try {
+        if (realMode) {
+          await modifyLabels(googleToken, id, {
+            [next ? "add" : "remove"]: ["STARRED"],
+          });
+        } else {
+          await svcToggleStar(id);
+        }
+      } catch {
+        // revert on failure
+        setMessages((m) => m.map((x) => (x.id === id ? { ...x, starred: !next } : x)));
+      }
     },
-    [realMode]
+    [realMode, googleToken, messages]
   );
 
   const remove = useCallback(
     async (id) => {
-      if (realMode) return;
-      await svcDelete(id);
       setMessages((m) => m.filter((x) => x.id !== id));
+      try {
+        if (realMode) await trashGmail(googleToken, id);
+        else await svcDelete(id);
+      } catch {
+        // ignore (already removed from the list)
+      }
     },
-    [realMode]
+    [realMode, googleToken]
   );
 
   const send = useCallback(
     async (payload) => {
-      if (realMode) return { ok: false };
+      if (realMode) {
+        try {
+          await sendGmail(googleToken, payload);
+          return { ok: true };
+        } catch {
+          return { ok: false };
+        }
+      }
       return svcSend(payload);
     },
-    [realMode]
+    [realMode, googleToken]
   );
 
   const unread = messages.filter((m) => m.unread).length;
@@ -150,13 +206,15 @@ export function useGmail() {
   return {
     connected,
     connecting,
-    realMode, // true → real inbox, read-only
+    realMode,
+    selfEmail, // used to drop yourself from reply-all
     status,
     messages,
     unread,
     connect,
     refresh,
     loadBody,
+    openAttachment,
     markRead,
     toggleStar,
     remove,
