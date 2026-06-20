@@ -160,10 +160,12 @@ export const EVENT_COLORS = COLORS;
 // `token` is the Google OAuth access token (from the Supabase session).
 const GCAL = "https://www.googleapis.com/calendar/v3";
 export async function fetchGoogleEvents(token) {
-  // Window wide enough to browse a bit of past + a couple of months ahead,
-  // so the day navigation can step backward/forward without re-fetching.
+  // A modest slice of recent past (so day-nav can step back ~a week) plus a
+  // couple of months ahead. Keeping the past window small matters: events are
+  // returned in start-time order capped at maxResults, so a large past window
+  // on a busy calendar could push the upcoming events out of the result set.
   const timeMin = new Date();
-  timeMin.setDate(timeMin.getDate() - 30);
+  timeMin.setDate(timeMin.getDate() - 7);
   const timeMax = new Date();
   timeMax.setDate(timeMax.getDate() + 90);
   const params = new URLSearchParams({

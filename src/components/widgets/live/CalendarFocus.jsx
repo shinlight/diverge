@@ -37,6 +37,25 @@ function startOfToday() {
   return d;
 }
 
+// Midnight of the day an ISO timestamp falls on.
+function startOfDay(iso) {
+  const d = new Date(iso);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+// The day to land on when the focus opens: the first day that still has an
+// upcoming event (so the user sees their agenda right away), or today if none.
+function dayOfFirstUpcoming(events) {
+  const now = new Date();
+  const next = events
+    .filter((e) => new Date(e.end) >= now)
+    .sort((a, b) => new Date(a.start) - new Date(b.start))[0];
+  const d = next ? new Date(next.start) : new Date();
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
 export default function CalendarFocus({
   open,
   onClose,
@@ -56,17 +75,23 @@ export default function CalendarFocus({
 
   useEffect(() => {
     if (!open) return;
-    // Each open starts on a clean slate: today, no active search.
+    // Each open starts on a clean slate: no active search, and focused on the
+    // day of the event we're opening (or the first day that has events).
     setSearchOpen(false);
     setQuery("");
-    setFocusedDate(startOfToday());
     if (initialCreate) {
       setMode("create");
       setSelectedId(null);
+      setFocusedDate(startOfToday());
     } else if (initialSelectedId) {
+      const ev = events.find((e) => e.id === initialSelectedId);
       setSelectedId(initialSelectedId);
       setMode("detail");
+      setFocusedDate(ev ? startOfDay(ev.start) : startOfToday());
+    } else {
+      setFocusedDate(dayOfFirstUpcoming(events));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, initialSelectedId, initialCreate]);
 
   function openEvent(id) {
