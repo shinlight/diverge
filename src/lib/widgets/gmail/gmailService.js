@@ -213,6 +213,144 @@ export async function sendMessage({ to, subject, body }) {
   return { ok: true };
 }
 
+// --- real Gmail (read-only) ----------------------------------------------
+//
+// Uses the shared Google access token (same one as Calendar). Needs the
+// gmail.readonly scope; a 403 means the user hasn't granted it yet.
+
+const GMAIL = "https://gmail.googleapis.com/gmail/v1/users/me";
+const GMAIL_READONLY_SCOPE = "https://www.googleapis.com/auth/gmail.readonly";
+export { GMAIL_READONLY_SCOPE };
+
+function gmailAuthError(status) {
+  const err = new Error("auth");
+  err.code = status;
+  return err;
+}
+
+async function gmailGet(token, path) {
+  const res = await fetch(`${GMAIL}${path}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (res.status === 401 || res.status === 403) throw gmailAuthError(res.status);
+  if (!res.ok) throw new Error("gmail request failed");
+  return res.json();
+}
+
+// INBOX list with light metadata (sender, subject, date, snippet, flags).
+// Bodies are loaded lazily (getGmailBody) when a message is opened.
+export async function fetchGmailMessages(token, max = 15) {
+  const list = await gmailGet(
+    token,
+    `/messages?labelIds=INBOX&maxResults=${max}`
+  );
+  const ids = (list.messages || []).map((m) => m.id);
+  const metaPath =
+    "?format=metadata&metadataHeaders=From&metadataHeaders=Subject&metadataHeaders=Date";
+  const results = await Promise.allSettled(
+    ids.map((id) => gmailGet(token, `/messages/${id}${metaPath}`))
+  );
+  // If the very first call failed with an auth error, surface it.
+  const authErr = results.find(
+    (r) => r.status === "rejected" && (r.reason?.code === 401 || r.reason?.code === 403)
+  );
+  if (authErr) throw authErr.reason;
+  return results
+    .filter((r) => r.status === "fulfilled")
+    .map((r) => mapGmailMeta(r.value));
+}
+
+// Full plain-text body for one message (lazy).
+export async function getGmailBody(token, id) {
+  const msg = await gmailGet(token, `/messages/${id}?format=full`);
+  return extractPlainText(msg.payload) || msg.snippet || "";
+}
+
+function mapGmailMeta(msg) {
+  const headers = Object.fromEntries(
+    (msg.payload?.headers || []).map((h) => [h.name.toLowerCase(), h.value])
+  );
+  const { name, email } = parseFrom(headers.from || "");
+  const labels = msg.labelIds || [];
+  return {
+    id: msg.id,
+    from: name,
+    email,
+    subject: headers.subject || "(nessun oggetto)",
+    snippet: decodeEntities(msg.snippet || ""),
+    body: null, // loaded on open
+    date: msg.internalDate
+      ? new Date(Number(msg.internalDate)).toISOString()
+      : new Date().toISOString(),
+    unread: labels.includes("UNREAD"),
+    starred: labels.includes("STARRED"),
+    link: `https://mail.google.com/mail/u/0/#all/${msg.id}`,
+  };
+}
+
+// "Mario Rossi <mario@x.com>" → { name, email }
+function parseFrom(value) {
+  const m = value.match(/^\s*"?([^"<]*?)"?\s*<([^>]+)>\s*$/);
+  if (m) return { name: m[1].trim() || m[2], email: m[2].trim() };
+  return { name: value.trim(), email: value.trim() };
+}
+
+// Walk the MIME tree for a text/plain part; fall back to stripped text/html.
+function extractPlainText(payload) {
+  if (!payload) return "";
+  const walk = (part, want) => {
+    if (!part) return "";
+    if (part.mimeType === want && part.body?.data) {
+      return decodeB64Url(part.body.data);
+    }
+    for (const child of part.parts || []) {
+      const found = walk(child, want);
+      if (found) return found;
+    }
+    return "";
+  };
+  const plain = walk(payload, "text/plain");
+  if (plain) return plain.trim();
+  const html = walk(payload, "text/html");
+  if (html) return stripHtml(html).trim();
+  if (payload.body?.data) return decodeB64Url(payload.body.data).trim();
+  return "";
+}
+
+function decodeB64Url(data) {
+  try {
+    const b64 = data.replace(/-/g, "+").replace(/_/g, "/");
+    const bin = atob(b64);
+    // Re-interpret the binary string as UTF-8.
+    try {
+      return decodeURIComponent(escape(bin));
+    } catch {
+      return bin;
+    }
+  } catch {
+    return "";
+  }
+}
+
+function stripHtml(html) {
+  return html
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<\/(p|div|br|li|tr|h\d)>/gi, "\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/\n{3,}/g, "\n\n");
+}
+
+function decodeEntities(s) {
+  return s
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, " ");
+}
+
 // --- helpers -------------------------------------------------------------
 
 function minutesAgo(n) {

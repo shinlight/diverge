@@ -12,6 +12,7 @@ import {
   ArrowLeft,
   Send,
   Inbox,
+  ExternalLink,
 } from "lucide-react";
 import { relativeTime, fullDate } from "../../../lib/widgets/gmail/gmailService";
 import { useI18n } from "../../../lib/i18n/LanguageContext";
@@ -24,9 +25,10 @@ export default function GmailFocus({
   gmail,
   initialSelectedId,
   initialCompose,
+  readOnly = false,
 }) {
   const { t } = useI18n();
-  const { messages, unread, status, refresh, markRead, toggleStar, remove, send } =
+  const { messages, unread, status, refresh, markRead, toggleStar, remove, send, loadBody } =
     gmail;
   const [selectedId, setSelectedId] = useState(initialSelectedId ?? null);
   const [mode, setMode] = useState("read"); // read | compose
@@ -35,20 +37,22 @@ export default function GmailFocus({
 
   useEffect(() => {
     if (!open) return;
-    if (initialCompose) {
+    if (initialCompose && !readOnly) {
       setMode("compose");
       setReplyTo(null);
     } else if (initialSelectedId) {
       setSelectedId(initialSelectedId);
       setMode("read");
       markRead(initialSelectedId, true);
+      loadBody?.(initialSelectedId);
     }
-  }, [open, initialSelectedId, initialCompose, markRead]);
+  }, [open, initialSelectedId, initialCompose, readOnly, markRead, loadBody]);
 
   function openMessage(id) {
     setSelectedId(id);
     setMode("read");
     markRead(id, true);
+    loadBody?.(id);
   }
 
   async function handleDelete(id) {
@@ -109,13 +113,15 @@ export default function GmailFocus({
               </h2>
 
               <div className="ml-auto flex items-center gap-1.5">
-                <button
-                  onClick={startCompose}
-                  className="inline-flex items-center gap-2 rounded-xl bg-accent px-3.5 py-2
-                    text-sm font-medium text-accent-contrast hover:brightness-110"
-                >
-                  <PenSquare size={16} /> {t("gmail.compose")}
-                </button>
+                {!readOnly && (
+                  <button
+                    onClick={startCompose}
+                    className="inline-flex items-center gap-2 rounded-xl bg-accent px-3.5 py-2
+                      text-sm font-medium text-accent-contrast hover:brightness-110"
+                  >
+                    <PenSquare size={16} /> {t("gmail.compose")}
+                  </button>
+                )}
                 <button
                   onClick={refresh}
                   disabled={status === "loading"}
@@ -158,6 +164,7 @@ export default function GmailFocus({
                         key={m.id}
                         message={m}
                         active={m.id === selectedId && mode === "read"}
+                        readOnly={readOnly}
                         onOpen={() => openMessage(m.id)}
                         onStar={() => toggleStar(m.id)}
                         onDelete={() => handleDelete(m.id)}
@@ -181,6 +188,7 @@ export default function GmailFocus({
                 ) : selected ? (
                   <ReaderPane
                     message={selected}
+                    readOnly={readOnly}
                     onBack={() => setSelectedId(null)}
                     onReply={() => startReply(selected)}
                     onToggleStar={() => toggleStar(selected.id)}
@@ -205,7 +213,7 @@ export default function GmailFocus({
   );
 }
 
-function ListRow({ message, active, onOpen, onStar, onDelete }) {
+function ListRow({ message, active, readOnly, onOpen, onStar, onDelete }) {
   const { t, lang } = useI18n();
   return (
     <li
@@ -213,20 +221,28 @@ function ListRow({ message, active, onOpen, onStar, onDelete }) {
       className={`group flex cursor-pointer items-start gap-2.5 border-b border-line/60 px-4 py-3
         transition-colors ${active ? "bg-surface-2/70" : "hover:bg-surface-2/40"}`}
     >
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onStar();
-        }}
-        aria-label={t("gmail.important")}
-        className="mt-0.5 shrink-0 text-muted hover:text-content"
-      >
-        <Star
-          size={15}
-          fill={message.starred ? "#f5b400" : "none"}
-          color={message.starred ? "#f5b400" : "currentColor"}
+      {readOnly ? (
+        <span
+          className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${message.unread ? "" : "opacity-0"}`}
+          style={{ backgroundColor: ACCENT }}
+          aria-hidden="true"
         />
-      </button>
+      ) : (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onStar();
+          }}
+          aria-label={t("gmail.important")}
+          className="mt-0.5 shrink-0 text-muted hover:text-content"
+        >
+          <Star
+            size={15}
+            fill={message.starred ? "#f5b400" : "none"}
+            color={message.starred ? "#f5b400" : "currentColor"}
+          />
+        </button>
+      )}
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline justify-between gap-2">
           <span
@@ -249,22 +265,24 @@ function ListRow({ message, active, onOpen, onStar, onDelete }) {
         </p>
         <p className="truncate text-xs text-muted">{message.snippet}</p>
       </div>
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onDelete();
-        }}
-        aria-label={t("common.delete")}
-        className="mt-0.5 shrink-0 text-muted opacity-0 transition-opacity
-          hover:text-content group-hover:opacity-100"
-      >
-        <Trash2 size={15} />
-      </button>
+      {!readOnly && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete();
+          }}
+          aria-label={t("common.delete")}
+          className="mt-0.5 shrink-0 text-muted opacity-0 transition-opacity
+            hover:text-content group-hover:opacity-100"
+        >
+          <Trash2 size={15} />
+        </button>
+      )}
     </li>
   );
 }
 
-function ReaderPane({ message, onBack, onReply, onToggleStar, onMarkUnread, onDelete }) {
+function ReaderPane({ message, readOnly, onBack, onReply, onToggleStar, onMarkUnread, onDelete }) {
   const { t, lang } = useI18n();
   return (
     <div className="flex h-full flex-col">
@@ -277,36 +295,50 @@ function ReaderPane({ message, onBack, onReply, onToggleStar, onMarkUnread, onDe
         >
           <ArrowLeft size={16} />
         </button>
-        <button
-          onClick={onReply}
-          className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm text-muted hover:bg-surface-2 hover:text-content"
-        >
-          <Reply size={16} /> {t("gmail.reply")}
-        </button>
-        <button
-          onClick={onMarkUnread}
-          className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm text-muted hover:bg-surface-2 hover:text-content"
-        >
-          <MailOpen size={16} /> {t("gmail.markUnread")}
-        </button>
-        <button
-          onClick={onToggleStar}
-          aria-label={t("gmail.important")}
-          className="grid h-8 w-8 place-items-center rounded-lg text-muted hover:bg-surface-2 hover:text-content"
-        >
-          <Star
-            size={16}
-            fill={message.starred ? "#f5b400" : "none"}
-            color={message.starred ? "#f5b400" : "currentColor"}
-          />
-        </button>
-        <button
-          onClick={onDelete}
-          aria-label={t("common.delete")}
-          className="ml-auto grid h-8 w-8 place-items-center rounded-lg text-muted hover:bg-surface-2 hover:text-content"
-        >
-          <Trash2 size={16} />
-        </button>
+        {!readOnly && (
+          <>
+            <button
+              onClick={onReply}
+              className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm text-muted hover:bg-surface-2 hover:text-content"
+            >
+              <Reply size={16} /> {t("gmail.reply")}
+            </button>
+            <button
+              onClick={onMarkUnread}
+              className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm text-muted hover:bg-surface-2 hover:text-content"
+            >
+              <MailOpen size={16} /> {t("gmail.markUnread")}
+            </button>
+            <button
+              onClick={onToggleStar}
+              aria-label={t("gmail.important")}
+              className="grid h-8 w-8 place-items-center rounded-lg text-muted hover:bg-surface-2 hover:text-content"
+            >
+              <Star
+                size={16}
+                fill={message.starred ? "#f5b400" : "none"}
+                color={message.starred ? "#f5b400" : "currentColor"}
+              />
+            </button>
+            <button
+              onClick={onDelete}
+              aria-label={t("common.delete")}
+              className="ml-auto grid h-8 w-8 place-items-center rounded-lg text-muted hover:bg-surface-2 hover:text-content"
+            >
+              <Trash2 size={16} />
+            </button>
+          </>
+        )}
+        {readOnly && message.link && (
+          <a
+            href={message.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ml-auto inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm text-muted hover:bg-surface-2 hover:text-content"
+          >
+            <ExternalLink size={16} /> {t("gmail.openInGmail")}
+          </a>
+        )}
       </div>
 
       {/* content */}
@@ -328,7 +360,7 @@ function ReaderPane({ message, onBack, onReply, onToggleStar, onMarkUnread, onDe
           </span>
         </div>
         <p className="mt-5 whitespace-pre-line text-sm leading-relaxed text-content/90">
-          {message.body}
+          {message.body || message.snippet}
         </p>
       </div>
     </div>
