@@ -160,11 +160,18 @@ export const EVENT_COLORS = COLORS;
 // `token` is the Google OAuth access token (from the Supabase session).
 const GCAL = "https://www.googleapis.com/calendar/v3";
 export async function fetchGoogleEvents(token) {
+  // Window wide enough to browse a bit of past + a couple of months ahead,
+  // so the day navigation can step backward/forward without re-fetching.
+  const timeMin = new Date();
+  timeMin.setDate(timeMin.getDate() - 30);
+  const timeMax = new Date();
+  timeMax.setDate(timeMax.getDate() + 90);
   const params = new URLSearchParams({
     singleEvents: "true",
     orderBy: "startTime",
-    timeMin: new Date().toISOString(),
-    maxResults: "25",
+    timeMin: timeMin.toISOString(),
+    timeMax: timeMax.toISOString(),
+    maxResults: "250",
   });
   const res = await fetch(`${GCAL}/calendars/primary/events?${params}`, {
     headers: { Authorization: `Bearer ${token}` },
@@ -193,6 +200,7 @@ export async function fetchGoogleEvents(token) {
         location: e.location || "",
         notes: e.description || "",
         color: COLORS[i % COLORS.length],
+        link: e.htmlLink || null, // deep link to the event in Google Calendar
       };
     });
 }
@@ -221,6 +229,28 @@ export function dayLabel(iso, lang = "en") {
     day: "numeric",
     month: "short",
   });
+}
+
+// True if an ISO timestamp falls on the same calendar day as `date`.
+export function isSameDay(iso, date) {
+  const d = new Date(iso);
+  return (
+    d.getFullYear() === date.getFullYear() &&
+    d.getMonth() === date.getMonth() &&
+    d.getDate() === date.getDate()
+  );
+}
+
+// A new Date shifted by `n` days (n can be negative), at the same time.
+export function addDays(date, n) {
+  const d = new Date(date);
+  d.setDate(d.getDate() + n);
+  return d;
+}
+
+// "Today" / "Tomorrow" / "Yesterday" / "Wed 18 Jun" for a Date (not ISO).
+export function fullDayLabel(date, lang = "en") {
+  return dayLabel(date.toISOString(), lang);
 }
 
 // Group a sorted event list into [{ key, label, events }] by calendar day.

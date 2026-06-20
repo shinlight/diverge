@@ -10,6 +10,10 @@ import {
   MapPin,
   Clock,
   CalendarClock,
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  ExternalLink,
 } from "lucide-react";
 import {
   timeRange,
@@ -18,10 +22,20 @@ import {
   fromLocalInput,
   defaultNewEvent,
   EVENT_COLORS,
+  isSameDay,
+  addDays,
+  fullDayLabel,
 } from "../../../lib/widgets/calendar/calendarService";
 import { useI18n } from "../../../lib/i18n/LanguageContext";
 
 const ACCENT = "#4285f4";
+
+// Midnight today — the default focused day for the day-by-day navigation.
+function startOfToday() {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
 
 export default function CalendarFocus({
   open,
@@ -35,10 +49,17 @@ export default function CalendarFocus({
   const { events, status, refresh, create, update, remove } = calendar;
   const [selectedId, setSelectedId] = useState(initialSelectedId ?? null);
   const [mode, setMode] = useState("idle"); // idle | detail | create
+  const [focusedDate, setFocusedDate] = useState(startOfToday);
+  const [query, setQuery] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
   const selected = events.find((e) => e.id === selectedId) ?? null;
 
   useEffect(() => {
     if (!open) return;
+    // Each open starts on a clean slate: today, no active search.
+    setSearchOpen(false);
+    setQuery("");
+    setFocusedDate(startOfToday());
     if (initialCreate) {
       setMode("create");
       setSelectedId(null);
@@ -64,7 +85,23 @@ export default function CalendarFocus({
     }
   }
 
-  const groups = groupByDay(events, lang);
+  // Two browse modes for the agenda pane:
+  //  - searching: text query → all matching events across the window, grouped by day
+  //  - day view: just the events on the focused day
+  const q = query.trim().toLowerCase();
+  const searching = q.length > 0;
+  const searchMatches = searching
+    ? events.filter((e) =>
+        [e.title, e.location, e.notes].some((f) =>
+          (f || "").toLowerCase().includes(q)
+        )
+      )
+    : [];
+  const searchGroups = groupByDay(searchMatches, lang);
+  const dayEvents = events
+    .filter((e) => isSameDay(e.start, focusedDate))
+    .sort((a, b) => new Date(a.start) - new Date(b.start));
+
   const paneActive = mode === "create" || (mode === "detail" && selected);
 
   return (
@@ -136,33 +173,110 @@ export default function CalendarFocus({
             <div className="flex min-h-0 flex-1">
               {/* Agenda */}
               <div
-                className={`w-full shrink-0 overflow-y-auto border-r border-line sm:w-[340px]
-                  ${paneActive ? "hidden sm:block" : "block"}`}
+                className={`flex w-full shrink-0 flex-col border-r border-line sm:w-[340px]
+                  ${paneActive ? "hidden sm:flex" : "flex"}`}
               >
-                {events.length === 0 ? (
-                  <div className="flex h-full flex-col items-center justify-center gap-2 text-sm text-muted">
-                    <Calendar size={20} />
-                    {t("calendar.emptyAgenda")}
-                  </div>
-                ) : (
-                  groups.map((g) => (
-                    <div key={g.key}>
-                      <p className="sticky top-0 bg-surface/95 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-muted backdrop-blur">
-                        {g.label}
-                      </p>
-                      <ul>
-                        {g.events.map((ev) => (
-                          <AgendaRow
-                            key={ev.id}
-                            event={ev}
-                            active={ev.id === selectedId && mode === "detail"}
-                            onOpen={() => openEvent(ev.id)}
-                          />
-                        ))}
-                      </ul>
+                {/* Toolbar: day navigation ↔ search */}
+                <div className="shrink-0 border-b border-line px-3 py-2">
+                  {searchOpen ? (
+                    <div className="flex items-center gap-2">
+                      <Search size={15} className="shrink-0 text-muted" />
+                      <input
+                        autoFocus
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        placeholder={t("calendar.searchPlaceholder")}
+                        className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted"
+                      />
+                      <button
+                        onClick={() => {
+                          setSearchOpen(false);
+                          setQuery("");
+                        }}
+                        aria-label={t("common.close")}
+                        className="grid h-7 w-7 shrink-0 place-items-center rounded-lg text-muted hover:bg-surface-2 hover:text-content"
+                      >
+                        <X size={15} />
+                      </button>
                     </div>
-                  ))
-                )}
+                  ) : (
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => setFocusedDate((d) => addDays(d, -1))}
+                        aria-label={t("calendar.prevDay")}
+                        className="grid h-7 w-7 shrink-0 place-items-center rounded-lg text-muted hover:bg-surface-2 hover:text-content"
+                      >
+                        <ChevronLeft size={16} />
+                      </button>
+                      <button
+                        onClick={() => setFocusedDate(startOfToday())}
+                        title={t("calendar.today")}
+                        className="min-w-0 flex-1 truncate rounded-lg px-2 py-1 text-sm font-medium hover:bg-surface-2"
+                      >
+                        {fullDayLabel(focusedDate, lang)}
+                      </button>
+                      <button
+                        onClick={() => setFocusedDate((d) => addDays(d, 1))}
+                        aria-label={t("calendar.nextDay")}
+                        className="grid h-7 w-7 shrink-0 place-items-center rounded-lg text-muted hover:bg-surface-2 hover:text-content"
+                      >
+                        <ChevronRight size={16} />
+                      </button>
+                      <button
+                        onClick={() => setSearchOpen(true)}
+                        aria-label={t("common.search")}
+                        className="grid h-7 w-7 shrink-0 place-items-center rounded-lg text-muted hover:bg-surface-2 hover:text-content"
+                      >
+                        <Search size={15} />
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* List */}
+                <div className="min-h-0 flex-1 overflow-y-auto">
+                  {searching ? (
+                    searchMatches.length === 0 ? (
+                      <EmptyAgenda icon={Search} label={t("calendar.noResults")} />
+                    ) : (
+                      <>
+                        <p className="px-4 pt-3 text-xs text-muted">
+                          {t("calendar.results", { n: searchMatches.length })}
+                        </p>
+                        {searchGroups.map((g) => (
+                          <div key={g.key}>
+                            <p className="sticky top-0 bg-surface/95 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-muted backdrop-blur">
+                              {g.label}
+                            </p>
+                            <ul>
+                              {g.events.map((ev) => (
+                                <AgendaRow
+                                  key={ev.id}
+                                  event={ev}
+                                  active={ev.id === selectedId && mode === "detail"}
+                                  onOpen={() => openEvent(ev.id)}
+                                />
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </>
+                    )
+                  ) : dayEvents.length === 0 ? (
+                    <EmptyAgenda icon={Calendar} label={t("calendar.noEventsDay")} />
+                  ) : (
+                    <ul>
+                      {dayEvents.map((ev) => (
+                        <AgendaRow
+                          key={ev.id}
+                          event={ev}
+                          active={ev.id === selectedId && mode === "detail"}
+                          onOpen={() => openEvent(ev.id)}
+                        />
+                      ))}
+                    </ul>
+                  )}
+                </div>
               </div>
 
               {/* Editor pane */}
@@ -205,6 +319,15 @@ export default function CalendarFocus({
         </motion.div>
       )}
     </AnimatePresence>
+  );
+}
+
+function EmptyAgenda({ icon: Icon, label }) {
+  return (
+    <div className="flex h-full flex-col items-center justify-center gap-2 px-4 text-center text-sm text-muted">
+      <Icon size={20} />
+      {label}
+    </div>
   );
 }
 
@@ -362,13 +485,26 @@ function EventEditor({ initial, onSave, onDelete, onCancel, readOnly = false }) 
 
       <div className="flex shrink-0 items-center gap-2 border-t border-line px-5 py-3">
         {readOnly ? (
-          <button
-            type="button"
-            onClick={onCancel}
-            className="rounded-xl bg-surface-2 px-4 py-2.5 text-sm font-medium hover:bg-surface-2/70"
-          >
-            {t("common.close")}
-          </button>
+          <>
+            {initial.link && (
+              <a
+                href={initial.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-xl bg-accent px-4 py-2.5
+                  text-sm font-medium text-accent-contrast hover:brightness-110"
+              >
+                <ExternalLink size={16} /> {t("calendar.openInGoogle")}
+              </a>
+            )}
+            <button
+              type="button"
+              onClick={onCancel}
+              className="rounded-xl bg-surface-2 px-4 py-2.5 text-sm font-medium hover:bg-surface-2/70"
+            >
+              {t("common.close")}
+            </button>
+          </>
         ) : (
           <>
             <button
