@@ -14,6 +14,8 @@ import {
   ChevronLeft,
   ChevronRight,
   ExternalLink,
+  ListChecks,
+  Check,
 } from "lucide-react";
 import {
   timeRange,
@@ -65,12 +67,14 @@ export default function CalendarFocus({
   readOnly = false,
 }) {
   const { t, lang } = useI18n();
-  const { events, status, refresh, create, update, remove } = calendar;
+  const { events, status, refresh, create, update, remove, calendars, selectedIds, toggleCalendar } =
+    calendar;
   const [selectedId, setSelectedId] = useState(initialSelectedId ?? null);
   const [mode, setMode] = useState("idle"); // idle | detail | create
   const [focusedDate, setFocusedDate] = useState(startOfToday);
   const [query, setQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
+  const [calPanelOpen, setCalPanelOpen] = useState(false);
   const selected = events.find((e) => e.id === selectedId) ?? null;
 
   useEffect(() => {
@@ -170,6 +174,39 @@ export default function CalendarFocus({
                   >
                     <Plus size={16} /> {t("calendar.newEvent")}
                   </button>
+                )}
+                {calendars?.length > 0 && (
+                  <div className="relative">
+                    <button
+                      onClick={() => setCalPanelOpen((o) => !o)}
+                      aria-label={t("calendar.calendars")}
+                      title={t("calendar.calendars")}
+                      className={`grid h-9 w-9 place-items-center rounded-xl transition-colors
+                        hover:bg-surface-2 hover:text-content
+                        ${calPanelOpen ? "bg-surface-2 text-content" : "text-muted"}`}
+                    >
+                      <ListChecks size={16} />
+                    </button>
+                    {calPanelOpen && (
+                      <>
+                        <div
+                          className="fixed inset-0 z-10"
+                          onClick={() => setCalPanelOpen(false)}
+                        />
+                        <div
+                          className="absolute right-0 z-20 mt-2 max-h-[60vh] w-72 overflow-y-auto
+                            rounded-2xl border border-line bg-surface p-2 shadow-xl"
+                        >
+                          <CalendarPicker
+                            calendars={calendars}
+                            selectedIds={selectedIds}
+                            onToggle={toggleCalendar}
+                            t={t}
+                          />
+                        </div>
+                      </>
+                    )}
+                  </div>
                 )}
                 <button
                   onClick={refresh}
@@ -344,6 +381,54 @@ export default function CalendarFocus({
         </motion.div>
       )}
     </AnimatePresence>
+  );
+}
+
+function CalendarPicker({ calendars, selectedIds, onToggle, t }) {
+  const sel = new Set(selectedIds || []);
+  const isOwned = (c) => c.primary || c.accessRole === "owner";
+  const owned = calendars.filter(isOwned);
+  const others = calendars.filter((c) => !isOwned(c));
+
+  const Row = (c) => {
+    const on = sel.has(c.id);
+    return (
+      <button
+        key={c.id}
+        onClick={() => onToggle(c.id)}
+        className="flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left hover:bg-surface-2"
+      >
+        <span
+          className="h-3.5 w-3.5 shrink-0 rounded-[4px]"
+          style={{ backgroundColor: c.color }}
+        />
+        <span className="min-w-0 flex-1 truncate text-sm">{c.name}</span>
+        <span
+          className={`grid h-4 w-4 shrink-0 place-items-center rounded border ${
+            on ? "border-accent bg-accent text-accent-contrast" : "border-line"
+          }`}
+        >
+          {on && <Check size={11} />}
+        </span>
+      </button>
+    );
+  };
+
+  return (
+    <div>
+      <p className="px-2 py-1 text-xs font-semibold text-muted">
+        {t("calendar.myCalendars")}
+      </p>
+      {owned.map(Row)}
+      {others.length > 0 && (
+        <>
+          <p className="px-2 pb-1 pt-2 text-xs font-semibold text-muted">
+            {t("calendar.otherCalendars")}
+          </p>
+          {others.map(Row)}
+        </>
+      )}
+    </div>
   );
 }
 

@@ -212,6 +212,9 @@ export const TRANSLATIONS = {
       noResults: "No matching events",
       results: "{n} results",
       openInGoogle: "Open in Google Calendar",
+      calendars: "Calendars",
+      myCalendars: "My calendars",
+      otherCalendars: "Other calendars",
     },
     focus: {
       todayCount: "🍅 {n} today",
@@ -470,6 +473,9 @@ export const TRANSLATIONS = {
       noResults: "Nessun evento corrispondente",
       results: "{n} risultati",
       openInGoogle: "Apri in Google Calendar",
+      calendars: "Calendari",
+      myCalendars: "I miei calendari",
+      otherCalendars: "Altri calendari",
     },
     focus: {
       todayCount: "🍅 {n} oggi",

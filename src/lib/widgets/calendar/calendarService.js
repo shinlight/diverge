@@ -159,7 +159,56 @@ export const EVENT_COLORS = COLORS;
 // Real Google Calendar read (MVP, read-only). Maps to our event shape.
 // `token` is the Google OAuth access token (from the Supabase session).
 const GCAL = "https://www.googleapis.com/calendar/v3";
-export async function fetchGoogleEvents(token) {
+
+// Noise Google injects into feeds: contact birthdays and "working location"
+// all-day markers. Keep real events, focus time, out-of-office.
+const SKIP_TYPES = new Set(["birthday", "workingLocation"]);
+
+function authError(status) {
+  const err = new Error("auth");
+  err.code = status;
+  return err;
+}
+
+// All calendars the user can access (owned + shared + "Other calendars"),
+// each with the colour the user picked in Google.
+export async function fetchCalendarList(token) {
+  const res = await fetch(`${GCAL}/users/me/calendarList`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (res.status === 401 || res.status === 403) throw authError(res.status);
+  if (!res.ok) throw new Error("calendarList request failed");
+  const j = await res.json();
+  return (j.items || []).map((c) => ({
+    id: c.id,
+    name: c.summaryOverride || c.summary || c.id,
+    color: c.backgroundColor || COLORS[0],
+    primary: Boolean(c.primary),
+    accessRole: c.accessRole,
+    // Default selection mirrors what's shown in Google (primary always on).
+    selected: Boolean(c.selected) || Boolean(c.primary),
+  }));
+}
+
+// Per-event colour overrides (when a user recolours a single event). Fetched
+// once and cached — most events just inherit their calendar's colour.
+let eventColorCache = null;
+async function getEventColors(token) {
+  if (eventColorCache) return eventColorCache;
+  try {
+    const res = await fetch(`${GCAL}/colors`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) return {};
+    const j = await res.json();
+    eventColorCache = j.event || {};
+    return eventColorCache;
+  } catch {
+    return {};
+  }
+}
+
+function timeWindowParams() {
   // A modest slice of recent past (so day-nav can step back ~a week) plus a
   // couple of months ahead. Keeping the past window small matters: events are
   // returned in start-time order capped at maxResults, so a large past window
@@ -168,43 +217,66 @@ export async function fetchGoogleEvents(token) {
   timeMin.setDate(timeMin.getDate() - 7);
   const timeMax = new Date();
   timeMax.setDate(timeMax.getDate() + 90);
-  const params = new URLSearchParams({
+  return new URLSearchParams({
     singleEvents: "true",
     orderBy: "startTime",
     timeMin: timeMin.toISOString(),
     timeMax: timeMax.toISOString(),
     maxResults: "250",
   });
-  const res = await fetch(`${GCAL}/calendars/primary/events?${params}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (res.status === 401 || res.status === 403) {
-    const err = new Error("auth");
-    err.code = res.status;
-    throw err;
-  }
-  if (!res.ok) throw new Error("google calendar request failed");
+}
+
+async function fetchOneCalendar(token, cal, params, eventColors) {
+  const res = await fetch(
+    `${GCAL}/calendars/${encodeURIComponent(cal.id)}/events?${params}`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  if (res.status === 401 || res.status === 403) throw authError(res.status);
+  if (!res.ok) throw new Error("calendar request failed");
   const j = await res.json();
-  // Skip the noise Google injects into the primary feed: contact birthdays
-  // and "working location" all-day markers. Keep real events, focus time, OOO.
-  const SKIP_TYPES = new Set(["birthday", "workingLocation"]);
   return (j.items || [])
     .filter((e) => e.start && (e.start.dateTime || e.start.date))
     .filter((e) => !SKIP_TYPES.has(e.eventType))
-    .map((e, i) => {
+    .map((e) => {
       const start = e.start.dateTime || e.start.date;
       const end = e.end?.dateTime || e.end?.date || start;
+      const override = e.colorId && eventColors[e.colorId]?.background;
       return {
-        id: e.id,
+        // Composite id: event ids are only unique within one calendar.
+        id: `${cal.id}::${e.id}`,
+        calendarId: cal.id,
         title: e.summary || "(no title)",
         start: new Date(start).toISOString(),
         end: new Date(end).toISOString(),
         location: e.location || "",
         notes: e.description || "",
-        color: COLORS[i % COLORS.length],
+        color: override || cal.color || COLORS[0],
         link: e.htmlLink || null, // deep link to the event in Google Calendar
       };
     });
+}
+
+// Read events from every selected calendar in parallel and merge them.
+// `calendars` is [{ id, color }]. A failing calendar is skipped, except auth
+// errors which bubble up so the caller can drop the (expired) token.
+export async function fetchGoogleEvents(token, calendars) {
+  const list =
+    calendars && calendars.length
+      ? calendars
+      : [{ id: "primary", color: COLORS[0] }];
+  const params = timeWindowParams().toString();
+  const eventColors = await getEventColors(token);
+  const results = await Promise.allSettled(
+    list.map((cal) => fetchOneCalendar(token, cal, params, eventColors))
+  );
+  const authErr = results.find(
+    (r) => r.status === "rejected" && (r.reason?.code === 401 || r.reason?.code === 403)
+  );
+  if (authErr) throw authErr.reason;
+  return results
+    .filter((r) => r.status === "fulfilled")
+    .flatMap((r) => r.value)
+    .sort((a, b) => new Date(a.start) - new Date(b.start));
 }
 
 const locale = (lang) => (lang === "it" ? "it-IT" : "en-US");

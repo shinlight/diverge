@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuth } from "../../auth/AuthContext";
 import {
   isConnected,
   connect as svcConnect,
   fetchEvents,
   fetchGoogleEvents,
+  fetchCalendarList,
   createEvent as svcCreate,
   updateEvent as svcUpdate,
   deleteEvent as svcDelete,
@@ -14,10 +15,11 @@ import {
 const CALENDAR_SCOPE = "https://www.googleapis.com/auth/calendar.readonly";
 
 // One source of truth for the Calendar widget + its focus view.
-// - Real mode: a Google token is present → read the user's real calendar.
+// - Real mode: a Google token is present → read the user's real calendars.
 // - Mock mode (no Supabase, local dev): the in-memory demo calendar.
 export function useCalendar() {
-  const { supabaseReady, googleToken, connectGoogle, clearGoogleToken } = useAuth();
+  const { supabaseReady, googleToken, connectGoogle, clearGoogleToken, user } =
+    useAuth();
   const realMode = Boolean(googleToken);
 
   const [mockConnected, setMockConnected] = useState(isConnected);
@@ -25,23 +27,100 @@ export function useCalendar() {
   const [events, setEvents] = useState([]);
   const [status, setStatus] = useState("idle"); // idle | loading | ready | error
 
+  // Multi-calendar: the list the user can access + which ids are shown.
+  // selectedIds === null means "not initialised yet" (calendar list loading).
+  const [calendars, setCalendars] = useState([]);
+  const [selectedIds, setSelectedIds] = useState(null);
+
+  // Remember the selection per user (no backend yet).
+  const storageKey = useMemo(
+    () => `diverge.calendar.selected.${user?.id ?? "anon"}`,
+    [user?.id]
+  );
+
   // With Supabase, the only path to "connected" is a real Google token.
   const connected = supabaseReady ? realMode : mockConnected;
 
+  // Load the calendar list once we have a real token, then seed the selection
+  // from storage (or from what Google itself marks as shown).
+  useEffect(() => {
+    if (!realMode) {
+      setCalendars([]);
+      setSelectedIds(null);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const list = await fetchCalendarList(googleToken);
+        if (cancelled) return;
+        setCalendars(list);
+        const available = new Set(list.map((c) => c.id));
+        const defaults = list.filter((c) => c.selected).map((c) => c.id);
+        let stored = null;
+        try {
+          const raw = localStorage.getItem(storageKey);
+          if (raw) stored = JSON.parse(raw);
+        } catch {
+          // ignore
+        }
+        const fromStore = Array.isArray(stored)
+          ? stored.filter((id) => available.has(id))
+          : null;
+        setSelectedIds(fromStore && fromStore.length ? fromStore : defaults);
+      } catch (e) {
+        if (e?.code === 401 || e?.code === 403) clearGoogleToken();
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [realMode, googleToken, storageKey, clearGoogleToken]);
+
   const refresh = useCallback(async () => {
+    if (realMode && selectedIds == null) {
+      setStatus("loading"); // still fetching the calendar list
+      return;
+    }
     setStatus("loading");
     try {
-      setEvents(realMode ? await fetchGoogleEvents(googleToken) : await fetchEvents());
+      if (realMode) {
+        const selCals = calendars.filter((c) => selectedIds.includes(c.id));
+        setEvents(
+          selCals.length ? await fetchGoogleEvents(googleToken, selCals) : []
+        );
+      } else {
+        setEvents(await fetchEvents());
+      }
       setStatus("ready");
     } catch (e) {
       if (e?.code === 401 || e?.code === 403) clearGoogleToken();
       setStatus("error");
     }
-  }, [realMode, googleToken, clearGoogleToken]);
+  }, [realMode, googleToken, selectedIds, calendars, clearGoogleToken]);
 
   useEffect(() => {
     if (connected) refresh();
   }, [connected, refresh]);
+
+  // Toggle a calendar on/off, persist the choice, and re-fetch (via refresh dep).
+  const toggleCalendar = useCallback(
+    (id) => {
+      setSelectedIds((prev) => {
+        const base = prev ?? [];
+        const next = base.includes(id)
+          ? base.filter((x) => x !== id)
+          : [...base, id];
+        try {
+          localStorage.setItem(storageKey, JSON.stringify(next));
+        } catch {
+          // ignore
+        }
+        return next;
+      });
+    },
+    [storageKey]
+  );
 
   const connect = useCallback(async () => {
     if (supabaseReady) {
@@ -97,10 +176,13 @@ export function useCalendar() {
   return {
     connected,
     connecting,
-    realMode, // true → reading the real Google calendar (read-only)
+    realMode, // true → reading the real Google calendars (read-only)
     status,
     events,
     upcoming,
+    calendars, // [{ id, name, color, primary, accessRole, selected }]
+    selectedIds, // ids currently shown (null while loading)
+    toggleCalendar,
     connect,
     refresh,
     create,
