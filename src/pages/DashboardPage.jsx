@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import TopBar from "../components/layout/TopBar";
+import Cockpit from "../components/cockpit/Cockpit";
 import WidgetGrid from "../components/widgets/WidgetGrid";
 import AddWidgetSheet from "../components/widgets/AddWidgetSheet";
 import ThemePanel from "../components/panels/ThemePanel";
@@ -66,6 +67,7 @@ export default function DashboardPage() {
       <TopBar onOpenTheme={() => setThemeOpen(true)} />
 
       <main className="px-4 py-6 sm:px-6 lg:px-8">
+        <Cockpit />
         <WidgetGrid
           layout={layout}
           titles={titles}

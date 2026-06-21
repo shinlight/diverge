@@ -48,6 +48,18 @@ export const TRANSLATIONS = {
     dashboard: {
       addWidget: "Add widget",
     },
+    cockpit: {
+      title: "Cockpit",
+      today: "Today",
+      now: "Now",
+      noEvents: "Nothing ahead",
+      allDay: "All day",
+      inMin: "in {n}m",
+      todo: "To-Do",
+      allClear: "All done ✨",
+      unread: "unread",
+      weather: "Weather",
+    },
     addWidget: {
       title: "Add a widget",
       subtitle: "Choose what to keep an eye on.",
@@ -315,6 +327,18 @@ export const TRANSLATIONS = {
     },
     dashboard: {
       addWidget: "Aggiungi widget",
+    },
+    cockpit: {
+      title: "Cockpit",
+      today: "Oggi",
+      now: "Adesso",
+      noEvents: "Niente in vista",
+      allDay: "Tutto il giorno",
+      inMin: "tra {n}m",
+      todo: "To-Do",
+      allClear: "Tutto fatto ✨",
+      unread: "non lette",
+      weather: "Meteo",
     },
     addWidget: {
       title: "Aggiungi un widget",

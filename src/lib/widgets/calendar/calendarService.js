@@ -280,6 +280,30 @@ export async function fetchGoogleEvents(token, calendars) {
     .sort((a, b) => new Date(a.start) - new Date(b.start));
 }
 
+// The next upcoming event on the primary calendar — one tiny call (Cockpit).
+export async function fetchNextEvent(token) {
+  const params = new URLSearchParams({
+    singleEvents: "true",
+    orderBy: "startTime",
+    timeMin: new Date().toISOString(),
+    maxResults: "1",
+  });
+  const res = await fetch(`${GCAL}/calendars/primary/events?${params}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (res.status === 401 || res.status === 403) throw authError(res.status);
+  if (!res.ok) throw new Error("calendar request failed");
+  const j = await res.json();
+  const e = (j.items || []).find((x) => x.start && (x.start.dateTime || x.start.date));
+  if (!e) return null;
+  const start = e.start.dateTime || e.start.date;
+  return {
+    title: e.summary || "(no title)",
+    start: new Date(start).toISOString(),
+    allDay: !e.start.dateTime,
+  };
+}
+
 // --- write operations (scope: calendar.events) ---------------------------
 
 // Map our editor data → a Google Calendar event resource body.

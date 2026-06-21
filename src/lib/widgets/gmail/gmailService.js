@@ -254,6 +254,12 @@ async function gmailPost(token, path, body) {
   return res.json();
 }
 
+// Just the INBOX unread count — one tiny call (for the Cockpit recap).
+export async function fetchUnreadCount(token) {
+  const j = await gmailGet(token, "/labels/INBOX");
+  return j.messagesUnread ?? 0;
+}
+
 // INBOX list with light metadata (sender, subject, date, snippet, flags).
 // Bodies are loaded lazily (getGmailBody) when a message is opened.
 export async function fetchGmailMessages(token, max = 15) {

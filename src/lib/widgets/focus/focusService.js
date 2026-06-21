@@ -71,7 +71,16 @@ export const loadTags = () => load(KEYS.tags, DEFAULT_TAGS);
 export const saveTags = (t) => save(KEYS.tags, t);
 
 export const loadTasks = () => load(KEYS.tasks, DEFAULT_TASKS);
-export const saveTasks = (t) => save(KEYS.tasks, t);
+export const saveTasks = (t) => {
+  save(KEYS.tasks, t);
+  // Let same-tab listeners (e.g. the Cockpit) react — `storage` only fires
+  // across tabs.
+  try {
+    window.dispatchEvent(new Event("diverge:tasks"));
+  } catch {
+    // ignore (non-browser)
+  }
+};
 
 export const loadSessions = () => load(KEYS.sessions, []);
 export const saveSessions = (s) => save(KEYS.sessions, s);
