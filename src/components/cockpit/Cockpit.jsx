@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from "react";
 import {
   Gauge,
   CalendarDays,
@@ -19,19 +18,11 @@ import { useI18n } from "../../lib/i18n/LanguageContext";
 import { codeKey } from "../../lib/widgets/weather/weatherService";
 
 // A pinned, non-removable summary strip above the widget grid.
-// Background is a faint pastel of the user's accent; height tracks 50% of a
-// widget cell at the current breakpoint.
+// Background is a faint pastel of the user's accent; the height hugs the
+// content (compact band) instead of a fixed proportion.
 
 const BG = "color-mix(in srgb, var(--color-accent) 10%, var(--color-bg))";
 const BORDER = "color-mix(in srgb, var(--color-accent) 24%, var(--color-bg))";
-
-function colsForWidth(w) {
-  if (w >= 1536) return 5;
-  if (w >= 1280) return 4;
-  if (w >= 1024) return 3;
-  if (w >= 640) return 2;
-  return 1;
-}
 
 const WEATHER_ICON = {
   clear: Sun,
@@ -48,29 +39,6 @@ const WEATHER_ICON = {
 export default function Cockpit() {
   const { t, lang } = useI18n();
   const { now, nextEvent, unread, google, weather, tasks } = useCockpit();
-  const ref = useRef(null);
-  const [height, setHeight] = useState(0);
-
-  // Height = half a widget cell: (width − gaps) / columns / 2.
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const compute = () => {
-      const cols = colsForWidth(window.innerWidth);
-      // On mobile (1 column) half a widget is too short for the cells → let
-      // the Cockpit size to its content instead. On sm+ it's a neat strip.
-      if (cols === 1) {
-        setHeight(0);
-        return;
-      }
-      const cell = (el.clientWidth - (cols - 1) * 16) / cols;
-      setHeight(Math.max(96, Math.round(cell / 2)));
-    };
-    compute();
-    const ro = new ResizeObserver(compute);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
 
   const cells = {
     date: <DateCell now={now} lang={lang} t={t} />,
@@ -82,17 +50,13 @@ export default function Cockpit() {
 
   return (
     <section
-      ref={ref}
-      style={{ height: height || undefined, background: BG, borderColor: BORDER }}
-      className="relative mb-4 w-full overflow-hidden rounded-2xl border min-h-[96px]"
+      style={{ background: BG, borderColor: BORDER }}
+      className="mb-4 w-full overflow-hidden rounded-2xl border"
     >
-      <span className="pointer-events-none absolute left-4 top-2.5 z-10 flex items-center gap-1
-        text-[10px] font-semibold uppercase tracking-[0.18em] text-accent/70">
-        <Gauge size={11} /> {t("cockpit.title")}
-      </span>
-
-      {/* Desktop: one horizontal strip */}
-      <div className="hidden h-full items-center px-4 sm:flex">
+      {/* Desktop: one compact horizontal strip */}
+      <div className="hidden items-center gap-1 px-4 py-3 sm:flex">
+        <Brand t={t} />
+        <Divider />
         {cells.date}
         <Divider />
         {cells.next}
@@ -104,20 +68,36 @@ export default function Cockpit() {
         {cells.weather}
       </div>
 
-      {/* Mobile: 2-column grid, To-Do full width (content-height) */}
-      <div className="grid grid-cols-2 gap-x-3 gap-y-3 px-4 pb-4 pt-7 sm:hidden">
-        {cells.date}
-        {cells.next}
-        {cells.mail}
-        {cells.weather}
-        <div className="col-span-2">{cells.todo}</div>
+      {/* Mobile: brand + 2-column grid, To-Do full width */}
+      <div className="px-4 py-3 sm:hidden">
+        <Brand t={t} className="mb-2.5" />
+        <div className="grid grid-cols-2 gap-x-3 gap-y-3">
+          {cells.date}
+          {cells.next}
+          {cells.mail}
+          {cells.weather}
+          <div className="col-span-2">{cells.todo}</div>
+        </div>
       </div>
     </section>
   );
 }
 
+function Brand({ t, className = "" }) {
+  return (
+    <span
+      className={`flex shrink-0 items-center gap-1.5 pr-1 text-accent/70 ${className}`}
+    >
+      <Gauge size={14} />
+      <span className="text-[11px] font-semibold uppercase tracking-[0.16em]">
+        {t("cockpit.title")}
+      </span>
+    </span>
+  );
+}
+
 function Divider() {
-  return <span className="mx-1 h-9 w-px shrink-0 bg-line/60" />;
+  return <span className="my-0.5 w-px shrink-0 self-stretch bg-line/60" />;
 }
 
 function Stat({ icon: Icon, label, value, sub, flex = "flex-1" }) {
