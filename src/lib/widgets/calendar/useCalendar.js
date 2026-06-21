@@ -170,7 +170,7 @@ export function useCalendar() {
     async (data) => {
       if (realMode) {
         const created = await withRetry((tok = googleToken) =>
-          createGoogleEvent(tok, data)
+          createGoogleEvent(tok, data, data.calendarId || "primary")
         );
         await refresh(); // resync from Google (source of truth)
         return created; // { id } → focus selects the new event

@@ -349,6 +349,7 @@ export default function CalendarFocus({
                     key="create"
                     initial={defaultNewEvent()}
                     realMode={realMode}
+                    calendars={calendars}
                     onSave={async (data) => {
                       const created = await create(data);
                       setSelectedId(created.id);
@@ -468,7 +469,14 @@ function AgendaRow({ event, active, onOpen }) {
   );
 }
 
-function EventEditor({ initial, onSave, onDelete, onCancel, realMode = false }) {
+function EventEditor({
+  initial,
+  onSave,
+  onDelete,
+  onCancel,
+  realMode = false,
+  calendars = [],
+}) {
   const { t } = useI18n();
   const [title, setTitle] = useState(initial.title);
   const [start, setStart] = useState(toLocalInput(initial.start));
@@ -478,6 +486,16 @@ function EventEditor({ initial, onSave, onDelete, onCancel, realMode = false }) 
   const [color, setColor] = useState(initial.color ?? EVENT_COLORS[0]);
   const [saving, setSaving] = useState(false);
   const isEdit = Boolean(onDelete);
+
+  // Calendars the user can write to (new events pick a target).
+  const writable = calendars.filter(
+    (c) => c.accessRole === "owner" || c.accessRole === "writer"
+  );
+  const [calendarId, setCalendarId] = useState(
+    () => (writable.find((c) => c.primary) || writable[0])?.id || "primary"
+  );
+  const showCalendarPicker = realMode && !isEdit && writable.length > 1;
+  const selectedCal = writable.find((c) => c.id === calendarId);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -489,6 +507,7 @@ function EventEditor({ initial, onSave, onDelete, onCancel, realMode = false }) 
       location,
       notes,
       color,
+      calendarId,
     });
     setSaving(false);
   }
@@ -538,6 +557,28 @@ function EventEditor({ initial, onSave, onDelete, onCancel, realMode = false }) 
             />
           </LabeledField>
         </div>
+
+        {showCalendarPicker && (
+          <LabeledField label={t("calendar.calendarField")} icon={Calendar}>
+            <div className="flex items-center gap-2">
+              <span
+                className="h-3 w-3 shrink-0 rounded-full"
+                style={{ backgroundColor: selectedCal?.color }}
+              />
+              <select
+                value={calendarId}
+                onChange={(e) => setCalendarId(e.target.value)}
+                className="w-full bg-transparent text-sm outline-none [color-scheme:dark]"
+              >
+                {writable.map((c) => (
+                  <option key={c.id} value={c.id} className="bg-surface text-content">
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </LabeledField>
+        )}
 
         <LabeledField label={t("calendar.location")} icon={MapPin}>
           <input
