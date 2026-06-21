@@ -3,6 +3,7 @@
 // To bring a widget to life later: build its component and add it here.
 import GmailWidget from "./GmailWidget";
 import CalendarWidget from "./CalendarWidget";
+import TasksWidget from "./TasksWidget";
 import FocusWidget from "./FocusWidget";
 import AIWidget from "./AIWidget";
 import WeatherWidget from "./WeatherWidget";
@@ -13,6 +14,7 @@ import MessagingWidget from "./MessagingWidget";
 export const LIVE_WIDGETS = {
   gmail: GmailWidget,
   calendar: CalendarWidget,
+  tasks: TasksWidget,
   focus: FocusWidget,
   ai: AIWidget,
   weather: WeatherWidget,

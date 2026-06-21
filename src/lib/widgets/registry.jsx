@@ -36,7 +36,7 @@ export const WIDGETS = {
     descKey: "widgets.tasks.desc",
     icon: CheckSquare,
     accent: "#2fb380",
-    status: "soon",
+    status: "live",
     size: "sm",
   },
   notes: {

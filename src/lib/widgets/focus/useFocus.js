@@ -13,6 +13,7 @@ import {
   todayStats,
   todayStr,
   uid,
+  makeTask,
 } from "./focusService";
 
 // Phase -> translation key for its label.
@@ -29,6 +30,20 @@ export function useFocus() {
   const [tags, setTags] = useState(loadTags);
   const [tasks, setTasks] = useState(loadTasks);
   const [sessions, setSessions] = useState(loadSessions);
+
+  // Tasks + tags are shared with the To-Do widget; re-sync on its changes.
+  useEffect(() => {
+    const sync = () => {
+      setTasks(loadTasks());
+      setTags(loadTags());
+    };
+    window.addEventListener("diverge:tasks", sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.removeEventListener("diverge:tasks", sync);
+      window.removeEventListener("storage", sync);
+    };
+  }, []);
 
   const [phase, setPhase] = useState("focus");
   const [running, setRunning] = useState(false);
@@ -176,10 +191,7 @@ export function useFocus() {
   const addTask = useCallback((title, tagId) => {
     if (!title.trim()) return;
     setTasks((list) => {
-      const next = [
-        ...list,
-        { id: uid(), title: title.trim(), tagId, done: false, pomodoros: 0 },
-      ];
+      const next = [...list, makeTask({ title: title.trim(), tagId })];
       saveTasks(next);
       return next;
     });

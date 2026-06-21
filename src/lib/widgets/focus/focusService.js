@@ -1,21 +1,26 @@
 /*
   DiVerge — Focus (Pomodoro) service.
 
-  Unlike Gmail/Calendar this widget is LOCAL: no external API to connect to.
-  Everything persists in localStorage so tasks, tags, settings and the day's
-  completed pomodoros survive reloads.
+  Local widget (no external API). Settings + the day's completed pomodoros
+  persist here. Tasks + tags are NOT owned here anymore — they live in the
+  shared tasksService (the To-Do widget is the canonical task store); we just
+  re-export its loaders so existing Focus code keeps working against one list.
 
   Data:
     settings  -> customizable timer durations
-    tags      -> groups for tasks ({ id, name, color })
-    tasks     -> { id, title, tagId, done, pomodoros }
     sessions  -> log of completed focus pomodoros ({ id, taskId, tagId, date, minutes })
 */
 
+import {
+  loadTasks as tasksLoad,
+  saveTasks as tasksSave,
+  loadTags as tagsLoad,
+  saveTags as tagsSave,
+  makeTask,
+} from "../tasks/tasksService";
+
 const KEYS = {
   settings: "diverge.focus.settings",
-  tags: "diverge.focus.tags",
-  tasks: "diverge.focus.tasks",
   sessions: "diverge.focus.sessions",
 };
 
@@ -36,18 +41,6 @@ export const DEFAULT_SETTINGS = {
   autoStart: true, // auto-start the next phase
 };
 
-const DEFAULT_TAGS = [
-  { id: "work", name: "Lavoro", color: TAG_COLORS[0] },
-  { id: "study", name: "Studio", color: TAG_COLORS[1] },
-  { id: "personal", name: "Personale", color: TAG_COLORS[2] },
-];
-
-const DEFAULT_TASKS = [
-  { id: "t1", title: "Sviluppo widget DiVerge", tagId: "work", done: false, pomodoros: 0 },
-  { id: "t2", title: "Studiare React hooks", tagId: "study", done: false, pomodoros: 0 },
-  { id: "t3", title: "Rispondere alle email", tagId: "work", done: false, pomodoros: 0 },
-];
-
 // --- persistence ---------------------------------------------------------
 
 function load(key, fallback) {
@@ -67,20 +60,16 @@ function save(key, value) {
 export const loadSettings = () => ({ ...DEFAULT_SETTINGS, ...load(KEYS.settings, {}) });
 export const saveSettings = (s) => save(KEYS.settings, s);
 
-export const loadTags = () => load(KEYS.tags, DEFAULT_TAGS);
-export const saveTags = (t) => save(KEYS.tags, t);
+// Tasks + tags are owned by the shared tasksService now — re-export so the
+// Focus widget reads/writes the same canonical list.
+export const loadTags = tagsLoad;
+export const saveTags = tagsSave;
+export const loadTasks = tasksLoad;
+export const saveTasks = tasksSave;
 
-export const loadTasks = () => load(KEYS.tasks, DEFAULT_TASKS);
-export const saveTasks = (t) => {
-  save(KEYS.tasks, t);
-  // Let same-tab listeners (e.g. the Cockpit) react — `storage` only fires
-  // across tabs.
-  try {
-    window.dispatchEvent(new Event("diverge:tasks"));
-  } catch {
-    // ignore (non-browser)
-  }
-};
+// Build a full-shaped task (the To-Do model) — used by useFocus.addTask so
+// tasks created from the Pomodoro widget are consistent everywhere.
+export { makeTask };
 
 export const loadSessions = () => load(KEYS.sessions, []);
 export const saveSessions = (s) => save(KEYS.sessions, s);

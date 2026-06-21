@@ -3,13 +3,16 @@ import { useAuth } from "../auth/AuthContext";
 import { fetchNextEvent } from "../widgets/calendar/calendarService";
 import { fetchUnreadCount } from "../widgets/gmail/gmailService";
 import { loadCache } from "../widgets/weather/weatherService";
-import { loadTasks, loadTags } from "../widgets/focus/focusService";
+import { loadTasks, loadTags, todayStr } from "../widgets/tasks/tasksService";
 
-// The next few undone tasks, joined with their tag colour.
+// The next few undone tasks (Big 3 of today first), joined with their tag colour.
 function upcomingTasks(limit = 3) {
   const tags = loadTags();
+  const today = todayStr();
+  const rank = (t) => (t.big3 && t.big3Date === today ? 0 : 1);
   return loadTasks()
-    .filter((t) => !t.done)
+    .filter((t) => !t.done && t.status !== "someday")
+    .sort((a, b) => rank(a) - rank(b))
     .slice(0, limit)
     .map((t) => ({
       id: t.id,
