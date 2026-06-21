@@ -149,7 +149,7 @@ export default function TasksFocus({ open, onClose, tasks }) {
             </div>
 
             {/* Big 3 */}
-            <Big3Strip big3={big3} all={all} onToggleDone={toggleDone} t={t} />
+            <Big3Strip big3={big3} all={all} onToggleDone={toggleDone} onAdd={toggleBig3} t={t} />
 
             {/* Body */}
             <div className="flex min-h-0 flex-1">
@@ -242,8 +242,12 @@ function todayStr(d = new Date()) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
-function Big3Strip({ big3, all, onToggleDone, t }) {
+function Big3Strip({ big3, all, onToggleDone, onAdd, t }) {
   const slots = [0, 1, 2];
+  const today = todayStr();
+  const candidates = all.filter(
+    (x) => !x.done && x.status === "active" && !(x.big3 && x.big3Date === today)
+  );
   return (
     <div className="shrink-0 border-b border-line bg-surface-2/40 px-5 py-3">
       <p className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted">
@@ -253,20 +257,50 @@ function Big3Strip({ big3, all, onToggleDone, t }) {
         {slots.map((i) => {
           const task = big3[i];
           if (!task)
-            return (
-              <div key={i} className="flex items-center gap-2 rounded-xl border border-dashed border-line px-3 py-2 text-sm text-muted">
-                <Plus size={15} /> {t("tasks.big3Add")}
-              </div>
-            );
+            return <Big3AddSlot key={`add-${i}`} candidates={candidates} onPick={onAdd} t={t} />;
           return (
-            <button key={task.id} onClick={() => onToggleDone(task.id)}
-              className="flex items-center gap-2 rounded-xl border border-line bg-surface px-3 py-2 text-left hover:bg-surface-2/60">
-              <Circle size={16} className="shrink-0 text-muted" />
-              <span className="truncate text-sm font-medium">{task.title}</span>
-            </button>
+            <div key={task.id}
+              className="flex items-center gap-2 rounded-xl border border-line bg-surface px-3 py-2">
+              <button onClick={() => onToggleDone(task.id)} aria-label={t("tasks.complete")} className="shrink-0">
+                <Circle size={16} className="text-muted hover:text-content" />
+              </button>
+              <span className="min-w-0 flex-1 truncate text-sm font-medium">{task.title}</span>
+              <button onClick={() => onAdd(task.id)} aria-label={t("common.delete")}
+                className="shrink-0 text-muted hover:text-content">
+                <X size={14} />
+              </button>
+            </div>
           );
         })}
       </div>
+    </div>
+  );
+}
+
+function Big3AddSlot({ candidates, onPick, t }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="relative">
+      <button onClick={() => candidates.length && setOpen((o) => !o)}
+        className={`flex w-full items-center gap-2 rounded-xl border border-dashed border-line px-3 py-2 text-sm text-muted
+          ${candidates.length ? "hover:border-accent hover:text-content" : "opacity-60"}`}>
+        <Plus size={15} /> {t("tasks.big3Add")}
+      </button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div className="absolute left-0 right-0 z-20 mt-1 max-h-56 overflow-y-auto rounded-xl border border-line bg-surface p-1 shadow-xl">
+            {candidates.map((task) => (
+              <button key={task.id}
+                onClick={() => { onPick(task.id); setOpen(false); }}
+                className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm hover:bg-surface-2">
+                <Star size={13} className="shrink-0 text-muted" />
+                <span className="min-w-0 flex-1 truncate">{task.title}</span>
+              </button>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }
