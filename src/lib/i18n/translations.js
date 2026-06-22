@@ -48,6 +48,12 @@ export const TRANSLATIONS = {
     dashboard: {
       addWidget: "Add widget",
     },
+    widget: {
+      pin: "Pin to top",
+      unpin: "Unpin",
+      pinned: "Pinned",
+      pinFull: "Max 6 pinned",
+    },
     cockpit: {
       title: "Cockpit",
       today: "Today",
@@ -386,6 +392,12 @@ export const TRANSLATIONS = {
     },
     dashboard: {
       addWidget: "Aggiungi widget",
+    },
+    widget: {
+      pin: "Fissa in alto",
+      unpin: "Sblocca",
+      pinned: "Fissato",
+      pinFull: "Massimo 6 fissati",
     },
     cockpit: {
       title: "Cockpit",

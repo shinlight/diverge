@@ -16,11 +16,14 @@ import WidgetCard from "./WidgetCard";
 import { useI18n } from "../../lib/i18n/LanguageContext";
 
 export default function WidgetGrid({
-  layout,
+  order,
   titles = {},
+  pinnedSet,
+  canPin = true,
   onReorder,
   onRemove,
   onRename,
+  onTogglePin,
   onAdd,
 }) {
   const { t } = useI18n();
@@ -31,9 +34,9 @@ export default function WidgetGrid({
   function handleDragEnd(event) {
     const { active, over } = event;
     if (over && active.id !== over.id) {
-      const oldIndex = layout.indexOf(active.id);
-      const newIndex = layout.indexOf(over.id);
-      onReorder(arrayMove(layout, oldIndex, newIndex));
+      const oldIndex = order.indexOf(active.id);
+      const newIndex = order.indexOf(over.id);
+      onReorder(arrayMove(order, oldIndex, newIndex));
     }
   }
 
@@ -43,27 +46,33 @@ export default function WidgetGrid({
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
     >
-      <SortableContext items={layout} strategy={rectSortingStrategy}>
+      <SortableContext items={order} strategy={rectSortingStrategy}>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
           <AnimatePresence mode="popLayout">
-            {layout.map((id) => (
-              <motion.div
-                key={id}
-                layout
-                className="aspect-square"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ type: "spring", stiffness: 350, damping: 30 }}
-              >
-                <WidgetCard
-                  id={id}
-                  titleOverride={titles[id]}
-                  onRemove={onRemove}
-                  onRename={onRename}
-                />
-              </motion.div>
-            ))}
+            {order.map((id) => {
+              const pinned = pinnedSet?.has(id) ?? false;
+              return (
+                <motion.div
+                  key={id}
+                  layout
+                  className="aspect-square"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                >
+                  <WidgetCard
+                    id={id}
+                    titleOverride={titles[id]}
+                    pinned={pinned}
+                    pinDisabled={!pinned && !canPin}
+                    onRemove={onRemove}
+                    onRename={onRename}
+                    onTogglePin={onTogglePin}
+                  />
+                </motion.div>
+              );
+            })}
           </AnimatePresence>
 
           <motion.button

@@ -1,12 +1,20 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, X } from "lucide-react";
+import { GripVertical, X, Pin } from "lucide-react";
 import { WIDGETS, instanceType } from "../../lib/widgets/registry";
 import { useI18n } from "../../lib/i18n/LanguageContext";
 import { LIVE_WIDGETS } from "./live";
 import WidgetHeader from "./WidgetHeader";
 
-export default function WidgetCard({ id, titleOverride, onRemove, onRename }) {
+export default function WidgetCard({
+  id,
+  titleOverride,
+  pinned = false,
+  pinDisabled = false,
+  onRemove,
+  onRename,
+  onTogglePin,
+}) {
   const { t } = useI18n();
   const type = instanceType(id);
   const widget = WIDGETS[type];
@@ -34,13 +42,36 @@ export default function WidgetCard({ id, titleOverride, onRemove, onRename }) {
     <div
       ref={setNodeRef}
       style={style}
-      className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border border-line
+      className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border
         bg-surface transition-shadow ${
-          isDragging ? "shadow-2xl shadow-black/40" : ""
-        }`}
+          pinned ? "border-accent/50 ring-1 ring-accent/30" : "border-line"
+        } ${isDragging ? "shadow-2xl shadow-black/40" : ""}`}
     >
+      {/* Persistent pin badge (so you see what's pinned without hovering). */}
+      {pinned && (
+        <span
+          className="absolute left-2 top-2 z-20 grid h-6 w-6 place-items-center rounded-lg
+            bg-accent/15 text-accent"
+          aria-hidden="true"
+          title={t("widget.pinned")}
+        >
+          <Pin size={13} fill="currentColor" />
+        </span>
+      )}
+
       {/* Hover controls — float above the widget's own content. */}
       <div className="absolute right-2 top-2 z-20 flex items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+        <button
+          onClick={() => !pinDisabled && onTogglePin?.(id)}
+          disabled={pinDisabled}
+          aria-label={pinned ? t("widget.unpin") : t("widget.pin")}
+          title={pinDisabled ? t("widget.pinFull") : pinned ? t("widget.unpin") : t("widget.pin")}
+          className={`grid h-7 w-7 place-items-center rounded-lg bg-surface/80 backdrop-blur
+            hover:bg-surface-2 hover:text-content disabled:opacity-40
+            ${pinned ? "text-accent" : "text-muted"}`}
+        >
+          <Pin size={15} fill={pinned ? "currentColor" : "none"} />
+        </button>
         <button
           onClick={() => onRemove(id)}
           aria-label={`Rimuovi ${title}`}
