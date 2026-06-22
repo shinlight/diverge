@@ -174,6 +174,7 @@ export default function TasksFocus({ open, onClose, tasks }) {
                 chunkingIds={chunkingIds}
                 onDone={(id) => toggleDone(id)}
                 onSkip={() => setMonoIdx((i) => i + 1)}
+                onShuffle={() => monoList.length && setMonoIdx(Math.floor(Math.random() * monoList.length))}
                 onPomodoro={(id) => startPomodoro(id)}
                 onChunk={(id) => chunkTask(id)}
                 onExit={() => setMono(false)}
@@ -278,7 +279,7 @@ function todayStr(d = new Date()) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
-function OneThing({ list, index, tags, t, chunkingIds, onDone, onSkip, onPomodoro, onChunk, onExit }) {
+function OneThing({ list, index, tags, t, chunkingIds, onDone, onSkip, onShuffle, onPomodoro, onChunk, onExit }) {
   const task = list[index] ?? null;
   const chunking = task ? chunkingIds.has(task.id) : false;
   if (!task) {
@@ -324,6 +325,10 @@ function OneThing({ list, index, tags, t, chunkingIds, onDone, onSkip, onPomodor
           className="inline-flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm hover:bg-surface-2 disabled:opacity-70">
           {chunking ? <RefreshCw size={16} className="animate-spin" /> : <Sparkles size={16} />}
           {chunking ? t("tasks.chunking") : t("tasks.chunkIt")}
+        </button>
+        <button onClick={onShuffle}
+          className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm text-muted hover:bg-surface-2 hover:text-content">
+          <Dice5 size={16} /> {t("tasks.spin")}
         </button>
         <button onClick={onSkip}
           className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm text-muted hover:bg-surface-2 hover:text-content">
