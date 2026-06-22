@@ -13,6 +13,7 @@ import {
 const LAYOUT_KEY = "diverge.layout";
 const TITLES_KEY = "diverge.titles";
 const PINNED_KEY = "diverge.pinned";
+const WIDE_KEY = "diverge.wide";
 const MAX_PINNED = 6;
 
 function loadJSON(key, fallback) {
@@ -29,15 +30,18 @@ export default function DashboardPage() {
   const [layout, setLayout] = useState(() => loadJSON(LAYOUT_KEY, DEFAULT_LAYOUT));
   const [titles, setTitles] = useState(() => loadJSON(TITLES_KEY, {}));
   const [pinned, setPinned] = useState(() => loadJSON(PINNED_KEY, []));
+  const [wide, setWide] = useState(() => loadJSON(WIDE_KEY, []));
   const [themeOpen, setThemeOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
 
   useEffect(() => localStorage.setItem(LAYOUT_KEY, JSON.stringify(layout)), [layout]);
   useEffect(() => localStorage.setItem(TITLES_KEY, JSON.stringify(titles)), [titles]);
   useEffect(() => localStorage.setItem(PINNED_KEY, JSON.stringify(pinned)), [pinned]);
+  useEffect(() => localStorage.setItem(WIDE_KEY, JSON.stringify(wide)), [wide]);
 
   // Pinned widgets (in pin order) lead, then the rest in their own order.
   const pinnedSet = useMemo(() => new Set(pinned), [pinned]);
+  const wideSet = useMemo(() => new Set(wide), [wide]);
   const order = useMemo(() => {
     const pins = pinned.filter((id) => layout.includes(id));
     const rest = layout.filter((id) => !pinnedSet.has(id));
@@ -49,7 +53,11 @@ export default function DashboardPage() {
   const removeWidget = (id) => {
     setLayout((l) => l.filter((w) => w !== id));
     setPinned((p) => p.filter((w) => w !== id));
+    setWide((w) => w.filter((x) => x !== id));
   };
+
+  const toggleWide = (id) =>
+    setWide((w) => (w.includes(id) ? w.filter((x) => x !== id) : [...w, id]));
 
   const togglePin = (id) =>
     setPinned((p) => {
@@ -82,11 +90,13 @@ export default function DashboardPage() {
           order={order}
           titles={titles}
           pinnedSet={pinnedSet}
+          wideSet={wideSet}
           canPin={pinned.length < MAX_PINNED}
           onReorder={reorder}
           onRemove={removeWidget}
           onRename={renameWidget}
           onTogglePin={togglePin}
+          onToggleWide={toggleWide}
           onAdd={() => setAddOpen(true)}
         />
       </main>

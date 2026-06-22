@@ -53,6 +53,8 @@ export const TRANSLATIONS = {
       unpin: "Unpin",
       pinned: "Pinned",
       pinFull: "Max 6 pinned",
+      widen: "Expand to 2 blocks",
+      shrink: "Back to 1 block",
     },
     cockpit: {
       title: "Cockpit",
@@ -398,6 +400,8 @@ export const TRANSLATIONS = {
       unpin: "Sblocca",
       pinned: "Fissato",
       pinFull: "Massimo 6 fissati",
+      widen: "Dilata a 2 blocchi",
+      shrink: "Torna a 1 blocco",
     },
     cockpit: {
       title: "Cockpit",

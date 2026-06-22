@@ -1,6 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, X, Pin } from "lucide-react";
+import { GripVertical, X, Pin, ChevronsLeftRight, ChevronsRightLeft } from "lucide-react";
 import { WIDGETS, instanceType } from "../../lib/widgets/registry";
 import { useI18n } from "../../lib/i18n/LanguageContext";
 import { LIVE_WIDGETS } from "./live";
@@ -11,9 +11,11 @@ export default function WidgetCard({
   titleOverride,
   pinned = false,
   pinDisabled = false,
+  wide = false,
   onRemove,
   onRename,
   onTogglePin,
+  onToggleWide,
 }) {
   const { t } = useI18n();
   const type = instanceType(id);
@@ -61,6 +63,17 @@ export default function WidgetCard({
 
       {/* Hover controls — float above the widget's own content. */}
       <div className="absolute right-2 top-2 z-20 flex items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+        {widget.wide && (
+          <button
+            onClick={() => onToggleWide?.(id)}
+            aria-label={wide ? t("widget.shrink") : t("widget.widen")}
+            title={wide ? t("widget.shrink") : t("widget.widen")}
+            className="hidden h-7 w-7 place-items-center rounded-lg bg-surface/80 text-muted
+              backdrop-blur hover:bg-surface-2 hover:text-content sm:grid"
+          >
+            {wide ? <ChevronsRightLeft size={15} /> : <ChevronsLeftRight size={15} />}
+          </button>
+        )}
         <button
           onClick={() => !pinDisabled && onTogglePin?.(id)}
           disabled={pinDisabled}

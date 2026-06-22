@@ -19,11 +19,13 @@ export default function WidgetGrid({
   order,
   titles = {},
   pinnedSet,
+  wideSet,
   canPin = true,
   onReorder,
   onRemove,
   onRename,
   onTogglePin,
+  onToggleWide,
   onAdd,
 }) {
   const { t } = useI18n();
@@ -51,11 +53,16 @@ export default function WidgetGrid({
           <AnimatePresence mode="popLayout">
             {order.map((id) => {
               const pinned = pinnedSet?.has(id) ?? false;
+              const wide = wideSet?.has(id) ?? false;
               return (
                 <motion.div
                   key={id}
                   layout
-                  className="aspect-square"
+                  className={
+                    wide
+                      ? "aspect-square sm:col-span-2 sm:aspect-[2/1]"
+                      : "aspect-square"
+                  }
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
@@ -66,9 +73,11 @@ export default function WidgetGrid({
                     titleOverride={titles[id]}
                     pinned={pinned}
                     pinDisabled={!pinned && !canPin}
+                    wide={wide}
                     onRemove={onRemove}
                     onRename={onRename}
                     onTogglePin={onTogglePin}
+                    onToggleWide={onToggleWide}
                   />
                 </motion.div>
               );

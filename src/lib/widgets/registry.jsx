@@ -20,6 +20,7 @@ export const WIDGETS = {
     accent: "#ea4335",
     status: "live",
     size: "md",
+    wide: true, // can expand to 2 blocks
   },
   calendar: {
     id: "calendar",
@@ -29,6 +30,7 @@ export const WIDGETS = {
     accent: "#4285f4",
     status: "live",
     size: "md",
+    wide: true,
   },
   tasks: {
     id: "tasks",
@@ -38,6 +40,7 @@ export const WIDGETS = {
     accent: "#2fb380",
     status: "live",
     size: "sm",
+    wide: true,
   },
   notes: {
     id: "notes",
@@ -74,6 +77,7 @@ export const WIDGETS = {
     accent: "#7c5cff",
     status: "live",
     size: "md",
+    wide: true,
     multiInstance: true, // the user can add several, each with its own model
   },
   clipboard: {
@@ -93,6 +97,7 @@ export const WIDGETS = {
     accent: "#0ea5e9",
     status: "live",
     size: "md",
+    wide: true,
     multiInstance: true, // one widget per channel; several can coexist
   },
   braindump: {
