@@ -139,6 +139,7 @@ export const TRANSLATIONS = {
     login: {
       tagline: "Your space, your way.\nA dashboard that follows how you think.",
       continueGoogle: "Continue with Google",
+      continueApple: "Continue with Apple",
       continueMeta: "Continue with Meta",
       or: "or",
       email: "Email",
@@ -477,6 +478,7 @@ export const TRANSLATIONS = {
     login: {
       tagline: "Il tuo spazio, a modo tuo.\nUna dashboard che asseconda il tuo modo di pensare.",
       continueGoogle: "Continua con Google",
+      continueApple: "Continua con Apple",
       continueMeta: "Continua con Meta",
       or: "oppure",
       email: "Email",
