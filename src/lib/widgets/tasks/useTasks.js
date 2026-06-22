@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { supabase, isSupabaseConfigured } from "../../supabase/client";
 import {
   loadTasks,
   saveTasks,
@@ -6,6 +7,7 @@ import {
   saveTags,
   makeTask,
   chunkIt,
+  chunkItAI,
   todayStr,
   uid,
 } from "./tasksService";
@@ -123,16 +125,41 @@ export function useTasks() {
 
   // --- subtasks ----------------------------------------------------------
 
+  const [chunkingIds, setChunkingIds] = useState(() => new Set());
+
   const chunkTask = useCallback(
-    (id) =>
-      commit((list) =>
-        list.map((t) =>
-          t.id === id
-            ? { ...t, subtasks: chunkIt(t.title).map((title) => ({ id: uid(), title, done: false })) }
-            : t
-        )
-      ),
-    [commit]
+    async (id) => {
+      const task = tasks.find((t) => t.id === id);
+      if (!task) return;
+      setChunkingIds((s) => new Set(s).add(id));
+      try {
+        let steps = null;
+        if (isSupabaseConfigured && supabase) {
+          try {
+            const { data } = await supabase.auth.getSession();
+            const jwt = data?.session?.access_token;
+            if (jwt) steps = await chunkItAI(task.title, jwt);
+          } catch {
+            // fall back to heuristic
+          }
+        }
+        if (!steps || !steps.length) steps = chunkIt(task.title);
+        commit((list) =>
+          list.map((t) =>
+            t.id === id
+              ? { ...t, subtasks: steps.map((title) => ({ id: uid(), title, done: false })) }
+              : t
+          )
+        );
+      } finally {
+        setChunkingIds((s) => {
+          const n = new Set(s);
+          n.delete(id);
+          return n;
+        });
+      }
+    },
+    [tasks, commit]
   );
 
   const toggleSubtask = useCallback(
@@ -196,6 +223,11 @@ export function useTasks() {
     [commit, commitTags]
   );
 
+  // Start a Pomodoro on a task — the Focus widget listens for this.
+  const startPomodoro = useCallback((id) => {
+    window.dispatchEvent(new CustomEvent("diverge:focus-start", { detail: { taskId: id } }));
+  }, []);
+
   // --- spin: pick one actionable task, optionally matching an energy -----
 
   const spin = useCallback(
@@ -231,6 +263,7 @@ export function useTasks() {
     big3,
     doneToday,
     activeCount,
+    chunkingIds,
     addTask,
     updateTask,
     removeTask,
@@ -244,5 +277,6 @@ export function useTasks() {
     addTag,
     removeTag,
     spin,
+    startPomodoro,
   };
 }

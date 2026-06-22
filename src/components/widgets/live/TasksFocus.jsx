@@ -8,6 +8,7 @@ import {
   Trash2,
   Sparkles,
   Dice5,
+  RefreshCw,
   Check,
   ChevronRight,
   Inbox,
@@ -16,6 +17,8 @@ import {
   CircleCheck,
   CalendarClock,
   Play,
+  Target,
+  SkipForward,
   BatteryLow,
   BatteryMedium,
   BatteryFull,
@@ -39,6 +42,7 @@ export default function TasksFocus({ open, onClose, tasks }) {
     tags,
     big3,
     doneToday,
+    chunkingIds,
     addTask,
     updateTask,
     removeTask,
@@ -51,6 +55,7 @@ export default function TasksFocus({ open, onClose, tasks }) {
     removeSubtask,
     addTag,
     spin,
+    startPomodoro,
   } = tasks;
 
   const [group, setGroup] = useState("all"); // all | inbox | <tagId> | someday
@@ -59,6 +64,8 @@ export default function TasksFocus({ open, onClose, tasks }) {
   const [expandedId, setExpandedId] = useState(null);
   const [spunId, setSpunId] = useState(null);
   const [quick, setQuick] = useState("");
+  const [mono, setMono] = useState(false); // "one thing" focus mode
+  const [monoIdx, setMonoIdx] = useState(0);
   const rowRefs = useRef({});
 
   useEffect(() => {
@@ -85,6 +92,11 @@ export default function TasksFocus({ open, onClose, tasks }) {
   const doneList = all.filter(
     (x) => x.done && x.doneAt?.slice(0, 10) === todayStr() && inGroup(x)
   );
+  // "One thing" mode walks Big 3 first, then the other active tasks.
+  const monoList = [
+    ...big3,
+    ...all.filter((x) => !x.done && x.status === "active" && !big3.some((b) => b.id === x.id)),
+  ];
 
   function submitQuick(e) {
     e.preventDefault();
@@ -136,6 +148,11 @@ export default function TasksFocus({ open, onClose, tasks }) {
                 {t("tasks.doneToday", { n: doneToday })}
               </span>
               <div className="ml-auto flex items-center gap-1.5">
+                <button onClick={() => { setMono((m) => !m); setMonoIdx(0); }}
+                  aria-label={t("tasks.focusMode")} title={t("tasks.focusMode")}
+                  className={`grid h-9 w-9 place-items-center rounded-xl ${mono ? "bg-accent text-accent-contrast" : "text-muted hover:bg-surface-2 hover:text-content"}`}>
+                  <Target size={17} />
+                </button>
                 <button onClick={doSpin}
                   className="inline-flex items-center gap-2 rounded-xl bg-accent px-3.5 py-2
                     text-sm font-medium text-accent-contrast hover:brightness-110">
@@ -148,6 +165,21 @@ export default function TasksFocus({ open, onClose, tasks }) {
               </div>
             </div>
 
+            {mono ? (
+              <OneThing
+                list={monoList}
+                index={Math.min(monoIdx, Math.max(0, monoList.length - 1))}
+                tags={tags}
+                t={t}
+                chunkingIds={chunkingIds}
+                onDone={(id) => toggleDone(id)}
+                onSkip={() => setMonoIdx((i) => i + 1)}
+                onPomodoro={(id) => startPomodoro(id)}
+                onChunk={(id) => chunkTask(id)}
+                onExit={() => setMono(false)}
+              />
+            ) : (
+            <>
             {/* Big 3 */}
             <Big3Strip big3={big3} all={all} onToggleDone={toggleDone} onAdd={toggleBig3} t={t} />
 
@@ -204,9 +236,11 @@ export default function TasksFocus({ open, onClose, tasks }) {
                           task={task} tags={tags} lang={lang} t={t}
                           expanded={expandedId === task.id}
                           spun={spunId === task.id}
+                          chunking={chunkingIds.has(task.id)}
                           onExpand={() => setExpandedId((id) => (id === task.id ? null : task.id))}
                           onToggleDone={() => toggleDone(task.id)}
                           onToggleBig3={() => toggleBig3(task.id)}
+                          onPomodoro={() => startPomodoro(task.id)}
                           onUpdate={(patch) => updateTask(task.id, patch)}
                           onRemove={() => removeTask(task.id)}
                           onChunk={() => chunkTask(task.id)}
@@ -230,6 +264,8 @@ export default function TasksFocus({ open, onClose, tasks }) {
                 )}
               </div>
             </div>
+            </>
+            )}
           </motion.div>
         </motion.div>
       )}
@@ -240,6 +276,65 @@ export default function TasksFocus({ open, onClose, tasks }) {
 function todayStr(d = new Date()) {
   const pad = (n) => String(n).padStart(2, "0");
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+function OneThing({ list, index, tags, t, chunkingIds, onDone, onSkip, onPomodoro, onChunk, onExit }) {
+  const task = list[index] ?? null;
+  const chunking = task ? chunkingIds.has(task.id) : false;
+  if (!task) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
+        <CircleCheck size={32} style={{ color: ACCENT }} />
+        <p className="text-lg font-medium">{t("tasks.allClear")}</p>
+        <button onClick={onExit} className="rounded-xl border border-line px-4 py-2 text-sm hover:bg-surface-2">
+          {t("tasks.exitFocus")}
+        </button>
+      </div>
+    );
+  }
+  const tag = tags.find((x) => x.id === task.tagId) ?? null;
+  const subDone = task.subtasks.filter((s) => s.done).length;
+  return (
+    <div className="flex flex-1 flex-col items-center justify-center gap-7 p-8 text-center">
+      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">
+        {t("tasks.oneThing")} · {index + 1}/{list.length}
+      </p>
+      <div className="max-w-xl">
+        {tag && (
+          <span className="mb-3 inline-flex items-center gap-1.5 text-sm text-muted">
+            <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: tag.color }} />
+            {tag.name}
+          </span>
+        )}
+        <h3 className="text-2xl font-semibold leading-snug">{task.title}</h3>
+        {task.subtasks.length > 0 && (
+          <p className="mt-2 text-sm text-muted">{subDone}/{task.subtasks.length} step</p>
+        )}
+      </div>
+      <div className="flex flex-wrap items-center justify-center gap-2">
+        <button onClick={() => onPomodoro(task.id)}
+          className="inline-flex items-center gap-2 rounded-xl bg-accent px-5 py-2.5 text-sm font-medium text-accent-contrast hover:brightness-110">
+          <Play size={16} /> {t("tasks.startPomodoro")}
+        </button>
+        <button onClick={() => onDone(task.id)}
+          className="inline-flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm hover:bg-surface-2">
+          <CircleCheck size={16} /> {t("tasks.complete")}
+        </button>
+        <button onClick={() => onChunk(task.id)} disabled={chunking} style={{ color: ACCENT }}
+          className="inline-flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm hover:bg-surface-2 disabled:opacity-70">
+          {chunking ? <RefreshCw size={16} className="animate-spin" /> : <Sparkles size={16} />}
+          {chunking ? t("tasks.chunking") : t("tasks.chunkIt")}
+        </button>
+        <button onClick={onSkip}
+          className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm text-muted hover:bg-surface-2 hover:text-content">
+          <SkipForward size={16} /> {t("tasks.skip")}
+        </button>
+      </div>
+      <button onClick={onExit} className="text-xs text-muted underline hover:text-content">
+        {t("tasks.exitFocus")}
+      </button>
+    </div>
+  );
 }
 
 function Big3Strip({ big3, all, onToggleDone, onAdd, t }) {
@@ -402,8 +497,8 @@ function LevelSelect({ meta, icons, value, onChange, label, hint, t }) {
 }
 
 function TaskRow({
-  task, tags, lang, t, expanded, spun,
-  onExpand, onToggleDone, onToggleBig3, onUpdate, onRemove,
+  task, tags, lang, t, expanded, spun, chunking,
+  onExpand, onToggleDone, onToggleBig3, onPomodoro, onUpdate, onRemove,
   onChunk, onToggleSub, onAddSub, onRemoveSub, onSomeday,
 }) {
   const tag = tags.find((x) => x.id === task.tagId) ?? null;
@@ -434,9 +529,13 @@ function TaskRow({
           </span>
         </button>
         <div className="flex shrink-0 items-center gap-0.5 text-muted">
-          <button onClick={onChunk} aria-label="chunk-it" title="chunk-it"
+          <button onClick={onPomodoro} aria-label={t("tasks.startPomodoro")} title={t("tasks.startPomodoro")}
             className="grid h-7 w-7 place-items-center rounded-lg hover:bg-surface-2 hover:text-content">
-            <Sparkles size={15} style={{ color: ACCENT }} />
+            <Play size={15} />
+          </button>
+          <button onClick={onChunk} disabled={chunking} aria-label="chunk-it" title="chunk-it"
+            className="grid h-7 w-7 place-items-center rounded-lg hover:bg-surface-2 hover:text-content disabled:opacity-100">
+            {chunking ? <RefreshCw size={15} className="animate-spin" style={{ color: ACCENT }} /> : <Sparkles size={15} style={{ color: ACCENT }} />}
           </button>
           <button onClick={onToggleBig3} aria-label={t("tasks.big3")} title={t("tasks.big3")}
             className="grid h-7 w-7 place-items-center rounded-lg hover:bg-surface-2 hover:text-content">
@@ -494,10 +593,11 @@ function TaskRow({
             label={t("tasks.timeQ")} hint={t("tasks.timeHint")} t={t} />
 
           <div className="flex flex-wrap items-center gap-2">
-            <button onClick={onChunk}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-accent px-3 py-1.5 text-sm font-medium"
+            <button onClick={onChunk} disabled={chunking}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-accent px-3 py-1.5 text-sm font-medium disabled:opacity-70"
               style={{ color: ACCENT }}>
-              <Sparkles size={15} /> {task.subtasks.length ? t("tasks.rechunk") : t("tasks.chunkIt")}
+              {chunking ? <RefreshCw size={15} className="animate-spin" /> : <Sparkles size={15} />}
+              {chunking ? t("tasks.chunking") : task.subtasks.length ? t("tasks.rechunk") : t("tasks.chunkIt")}
             </button>
             <form onSubmit={(e) => { e.preventDefault(); if (sub.trim()) { onAddSub(sub); setSub(""); } }}
               className="flex flex-1 items-center gap-2 rounded-lg border border-line px-2 py-1.5">

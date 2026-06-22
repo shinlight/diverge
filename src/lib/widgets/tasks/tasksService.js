@@ -77,6 +77,14 @@ export function makeTask(partial = {}) {
   return normalizeTask({ id: uid(), createdAt: new Date().toISOString(), ...partial });
 }
 
+// Append a task to the shared store from outside a React hook (e.g. the
+// Brain-dump widget "→ task"). Dispatches so widgets re-sync.
+export function pushTask(partial) {
+  const task = makeTask(partial);
+  saveTasks([task, ...loadTasks()]);
+  return task;
+}
+
 function read(key) {
   try {
     const raw = localStorage.getItem(key);
@@ -138,6 +146,27 @@ const shorten = (s, n = 40) => (s.length > n ? `${s.slice(0, n).trim()}…` : s)
 // Split a task title into 2-6 actionable micro-steps. If the title already
 // lists parts (commas / "e" / "poi" / "then"…), use those; otherwise fall back
 // to a generic ADHD scaffold whose first step is always a 2-minute starter.
+// Real-AI chunk-it via the serverless function (needs a Supabase JWT).
+// Returns an array of step strings, or null on any failure (caller falls back
+// to the heuristic chunkIt below).
+export async function chunkItAI(title, jwt) {
+  try {
+    const res = await fetch("/api/ai-chunk", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwt}`,
+      },
+      body: JSON.stringify({ title }),
+    });
+    if (!res.ok) return null;
+    const j = await res.json();
+    return Array.isArray(j.steps) && j.steps.length ? j.steps : null;
+  } catch {
+    return null;
+  }
+}
+
 export function chunkIt(title) {
   const t = (title || "").trim();
   if (!t) return [];

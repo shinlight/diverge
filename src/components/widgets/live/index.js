@@ -10,6 +10,7 @@ import WeatherWidget from "./WeatherWidget";
 import NotesWidget from "./NotesWidget";
 import ClipboardWidget from "./ClipboardWidget";
 import MessagingWidget from "./MessagingWidget";
+import BrainDumpWidget from "./BrainDumpWidget";
 
 export const LIVE_WIDGETS = {
   gmail: GmailWidget,
@@ -21,4 +22,5 @@ export const LIVE_WIDGETS = {
   notes: NotesWidget,
   clipboard: ClipboardWidget,
   messaging: MessagingWidget,
+  braindump: BrainDumpWidget,
 };

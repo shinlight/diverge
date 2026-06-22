@@ -1,4 +1,4 @@
-import { Mail, Calendar, CheckSquare, StickyNote, Cloud, Clock, Sparkles, ClipboardList, MessageCircle } from "lucide-react";
+import { Mail, Calendar, CheckSquare, StickyNote, Cloud, Clock, Sparkles, ClipboardList, MessageCircle, BrainCircuit } from "lucide-react";
 
 /*
   DiVerge — Widget registry.
@@ -95,12 +95,21 @@ export const WIDGETS = {
     size: "md",
     multiInstance: true, // one widget per channel; several can coexist
   },
+  braindump: {
+    id: "braindump",
+    nameKey: "widgets.braindump.name",
+    descKey: "widgets.braindump.desc",
+    icon: BrainCircuit,
+    accent: "#a855f7",
+    status: "live",
+    size: "sm",
+  },
 };
 
 export const WIDGET_LIST = Object.values(WIDGETS);
 
 // Which widgets a brand-new user starts with.
-export const DEFAULT_LAYOUT = ["gmail", "calendar", "ai::main", "focus"];
+export const DEFAULT_LAYOUT = ["gmail", "calendar", "tasks", "braindump", "ai::main", "focus"];
 
 /*
   Instance ids vs. types.

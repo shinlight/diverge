@@ -45,6 +45,26 @@ export function useFocus() {
     };
   }, []);
 
+  // The To-Do widget can start a focus session on a specific task.
+  useEffect(() => {
+    const onStart = (e) => {
+      const id = e.detail?.taskId ?? null;
+      const task = loadTasks().find((t) => t.id === id) ?? null;
+      setCurrentTaskId(id);
+      setPhase("focus");
+      setSecondsLeft(settings.focusMin * 60);
+      setRunning(true);
+      addNotification({
+        title: t("focus.notifStartTitle"),
+        message: task ? t("focus.notifStartTask", { task: task.title }) : t("focus.phaseFocus"),
+        color: "#e864c4",
+      });
+    };
+    window.addEventListener("diverge:focus-start", onStart);
+    return () => window.removeEventListener("diverge:focus-start", onStart);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settings.focusMin]);
+
   const [phase, setPhase] = useState("focus");
   const [running, setRunning] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(settings.focusMin * 60);
