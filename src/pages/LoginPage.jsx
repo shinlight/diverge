@@ -18,14 +18,6 @@ function GoogleIcon() {
   );
 }
 
-function MetaIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="#0866FF">
-      <path d="M6.9 3C4.2 3 2 5.5 2 9.2c0 2.3.9 4.7 2.3 6.2.9 1 2 1.6 3.2 1.6 1.5 0 2.5-.9 3.6-2.7.4-.6.7-1.2 1-1.8.3.6.6 1.2 1 1.8 1.1 1.8 2.1 2.7 3.6 2.7 1.2 0 2.3-.6 3.2-1.6C21.1 13.9 22 11.5 22 9.2 22 5.5 19.8 3 17.1 3c-1.7 0-3 .9-4.2 2.8L12 6.9l-.9-1.1C9.9 3.9 8.6 3 6.9 3Zm0 2.3c.8 0 1.6.6 2.6 2.1l1 1.6c-.6 1-1.2 2-1.7 2.8-.8 1.3-1.3 1.6-1.9 1.6-.6 0-1.1-.3-1.5-.8-.7-.9-1.1-2.3-1.1-3.6 0-2.2 1-3.7 2.6-3.7Zm10.2 0c1.6 0 2.6 1.5 2.6 3.7 0 1.3-.4 2.7-1.1 3.6-.4.5-.9.8-1.5.8-.6 0-1.1-.3-1.9-1.6-.5-.8-1.1-1.8-1.7-2.8l1-1.6c1-1.5 1.8-2.1 2.6-2.1Z" />
-    </svg>
-  );
-}
-
 export default function LoginPage() {
   const { signInWithProvider, signInWithEmail, signUpWithEmail, loading } =
     useAuth();
@@ -91,15 +83,6 @@ export default function LoginPage() {
               onClick={() => oauth("google")}
             >
               <GoogleIcon /> {t("login.continueGoogle")}
-            </Button>
-            <Button
-              variant="surface"
-              size="lg"
-              className="w-full"
-              disabled={disabled}
-              onClick={() => oauth("meta")}
-            >
-              <MetaIcon /> {t("login.continueMeta")}
             </Button>
           </div>
 
