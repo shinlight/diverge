@@ -580,9 +580,21 @@ function TaskRow({
               {tags.map((tg) => (<option key={tg.id} value={tg.id}>{tg.name}</option>))}
             </select>
             <span className="ml-2 text-xs text-muted">{t("tasks.due")}</span>
-            <input type="date" value={task.due ? task.due.slice(0, 10) : ""}
-              onChange={(e) => onUpdate({ due: e.target.value || null })}
-              className="rounded-lg border border-line bg-surface px-2 py-1 text-sm outline-none [color-scheme:dark]" />
+            <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-line bg-surface px-2 py-1 hover:border-accent">
+              <CalendarClock size={14} className="text-muted" />
+              <input type="date" value={task.due ? task.due.slice(0, 10) : ""}
+                onChange={(e) => onUpdate({ due: e.target.value || null })}
+                onClick={(e) => e.currentTarget.showPicker?.()}
+                onFocus={(e) => e.currentTarget.showPicker?.()}
+                className="cursor-pointer bg-transparent text-sm outline-none [color-scheme:dark]" />
+              {task.due && (
+                <button type="button" aria-label={t("common.delete")}
+                  onClick={() => onUpdate({ due: null })}
+                  className="text-muted hover:text-content">
+                  <X size={13} />
+                </button>
+              )}
+            </label>
           </div>
 
           <LevelSelect meta={ENERGY_META} icons={ENERGY_ICON} value={task.energy}
