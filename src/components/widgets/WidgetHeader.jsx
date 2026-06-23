@@ -38,7 +38,7 @@ export default function WidgetHeader({
   }
 
   return (
-    <div className="mb-3 flex items-start gap-2.5 pr-28 sm:pr-[8.5rem]">
+    <div className="mb-3 flex items-start gap-2.5 pr-3 transition-[padding] group-hover:pr-28 sm:group-hover:pr-[8.5rem]">
       <span
         className="grid h-9 w-9 shrink-0 place-items-center rounded-lg"
         style={{
@@ -61,12 +61,12 @@ export default function WidgetHeader({
               if (e.key === "Escape") setEditing(false);
             }}
             className="w-full rounded-md border border-line bg-surface-2/60 px-1.5 py-0.5
-              text-base font-semibold outline-none focus:border-accent"
+              text-lg font-semibold outline-none focus:border-accent"
           />
         ) : (
-          <div className="flex items-center gap-1.5">
-            <h3 className="truncate text-base font-semibold">{title}</h3>
-            {badge}
+          <div className="flex min-w-0 items-center gap-1.5">
+            <h3 className="min-w-0 truncate text-lg font-semibold">{title}</h3>
+            {badge && <span className="shrink-0">{badge}</span>}
             {onRename && (
               <button
                 onClick={() => setEditing(true)}
