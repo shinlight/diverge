@@ -7,7 +7,8 @@ import { useTheme } from "../../lib/theme/ThemeContext";
   Shows: icon + editable title (+ optional badge) + optional subtitle + actions.
   The title is renamed inline; onRename persists the user's custom name.
 
-  pr-16 keeps the row clear of the card's floating remove/drag controls.
+  The right padding keeps the title + actions clear of the card's floating
+  controls (drag / remove / pin / widen — up to 4 on hover).
 */
 export default function WidgetHeader({
   icon: Icon,
@@ -37,7 +38,7 @@ export default function WidgetHeader({
   }
 
   return (
-    <div className="mb-3 flex items-start gap-2.5 pr-12">
+    <div className="mb-3 flex items-start gap-2.5 pr-28 sm:pr-[8.5rem]">
       <span
         className="grid h-9 w-9 shrink-0 place-items-center rounded-lg"
         style={{
