@@ -53,19 +53,16 @@ export default function Cockpit() {
       style={{ background: BG, borderColor: BORDER }}
       className="mb-4 w-full overflow-hidden rounded-2xl border"
     >
-      {/* Desktop: one compact horizontal strip */}
-      <div className="hidden items-center gap-1 px-4 py-3 sm:flex">
-        <Brand t={t} />
-        <Divider />
-        {cells.date}
-        <Divider />
-        {cells.next}
-        <Divider />
-        {cells.todo}
-        <Divider />
-        {cells.mail}
-        <Divider />
-        {cells.weather}
+      {/* Desktop: brand on top, cells left-aligned with light separators. */}
+      <div className="hidden px-5 pb-3 pt-2.5 sm:block">
+        <Brand t={t} className="mb-2.5" />
+        <div className="flex items-stretch">
+          <CockpitCell first max="max-w-[150px]">{cells.date}</CockpitCell>
+          <CockpitCell max="max-w-[210px]">{cells.next}</CockpitCell>
+          <CockpitCell max="max-w-[230px]">{cells.todo}</CockpitCell>
+          <CockpitCell max="max-w-[120px]">{cells.mail}</CockpitCell>
+          <CockpitCell max="max-w-[150px]">{cells.weather}</CockpitCell>
+        </div>
       </div>
 
       {/* Mobile: brand + 2-column grid, To-Do full width */}
@@ -96,13 +93,23 @@ function Brand({ t, className = "" }) {
   );
 }
 
-function Divider() {
-  return <span className="my-0.5 w-px shrink-0 self-stretch bg-line/60" />;
+// A left-aligned cockpit cell with a hairline separator (very light) on its
+// left, plus breathing room. The first cell skips the separator.
+function CockpitCell({ children, first = false, max = "" }) {
+  return (
+    <div
+      className={`flex min-w-0 items-center ${max} ${
+        first ? "pr-5" : "border-l border-line/40 px-5"
+      }`}
+    >
+      {children}
+    </div>
+  );
 }
 
-function Stat({ icon: Icon, label, value, sub, flex = "flex-1" }) {
+function Stat({ icon: Icon, label, value, sub }) {
   return (
-    <div className={`flex min-w-0 ${flex} flex-col justify-center gap-0.5 px-2`}>
+    <div className="flex min-w-0 flex-col gap-0.5">
       <span className="flex items-center gap-1.5 text-[11px] font-medium text-muted">
         <Icon size={13} /> {label}
       </span>
@@ -153,7 +160,7 @@ function whenLabel(event, now, loc, t) {
 
 function TodoCell({ tasks, t }) {
   return (
-    <div className="flex min-w-0 flex-[1.6] flex-col justify-center gap-0.5 px-2">
+    <div className="flex min-w-0 flex-col gap-0.5">
       <span className="flex items-center gap-1.5 text-[11px] font-medium text-muted">
         <ListTodo size={13} /> {t("cockpit.todo")}
       </span>
