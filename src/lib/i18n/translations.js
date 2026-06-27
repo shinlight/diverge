@@ -161,6 +161,18 @@ export const TRANSLATIONS = {
       port: "Port",
       useSSL: "Use SSL/TLS",
     },
+    revolut: {
+      notConnected: "Not connected",
+      mainAccount: "Main account",
+      connectPrompt: "Connect your Revolut\nvia Open Banking.",
+      connectCta: "Connect Revolut",
+      loading: "Loading account…",
+      balance: "Balance",
+      pockets: "Pockets",
+      transactions: "Transactions",
+      empty: "No transactions.",
+      disconnect: "Disconnect",
+    },
     addWidget: {
       title: "Add a widget",
       subtitle: "Choose what to keep an eye on.",
@@ -229,6 +241,7 @@ export const TRANSLATIONS = {
       messaging: { name: "Messages", desc: "Chat with other DiVerge users. More channels soon!" },
       braindump: { name: "Brain Dump", desc: "Capture a thought now, triage it later." },
       imap: { name: "Email (IMAP)", desc: "Connect any mailbox via IMAP/SMTP." },
+      revolut: { name: "Revolut", desc: "Balance and recent transactions, at a glance." },
     },
     weather: {
       shareTitle: "See your local weather",
@@ -547,6 +560,18 @@ export const TRANSLATIONS = {
       port: "Porta",
       useSSL: "Usa SSL/TLS",
     },
+    revolut: {
+      notConnected: "Non connesso",
+      mainAccount: "Conto principale",
+      connectPrompt: "Collega il tuo Revolut\nvia Open Banking.",
+      connectCta: "Connetti Revolut",
+      loading: "Carico il conto…",
+      balance: "Saldo",
+      pockets: "Pocket",
+      transactions: "Movimenti",
+      empty: "Nessun movimento.",
+      disconnect: "Disconnetti",
+    },
     addWidget: {
       title: "Aggiungi un widget",
       subtitle: "Scegli cosa tenere sotto controllo.",
@@ -615,6 +640,7 @@ export const TRANSLATIONS = {
       messaging: { name: "Messaggi", desc: "Chatta con altri utenti DiVerge. Altri canali in arrivo!" },
       braindump: { name: "Brain Dump", desc: "Cattura un pensiero ora, lo smisti dopo." },
       imap: { name: "Email (IMAP)", desc: "Collega una casella qualsiasi via IMAP/SMTP." },
+      revolut: { name: "Revolut", desc: "Saldo e ultimi movimenti, a colpo d'occhio." },
     },
     weather: {
       shareTitle: "Vedi il meteo locale",
