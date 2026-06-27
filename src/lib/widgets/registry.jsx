@@ -1,4 +1,4 @@
-import { Mail, Calendar, CheckSquare, StickyNote, Cloud, Clock, Sparkles, ClipboardList, MessageCircle, BrainCircuit } from "lucide-react";
+import { Mail, Calendar, CheckSquare, StickyNote, Cloud, Clock, Sparkles, ClipboardList, MessageCircle, BrainCircuit, AtSign } from "lucide-react";
 
 /*
   DiVerge — Widget registry.
@@ -108,6 +108,16 @@ export const WIDGETS = {
     accent: "#a855f7",
     status: "live",
     size: "sm",
+  },
+  imap: {
+    id: "imap",
+    nameKey: "widgets.imap.name",
+    descKey: "widgets.imap.desc",
+    icon: AtSign,
+    accent: "#6366f1",
+    status: "live",
+    size: "md",
+    wide: true,
   },
 };
 
