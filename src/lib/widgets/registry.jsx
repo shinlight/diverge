@@ -1,4 +1,4 @@
-import { Mail, Calendar, CheckSquare, StickyNote, Cloud, Clock, Sparkles, ClipboardList, MessageCircle, BrainCircuit, AtSign, Wallet } from "lucide-react";
+import { Mail, Calendar, CheckSquare, StickyNote, Cloud, Clock, Sparkles, ClipboardList, MessageCircle, BrainCircuit, AtSign, Wallet, MapPin } from "lucide-react";
 
 /*
   DiVerge — Widget registry.
@@ -125,6 +125,16 @@ export const WIDGETS = {
     descKey: "widgets.revolut.desc",
     icon: Wallet,
     accent: "#0666eb",
+    status: "live",
+    size: "md",
+    wide: true,
+  },
+  place: {
+    id: "place",
+    nameKey: "widgets.place.name",
+    descKey: "widgets.place.desc",
+    icon: MapPin,
+    accent: "#34a853",
     status: "live",
     size: "md",
     wide: true,

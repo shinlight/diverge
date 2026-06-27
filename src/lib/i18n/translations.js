@@ -173,6 +173,18 @@ export const TRANSLATIONS = {
       empty: "No transactions.",
       disconnect: "Disconnect",
     },
+    place: {
+      subtitle: "Search nearby",
+      searchPlaceholder: "Search a place…",
+      hint: "Search for a place to start.",
+      selectHint: "Search and pick a place",
+      recent: "Recent",
+      noResults: "No places found.",
+      mapPreview: "Map preview · connect Google Maps",
+      openNow: "Open now",
+      closedNow: "Closed now",
+      openInMaps: "Open in Google Maps",
+    },
     addWidget: {
       title: "Add a widget",
       subtitle: "Choose what to keep an eye on.",
@@ -242,6 +254,7 @@ export const TRANSLATIONS = {
       braindump: { name: "Brain Dump", desc: "Capture a thought now, triage it later." },
       imap: { name: "Email (IMAP)", desc: "Connect any mailbox via IMAP/SMTP." },
       revolut: { name: "Revolut", desc: "Balance and recent transactions, at a glance." },
+      place: { name: "Find a Place", desc: "Search places on the map and see details." },
     },
     weather: {
       shareTitle: "See your local weather",
@@ -572,6 +585,18 @@ export const TRANSLATIONS = {
       empty: "Nessun movimento.",
       disconnect: "Disconnetti",
     },
+    place: {
+      subtitle: "Cerca nei dintorni",
+      searchPlaceholder: "Cerca un posto…",
+      hint: "Cerca un posto per iniziare.",
+      selectHint: "Cerca e scegli un posto",
+      recent: "Recenti",
+      noResults: "Nessun posto trovato.",
+      mapPreview: "Anteprima mappa · collega Google Maps",
+      openNow: "Aperto ora",
+      closedNow: "Chiuso ora",
+      openInMaps: "Apri in Google Maps",
+    },
     addWidget: {
       title: "Aggiungi un widget",
       subtitle: "Scegli cosa tenere sotto controllo.",
@@ -641,6 +666,7 @@ export const TRANSLATIONS = {
       braindump: { name: "Brain Dump", desc: "Cattura un pensiero ora, lo smisti dopo." },
       imap: { name: "Email (IMAP)", desc: "Collega una casella qualsiasi via IMAP/SMTP." },
       revolut: { name: "Revolut", desc: "Saldo e ultimi movimenti, a colpo d'occhio." },
+      place: { name: "Trova un posto", desc: "Cerca luoghi sulla mappa e vedi i dettagli." },
     },
     weather: {
       shareTitle: "Vedi il meteo locale",
