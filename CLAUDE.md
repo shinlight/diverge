@@ -1,0 +1,74 @@
+# DiVerge — project guide for Claude
+
+ADHD-friendly **widget dashboard** web app. A grid of widgets (Gmail, Calendar,
+To-Do, Brain Dump, AI, Weather, Messaging, IMAP email, …) over a pinned
+**Cockpit** recap band. Deployed on Vercel (auto-deploy from `main`,
+GitHub `shinlight/diverge`).
+
+## Stack
+React 19 + Vite · Tailwind CSS v4 (`@theme` CSS-var tokens in `src/index.css`) ·
+Framer Motion · dnd-kit (sortable grid) · React Router v7 · lucide-react ·
+Supabase (auth + Postgres + realtime + storage) · Vercel serverless (`/api/*`).
+
+## Run & verify (do this for every UI change)
+- Dev server: use the **preview MCP** (`preview_start` name `dev`), never `npm run dev` in Bash.
+- The app runs in **mock mode** when Supabase env is absent, and **real mode** when present.
+  To test the mock UI locally, temporarily move the env file:
+  `Rename-Item .env.local .env.local.bak` → start preview → seed a fake user in
+  `localStorage` (`diverge.user`) → reload. **Always restore it after:** `Rename-Item .env.local.bak .env.local`.
+- Serverless functions (`/api/*`) do **not** run under `vite dev` — verify those on Vercel.
+- **Before committing:** `npm run build` must pass. Check `preview_console_logs` (level error) = clean.
+- The user's flow: implement → build green → verify in mock (preview) → **commit + push** each feature.
+  End commit messages with `Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>`.
+
+## Widget pattern (the template — follow it for every widget)
+`service + hook + Widget(card) + Focus(overlay)`:
+- `src/lib/widgets/<name>/<name>Service.js` — data + the **swap point** (mock now / real API later).
+- `src/lib/widgets/<name>/use<Name>.js` — the shared state hook.
+- `src/components/widgets/live/<Name>Widget.jsx` — the square card.
+- `src/components/widgets/live/<Name>Focus.jsx` — the expanded overlay (`fixed inset-0 z-50`).
+- Register in `src/lib/widgets/registry.jsx` (`status: "live"`, `accent`, optional `wide: true`,
+  `multiInstance: true`) **and** map it in `src/components/widgets/live/index.js`.
+- Add i18n keys (EN + IT) in `src/lib/i18n/translations.js` (`widgets.<name>.name/desc` + a `<name>` block).
+
+## Dashboard layout state (localStorage, in `DashboardPage`)
+- `diverge.layout` — ordered widget instance ids (drag reorders).
+- `diverge.pinned` — pinned ids (max 6, shown first, accent ring + badge).
+- `diverge.wide` — ids dilated to 2 blocks (`sm:col-span-2 sm:aspect-[2/1]`; only `wide:true` widgets).
+- `diverge.titles` — per-widget custom titles.
+Multi-instance ids are `"<type>::<uuid>"`; helpers `instanceType`/`isMultiInstance`/`newInstanceId` in `registry.jsx`.
+
+## Cross-widget sync (CustomEvents on `window`)
+- `diverge:tasks` — the canonical task store (`tasksService`) changed; To-Do, Focus, Cockpit re-read.
+- `diverge:braindump` — brain-dump items changed.
+- `diverge:focus-start` (`detail.taskId`) — start a Pomodoro on a task (`useFocus` listens).
+
+## Gotchas (hard-won — don't repeat)
+- **StrictMode duplication:** never put a side-effect (`saveX`, `dispatchEvent`, `pushTask`) **inside a
+  `setState` updater** — StrictMode double-invokes it and you get duplicates. Persist via a `useEffect`
+  on the state, with a "skip first render / skip external-sync" ref guard. (See `useTasks`, `useBrainDump`.)
+- **Theme token:** the page-bg token is `--color-bg`, NOT `--color-base` (`base` collides with the
+  `text-base` font-size utility → invisible text). Never name a `@theme` colour after a font-size scale.
+- **i18n:** sub-components defined outside a `useI18n()` caller need their **own** `useI18n()`; never close
+  over `t` from an outer scope, and don't shadow `t` with `.map((t)=>…)`.
+- **Truncation:** a flex title row needs `min-w-0` on the container AND the `<h3 className="min-w-0 truncate">`.
+- **Serverless functions** (`api/*.js`, Node ESM): authenticate the caller with their Supabase JWT
+  (`supabase.auth.getUser(jwt)`); keep secrets server-only (never `VITE_`-prefixed if they must stay secret).
+  `vercel.json` excludes `/api/` from the SPA rewrite.
+
+## Real backends already wired
+- **Google (Calendar read+write, Gmail read+write):** shared OAuth token; refresh persisted via
+  `api/google-token.js` + `google_credentials` table. Restricted scopes work in the Testing consent screen.
+- **Messaging (internal channel):** real via Supabase (`messages` table + realtime).
+- **AI chunk-it:** `api/ai-chunk.js` → Claude (Anthropic).
+
+## ⏳ Pending prerequisites (user-side; flag when relevant)
+- **AI chunk-it:** set `ANTHROPIC_API_KEY` on Vercel (else the heuristic fallback runs).
+- **Apple login:** the button exists; needs Apple Developer setup + the Apple provider enabled in Supabase.
+- **Email (IMAP) widget:** UI is **mock-only**. Real use needs a serverless `api/imap.js`
+  (`imapflow` + `nodemailer`), a Supabase table for the account config with the **password encrypted**
+  (`IMAP_ENC_KEY` env), then swap the bodies in `imapService.js`.
+
+## Notes
+- A temporary access gate (`middleware.js`, Vercel Edge) shows a black login before the app.
+- Mock fallbacks stay in place so the whole app is testable without any keys.
