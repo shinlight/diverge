@@ -68,6 +68,11 @@ Multi-instance ids are `"<type>::<uuid>"`; helpers `instanceType`/`isMultiInstan
 - **Email (IMAP) widget:** UI is **mock-only**. Real use needs a serverless `api/imap.js`
   (`imapflow` + `nodemailer`), a Supabase table for the account config with the **password encrypted**
   (`IMAP_ENC_KEY` env), then swap the bodies in `imapService.js`.
+- **Revolut widget:** UI is **mock-only** (read-only). Revolut retail has no direct API — real use
+  goes via Open Banking (PSD2/AIS) through an aggregator. Plan: register on **GoCardless Bank Account
+  Data** (ex Nordigen, free tier), add a serverless `api/revolut.js` holding `secret_id`/`secret_key`
+  server-side (consent/requisition link → balances → transactions), then swap the bodies in
+  `revolutService.js`. PSD2 consent expires ~90 days. See `docs/superpowers/specs/2026-06-28-revolut-widget-design.md`.
 
 ## Notes
 - A temporary access gate (`middleware.js`, Vercel Edge) shows a black login before the app.
