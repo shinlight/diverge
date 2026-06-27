@@ -73,6 +73,11 @@ Multi-instance ids are `"<type>::<uuid>"`; helpers `instanceType`/`isMultiInstan
   Data** (ex Nordigen, free tier), add a serverless `api/revolut.js` holding `secret_id`/`secret_key`
   server-side (consent/requisition link → balances → transactions), then swap the bodies in
   `revolutService.js`. PSD2 consent expires ~90 days. See `docs/superpowers/specs/2026-06-28-revolut-widget-design.md`.
+- **Find a Place widget:** UI is **mock-only** (search + results + map placeholder). Real use needs a
+  **Google Maps Platform API key** (billing-enabled GCP project): Places API for search/details and the
+  Maps Embed API (or Maps JS SDK) for the map, then swap the bodies in `placeService.js`. The "Open in
+  Google Maps" deep link is already real (no key). Note: this is a Maps **Platform** key, separate from
+  the Google OAuth already wired for Calendar/Gmail. See `docs/superpowers/specs/2026-06-28-find-a-place-widget-design.md`.
 
 ## Notes
 - A temporary access gate (`middleware.js`, Vercel Edge) shows a black login before the app.
