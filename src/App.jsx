@@ -4,6 +4,7 @@ import { LanguageProvider } from "./lib/i18n/LanguageContext";
 import { ThemeProvider } from "./lib/theme/ThemeContext";
 import { AuthProvider, useAuth } from "./lib/auth/AuthContext";
 import { NotificationProvider } from "./lib/notifications/NotificationContext";
+import { FeedbackProvider } from "./lib/feedback/FeedbackContext";
 import NotificationToasts from "./components/notifications/NotificationToasts";
 import ErrorBoundary from "./components/ui/ErrorBoundary";
 import LoginPage from "./pages/LoginPage";
@@ -36,6 +37,7 @@ export default function App() {
       <ThemeProvider>
         <AuthProvider>
           <NotificationProvider>
+            <FeedbackProvider>
             <BrowserRouter>
               <ErrorBoundary
                 label="DiVerge"
@@ -61,6 +63,7 @@ export default function App() {
               </ErrorBoundary>
               <NotificationToasts />
             </BrowserRouter>
+            </FeedbackProvider>
           </NotificationProvider>
         </AuthProvider>
       </ThemeProvider>

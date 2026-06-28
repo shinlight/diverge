@@ -1,8 +1,9 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, X, Pin, ChevronsLeftRight, ChevronsRightLeft } from "lucide-react";
+import { GripVertical, X, Pin, ChevronsLeftRight, ChevronsRightLeft, Megaphone } from "lucide-react";
 import { WIDGETS, instanceType } from "../../lib/widgets/registry";
 import { useI18n } from "../../lib/i18n/LanguageContext";
+import { useFeedback } from "../../lib/feedback/FeedbackContext";
 import { LIVE_WIDGETS } from "./live";
 import WidgetHeader from "./WidgetHeader";
 import ErrorBoundary from "../ui/ErrorBoundary";
@@ -19,6 +20,7 @@ export default function WidgetCard({
   onToggleWide,
 }) {
   const { t } = useI18n();
+  const { open: openFeedback } = useFeedback();
   const type = instanceType(id);
   const widget = WIDGETS[type];
   const {
@@ -64,6 +66,15 @@ export default function WidgetCard({
 
       {/* Hover controls — float above the widget's own content. */}
       <div className="absolute right-2 top-2 z-20 flex items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+        <button
+          onClick={() => openFeedback({ widgetId: type, widgetName: title })}
+          aria-label={t("feedback.report")}
+          title={t("feedback.report")}
+          className="grid h-7 w-7 place-items-center rounded-lg bg-surface/80 text-muted
+            backdrop-blur hover:bg-surface-2 hover:text-content"
+        >
+          <Megaphone size={15} />
+        </button>
         {widget.wide && (
           <button
             onClick={() => onToggleWide?.(id)}
