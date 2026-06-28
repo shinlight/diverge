@@ -4,6 +4,7 @@ import { Mail, Loader2 } from "lucide-react";
 import Logo from "../components/ui/Logo";
 import Button from "../components/ui/Button";
 import { useAuth } from "../lib/auth/AuthContext";
+import { isAllowed, addToWaitlist } from "../lib/access/accessService";
 import { useI18n } from "../lib/i18n/LanguageContext";
 
 // Inline brand glyphs (no extra dependency).
@@ -27,7 +28,7 @@ function AppleIcon() {
 }
 
 export default function LoginPage() {
-  const { signInWithProvider, signInWithEmail, signUpWithEmail, loading } =
+  const { signInWithProvider, signInWithEmail, signUpWithEmail, loading, supabaseReady } =
     useAuth();
   const { t } = useI18n();
   const [mode, setMode] = useState("signin"); // signin | signup
@@ -41,6 +42,13 @@ export default function LoginPage() {
   async function handleSubmit(e) {
     e.preventDefault();
     setMsg(null);
+    // Early-access allowlist. Mock enforces here; in real mode the lock is a
+    // Supabase auth hook (server-side) and a non-allowed email is rejected there.
+    if (!supabaseReady && !isAllowed(email)) {
+      addToWaitlist(email);
+      setMsg({ type: "info", text: t("login.waitlisted") });
+      return;
+    }
     setBusy(true);
     const res =
       mode === "signup"

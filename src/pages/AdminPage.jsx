@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
-import { LayoutDashboard, Users as UsersIcon, CreditCard, Receipt, Megaphone, ArrowLeft } from "lucide-react";
+import { LayoutDashboard, Users as UsersIcon, CreditCard, Receipt, Megaphone, KeyRound, ArrowLeft } from "lucide-react";
 import { useAuth } from "../lib/auth/AuthContext";
 import { isAdmin } from "../lib/admin/adminService";
 import { useI18n } from "../lib/i18n/LanguageContext";
@@ -9,9 +9,11 @@ import Users from "../components/admin/Users";
 import Subscriptions from "../components/admin/Subscriptions";
 import Payments from "../components/admin/Payments";
 import Feedback from "../components/admin/Feedback";
+import Access from "../components/admin/Access";
 
 const SECTIONS = [
   { id: "overview", icon: LayoutDashboard, Comp: Overview },
+  { id: "access", icon: KeyRound, Comp: Access },
   { id: "users", icon: UsersIcon, Comp: Users },
   { id: "subscriptions", icon: CreditCard, Comp: Subscriptions },
   { id: "payments", icon: Receipt, Comp: Payments },

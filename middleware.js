@@ -5,17 +5,27 @@ export const config = { matcher: "/:path*" };
 /*
   TEMPORARY access gate (Vercel Edge Middleware).
 
-  Runs at the edge BEFORE the app is served. This file never reaches the
-  browser, so the credentials here are not visible to visitors. Real lock,
-  not a client-side curtain.
+  Runs at the edge BEFORE the app is served. Credentials come from Vercel
+  Environment Variables — NEVER hardcode them here (this repo is public).
 
-  To remove the gate later: delete this file (and optionally `@vercel/edge`).
-  TODO: move USER/PASS to Vercel Environment Variables before going public.
+  Set on Vercel (Project → Settings → Environment Variables), then redeploy:
+    GATE_USER  = <a username>
+    GATE_PASS  = <a strong password — rotate; the old one was public>
+    GATE_TOKEN = <a long random string, the opaque cookie value>
+
+  Fail-closed: if these are unset the gate denies everyone (no open window).
+
+  Early access plan: once the Supabase allowlist auth hook is live, this curtain
+  can be deleted entirely (delete this file + optionally `@vercel/edge`).
+  See docs/superpowers/specs/2026-06-28-early-access.md.
 */
-const USER = "admin";
-const PASS = "$D1V3rg32026$";
+const USER = process.env.GATE_USER;
+const PASS = process.env.GATE_PASS;
 const COOKIE = "dvg_gate";
-const TOKEN = "k7Q2-9fLm-Xa31-Tz80-Vb56-Rn4Q8d"; // opaque, unguessable cookie value
+const TOKEN = process.env.GATE_TOKEN;
+
+// Fail closed: without configured credentials, nobody can pass.
+const CONFIGURED = Boolean(USER && PASS && TOKEN);
 
 const PAGE = (error) => `<!doctype html><html lang="en"><head>
 <meta charset="utf-8" />
@@ -73,7 +83,7 @@ export default async function middleware(request) {
   // Handle the login form submission.
   if (request.method === "POST" && url.pathname === "/__auth") {
     const form = await request.formData();
-    if (form.get("u") === USER && form.get("p") === PASS) {
+    if (CONFIGURED && form.get("u") === USER && form.get("p") === PASS) {
       return new Response(null, {
         status: 303,
         headers: {
