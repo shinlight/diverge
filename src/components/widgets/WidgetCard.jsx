@@ -5,6 +5,7 @@ import { WIDGETS, instanceType } from "../../lib/widgets/registry";
 import { useI18n } from "../../lib/i18n/LanguageContext";
 import { LIVE_WIDGETS } from "./live";
 import WidgetHeader from "./WidgetHeader";
+import ErrorBoundary from "../ui/ErrorBoundary";
 
 export default function WidgetCard({
   id,
@@ -105,11 +106,13 @@ export default function WidgetCard({
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto">
-        {Live ? (
-          <Live instanceId={id} title={title} onRename={rename} />
-        ) : (
-          <PlaceholderBody widget={widget} title={title} desc={t(widget.descKey)} onRename={rename} />
-        )}
+        <ErrorBoundary label={title} retryLabel={t("common.retry")}>
+          {Live ? (
+            <Live instanceId={id} title={title} onRename={rename} />
+          ) : (
+            <PlaceholderBody widget={widget} title={title} desc={t(widget.descKey)} onRename={rename} />
+          )}
+        </ErrorBoundary>
       </div>
     </div>
   );
