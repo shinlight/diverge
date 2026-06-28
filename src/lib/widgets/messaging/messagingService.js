@@ -86,8 +86,13 @@ export async function markRead(myId, peerId) {
 // Live-stream messages addressed to me. Returns an unsubscribe function.
 export function subscribeIncoming(myId, onInsert) {
   if (!supabase) return () => {};
+  // Unique topic per subscription: several Messaging widget instances (and
+  // re-subscribes) must NOT share a channel name, otherwise the second call
+  // reuses an already-subscribed channel and Supabase throws
+  // "cannot add postgres_changes callbacks ... after subscribe()". The row
+  // filter below (recipient_id) is what actually scopes the stream.
   const ch = supabase
-    .channel(`messages:${myId}`)
+    .channel(`messages:${myId}:${crypto.randomUUID().slice(0, 8)}`)
     .on(
       "postgres_changes",
       {
