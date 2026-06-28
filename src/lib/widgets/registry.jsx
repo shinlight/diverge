@@ -1,4 +1,4 @@
-import { Mail, Calendar, CheckSquare, StickyNote, Cloud, Clock, Sparkles, ClipboardList, MessageCircle, BrainCircuit, AtSign, Wallet, MapPin } from "lucide-react";
+import { Mail, Calendar, CheckSquare, StickyNote, Cloud, Clock, Sparkles, ClipboardList, MessageCircle, BrainCircuit, AtSign, Wallet, MapPin, Flame, Smile, Zap } from "lucide-react";
 
 /*
   DiVerge — Widget registry.
@@ -135,6 +135,34 @@ export const WIDGETS = {
     descKey: "widgets.place.desc",
     icon: MapPin,
     accent: "#34a853",
+    status: "live",
+    size: "md",
+    wide: true,
+  },
+  habits: {
+    id: "habits",
+    nameKey: "widgets.habits.name",
+    descKey: "widgets.habits.desc",
+    icon: Flame,
+    accent: "#f97316",
+    status: "live",
+    size: "md",
+  },
+  mood: {
+    id: "mood",
+    nameKey: "widgets.mood.name",
+    descKey: "widgets.mood.desc",
+    icon: Smile,
+    accent: "#ec4899",
+    status: "live",
+    size: "md",
+  },
+  dopamine: {
+    id: "dopamine",
+    nameKey: "widgets.dopamine.name",
+    descKey: "widgets.dopamine.desc",
+    icon: Zap,
+    accent: "#eab308",
     status: "live",
     size: "md",
     wide: true,

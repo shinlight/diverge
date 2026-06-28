@@ -14,6 +14,9 @@ import BrainDumpWidget from "./BrainDumpWidget";
 import ImapWidget from "./ImapWidget";
 import RevolutWidget from "./RevolutWidget";
 import PlaceWidget from "./PlaceWidget";
+import HabitsWidget from "./HabitsWidget";
+import MoodWidget from "./MoodWidget";
+import DopamineWidget from "./DopamineWidget";
 
 export const LIVE_WIDGETS = {
   gmail: GmailWidget,
@@ -29,4 +32,7 @@ export const LIVE_WIDGETS = {
   imap: ImapWidget,
   revolut: RevolutWidget,
   place: PlaceWidget,
+  habits: HabitsWidget,
+  mood: MoodWidget,
+  dopamine: DopamineWidget,
 };
