@@ -56,6 +56,8 @@ export function loadHabits() {
 
 export function saveHabits(list) {
   localStorage.setItem(KEY, JSON.stringify(list));
+  // Let same-tab listeners (e.g. the Cockpit recap) re-read.
+  window.dispatchEvent(new Event("diverge:habits"));
 }
 
 // Seeded so streaks are visible on first run.

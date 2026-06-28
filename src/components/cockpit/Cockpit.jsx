@@ -4,6 +4,8 @@ import {
   Clock,
   ListTodo,
   Mail,
+  Flame,
+  Timer,
   Sun,
   CloudSun,
   Cloud,
@@ -38,12 +40,14 @@ const WEATHER_ICON = {
 
 export default function Cockpit() {
   const { t, lang } = useI18n();
-  const { now, nextEvent, unread, google, weather, tasks } = useCockpit();
+  const { now, nextEvent, unread, google, weather, tasks, habits, focus } = useCockpit();
 
   const cells = {
     date: <DateCell now={now} lang={lang} t={t} />,
     next: <NextCell now={now} event={nextEvent} google={google} lang={lang} t={t} />,
     todo: <TodoCell tasks={tasks} t={t} />,
+    habits: <HabitsCell habits={habits} t={t} />,
+    focus: <FocusCell focus={focus} t={t} />,
     mail: <MailCell unread={unread} google={google} t={t} />,
     weather: <WeatherCell weather={weather} lang={lang} t={t} />,
   };
@@ -57,11 +61,13 @@ export default function Cockpit() {
       <div className="hidden px-5 pb-3 pt-2.5 sm:block">
         <Brand t={t} className="mb-2.5" />
         <div className="flex items-stretch">
-          <CockpitCell first max="max-w-[150px]">{cells.date}</CockpitCell>
-          <CockpitCell max="max-w-[210px]">{cells.next}</CockpitCell>
-          <CockpitCell max="max-w-[230px]">{cells.todo}</CockpitCell>
-          <CockpitCell max="max-w-[120px]">{cells.mail}</CockpitCell>
-          <CockpitCell max="max-w-[150px]">{cells.weather}</CockpitCell>
+          <CockpitCell first max="max-w-[140px]">{cells.date}</CockpitCell>
+          <CockpitCell max="max-w-[200px]">{cells.next}</CockpitCell>
+          <CockpitCell max="max-w-[220px]">{cells.todo}</CockpitCell>
+          <CockpitCell max="max-w-[120px]">{cells.habits}</CockpitCell>
+          <CockpitCell max="max-w-[120px]">{cells.focus}</CockpitCell>
+          <CockpitCell max="max-w-[110px]">{cells.mail}</CockpitCell>
+          <CockpitCell max="max-w-[140px]">{cells.weather}</CockpitCell>
         </div>
       </div>
 
@@ -71,6 +77,8 @@ export default function Cockpit() {
         <div className="grid grid-cols-2 gap-x-3 gap-y-3">
           {cells.date}
           {cells.next}
+          {cells.habits}
+          {cells.focus}
           {cells.mail}
           {cells.weather}
           <div className="col-span-2">{cells.todo}</div>
@@ -93,13 +101,14 @@ function Brand({ t, className = "" }) {
   );
 }
 
-// A left-aligned cockpit cell with a hairline separator (very light) on its
-// left, plus breathing room. The first cell skips the separator.
+// A left-aligned cockpit cell separated from its neighbour by a thin vertical
+// rule. The hairline is kept 1px ("molto sottile") but tinted enough to read as
+// a divider so the cells don't run together. The first cell skips it.
 function CockpitCell({ children, first = false, max = "" }) {
   return (
     <div
       className={`flex min-w-0 items-center ${max} ${
-        first ? "pr-5" : "border-l border-line/40 px-5"
+        first ? "pr-4" : "border-l border-line/70 px-4"
       }`}
     >
       {children}
@@ -180,6 +189,30 @@ function TodoCell({ tasks, t }) {
         </ul>
       )}
     </div>
+  );
+}
+
+function HabitsCell({ habits, t }) {
+  const { done, total, streak } = habits;
+  return (
+    <Stat
+      icon={Flame}
+      label={t("cockpit.habits")}
+      value={total > 0 ? `${done}/${total}` : "—"}
+      sub={streak > 0 ? t("cockpit.streak", { n: streak }) : "—"}
+    />
+  );
+}
+
+function FocusCell({ focus, t }) {
+  const { count, minutes } = focus;
+  return (
+    <Stat
+      icon={Timer}
+      label={t("cockpit.focus")}
+      value={count}
+      sub={count > 0 ? t("cockpit.focusMin", { n: minutes }) : "—"}
+    />
   );
 }
 

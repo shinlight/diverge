@@ -4,6 +4,8 @@ import { fetchNextEvent } from "../widgets/calendar/calendarService";
 import { fetchUnreadCount } from "../widgets/gmail/gmailService";
 import { loadCache } from "../widgets/weather/weatherService";
 import { loadTasks, loadTags, todayStr } from "../widgets/tasks/tasksService";
+import { loadHabits, isDoneToday, computeStreak } from "../widgets/habits/habitsService";
+import { loadSessions, todayStats } from "../widgets/focus/focusService";
 
 // The next few undone tasks (Big 3 of today first), joined with their tag colour.
 function upcomingTasks(limit = 3) {
@@ -21,6 +23,23 @@ function upcomingTasks(limit = 3) {
     }));
 }
 
+// Today's habits recap: how many are checked off / total, plus the best
+// running streak across them (the dopamine number worth surfacing).
+function habitsSummary() {
+  const list = loadHabits();
+  return {
+    done: list.filter(isDoneToday).length,
+    total: list.length,
+    streak: list.reduce((max, h) => Math.max(max, computeStreak(h.history)), 0),
+  };
+}
+
+// Today's focus recap: completed pomodoros + total focused minutes.
+function focusSummary() {
+  const { count, minutes } = todayStats(loadSessions(), []);
+  return { count, minutes };
+}
+
 // One light data source for the Cockpit. Uses *minimal* Google calls (a single
 // next-event + the INBOX unread count) so it never duplicates the heavy widget
 // fetches. Local cells (date, tasks, weather) read from storage.
@@ -33,6 +52,8 @@ export function useCockpit() {
   const [google, setGoogle] = useState("idle"); // idle | loading | ready | off
   const [weather, setWeather] = useState(() => loadCache()?.data ?? null);
   const [tasks, setTasks] = useState(() => upcomingTasks());
+  const [habits, setHabits] = useState(() => habitsSummary());
+  const [focus, setFocus] = useState(() => focusSummary());
 
   // Clock tick (every 30s keeps the time + countdown fresh enough).
   useEffect(() => {
@@ -77,15 +98,26 @@ export function useCockpit() {
   useEffect(() => {
     const syncTasks = () => setTasks(upcomingTasks());
     const syncWeather = () => setWeather(loadCache()?.data ?? null);
+    const syncHabits = () => setHabits(habitsSummary());
+    const syncFocus = () => setFocus(focusSummary());
+    // "storage" fires cross-tab only; the custom events keep us fresh same-tab.
     window.addEventListener("diverge:tasks", syncTasks);
+    window.addEventListener("diverge:habits", syncHabits);
+    window.addEventListener("diverge:focus", syncFocus);
     window.addEventListener("storage", syncTasks);
     window.addEventListener("storage", syncWeather);
+    window.addEventListener("storage", syncHabits);
+    window.addEventListener("storage", syncFocus);
     return () => {
       window.removeEventListener("diverge:tasks", syncTasks);
+      window.removeEventListener("diverge:habits", syncHabits);
+      window.removeEventListener("diverge:focus", syncFocus);
       window.removeEventListener("storage", syncTasks);
       window.removeEventListener("storage", syncWeather);
+      window.removeEventListener("storage", syncHabits);
+      window.removeEventListener("storage", syncFocus);
     };
   }, []);
 
-  return { now, nextEvent, unread, google, weather, tasks };
+  return { now, nextEvent, unread, google, weather, tasks, habits, focus };
 }

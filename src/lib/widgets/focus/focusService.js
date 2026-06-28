@@ -72,7 +72,11 @@ export const saveTasks = tasksSave;
 export { makeTask };
 
 export const loadSessions = () => load(KEYS.sessions, []);
-export const saveSessions = (s) => save(KEYS.sessions, s);
+export const saveSessions = (s) => {
+  save(KEYS.sessions, s);
+  // Let same-tab listeners (e.g. the Cockpit recap) re-read.
+  window.dispatchEvent(new Event("diverge:focus"));
+};
 
 // --- helpers -------------------------------------------------------------
 
