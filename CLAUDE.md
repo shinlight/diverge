@@ -52,6 +52,13 @@ Multi-instance ids are `"<type>::<uuid>"`; helpers `instanceType`/`isMultiInstan
 - **i18n:** sub-components defined outside a `useI18n()` caller need their **own** `useI18n()`; never close
   over `t` from an outer scope, and don't shadow `t` with `.map((t)=>…)`.
 - **Truncation:** a flex title row needs `min-w-0` on the container AND the `<h3 className="min-w-0 truncate">`.
+- **Supabase Realtime channel names:** give each `supabase.channel(...)` a **unique topic per
+  subscription** (e.g. append a random suffix). A shared name across widget instances/re-subscribes
+  reuses an already-subscribed channel → `cannot add postgres_changes callbacks ... after subscribe()`,
+  which (real mode only) threw and white-screened the app. (See `messagingService.subscribeIncoming`.)
+- **Error Boundary:** the app wraps each widget (and the root) in `components/ui/ErrorBoundary` — a single
+  widget render error shows inline in its card instead of blanking the whole dashboard. Mock mode can't
+  exercise real-data/realtime crashes, so verify realtime-touching changes against real Supabase.
 - **Serverless functions** (`api/*.js`, Node ESM): authenticate the caller with their Supabase JWT
   (`supabase.auth.getUser(jwt)`); keep secrets server-only (never `VITE_`-prefixed if they must stay secret).
   `vercel.json` excludes `/api/` from the SPA rewrite.
