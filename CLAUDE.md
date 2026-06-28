@@ -94,5 +94,8 @@ Multi-instance ids are `"<type>::<uuid>"`; helpers `instanceType`/`isMultiInstan
   the Google OAuth already wired for Calendar/Gmail. See `docs/superpowers/specs/2026-06-28-find-a-place-widget-design.md`.
 
 ## Notes
-- A temporary access gate (`middleware.js`, Vercel Edge) shows a black login before the app.
+- A temporary access gate (`middleware.js`, Vercel Edge) shows a black login before the app. Credentials
+  come from env (`GATE_USER`/`GATE_PASS`/`GATE_TOKEN`), **fail-closed** if unset. Early access proper is
+  an **email allowlist** (`lib/access`, admin "Early access" section) enforced server-side by a Supabase
+  auth hook — see `docs/superpowers/specs/2026-06-28-early-access.md`; the curtain is removed once it's live.
 - Mock fallbacks stay in place so the whole app is testable without any keys.
