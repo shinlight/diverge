@@ -73,3 +73,10 @@ export function loadFeedback() {
   }
   return [];
 }
+
+// Admin: change a report's status (PHASE: supabase update with admin RLS).
+export function updateFeedbackStatus(id, status) {
+  const list = loadFeedback().map((f) => (f.id === id ? { ...f, status } : f));
+  localStorage.setItem(KEY, JSON.stringify(list));
+  return list;
+}
