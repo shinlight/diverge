@@ -102,13 +102,14 @@ function Brand({ t, className = "" }) {
 }
 
 // A left-aligned cockpit cell separated from its neighbour by a thin vertical
-// rule. The hairline is kept 1px ("molto sottile") but tinted enough to read as
-// a divider so the cells don't run together. The first cell skips it.
+// rule. The hairline is kept 1px ("molto sottile") at full opacity so the
+// divider reads clearly, with generous padding for air between cells. The
+// first cell skips the rule.
 function CockpitCell({ children, first = false, max = "" }) {
   return (
     <div
       className={`flex min-w-0 items-center ${max} ${
-        first ? "pr-4" : "border-l border-line/70 px-4"
+        first ? "pr-7" : "border-l border-line px-7"
       }`}
     >
       {children}
