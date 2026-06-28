@@ -80,6 +80,13 @@ Multi-instance ids are `"<type>::<uuid>"`; helpers `instanceType`/`isMultiInstan
   Data** (ex Nordigen, free tier), add a serverless `api/revolut.js` holding `secret_id`/`secret_key`
   server-side (consent/requisition link → balances → transactions), then swap the bodies in
   `revolutService.js`. PSD2 consent expires ~90 days. See `docs/superpowers/specs/2026-06-28-revolut-widget-design.md`.
+- **Feedback (in-widget):** the 📣 button on every widget collects bug/idea reports. Mock stores in
+  `localStorage` (`diverge.feedback`); go live by swapping `feedbackService.js` for a Supabase
+  `feedback` table (schema + RLS notes in that file).
+- **Admin dashboard (`/admin`):** **mock-only** management console (Overview/Users/Subscriptions/
+  Payments[Stripe+Crypto]/Feedback). Gated by an email allowlist in `adminService.js`; go live with a
+  `profiles.is_admin` column + RLS, `subscriptions`/`payments` tables (Stripe webhooks + on-chain), and
+  swap the `adminService` getters. See `docs/superpowers/specs` / `2026-06-28` work.
 - **Find a Place widget:** UI is **mock-only** (search + results + map placeholder). Real use needs a
   **Google Maps Platform API key** (billing-enabled GCP project): Places API for search/details and the
   Maps Embed API (or Maps JS SDK) for the map, then swap the bodies in `placeService.js`. The "Open in
