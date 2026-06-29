@@ -1,5 +1,5 @@
 /*
-  DiVerge — translations (EN default, IT available).
+  Divergify — translations (EN default, IT available).
 
   Strings are looked up by dot path: t("common.save").
   Interpolation: t("profile.plan", { plan: "free" }) with "{plan}" in the value.
@@ -336,7 +336,7 @@ export const TRANSLATIONS = {
       haveAccount: "Already have an account?",
       signUp: "Sign up",
       demo: "Demo mode · no real data is sent",
-      waitlisted: "DiVerge is in early access. We added you to the waitlist — we'll email you an invite.",
+      waitlisted: "Divergify is in early access. We added you to the waitlist — we'll email you an invite.",
     },
     profile: {
       back: "Back to dashboard",
@@ -366,7 +366,7 @@ export const TRANSLATIONS = {
       focus: { name: "Focus Timer", desc: "Pomodoro-style focus sessions." },
       ai: { name: "AI Assistant", desc: "Chat with an LLM of your choice. Add more than one!" },
       clipboard: { name: "Clipboard History", desc: "Reuse anything you've copied recently." },
-      messaging: { name: "Messages", desc: "Chat with other DiVerge users. More channels soon!" },
+      messaging: { name: "Messages", desc: "Chat with other Divergify users. More channels soon!" },
       braindump: { name: "Brain Dump", desc: "Capture a thought now, triage it later." },
       imap: { name: "Email (IMAP)", desc: "Connect any mailbox via IMAP/SMTP." },
       revolut: { name: "Revolut", desc: "Balance and recent transactions, at a glance." },
@@ -530,7 +530,7 @@ export const TRANSLATIONS = {
       demoLine1: "{model} · {provider} (demo)",
       demoYouWrote: "You wrote: “{q}”.",
       demoNote:
-        "In this version of DiVerge replies are simulated. Connect a real {provider} API and the model's genuine answer will appear here — without changing the interface. ✨",
+        "In this version of Divergify replies are simulated. Connect a real {provider} API and the model's genuine answer will appear here — without changing the interface. ✨",
       demoEmpty: "I'm {model} ({provider}). Type something!",
     },
     messaging: {
@@ -545,6 +545,16 @@ export const TRANSLATIONS = {
       send: "Send",
       selectConversation: "Select a conversation",
       startConversation: "Start chatting with {name}.",
+    },
+    landing: {
+      waitlist: {
+        placeholder: "you@email.com",
+        cta: "Enter early access",
+        success: "You're on the list. We'll be in touch.",
+        already: "You're already in — check your inbox.",
+        invalid: "Please enter a valid email.",
+        error: "Something went wrong. Try again.",
+      },
     },
   },
 
@@ -867,7 +877,7 @@ export const TRANSLATIONS = {
       haveAccount: "Hai già un account?",
       signUp: "Registrati",
       demo: "Modalità demo · nessun dato reale viene inviato",
-      waitlisted: "DiVerge è in early access. Ti abbiamo aggiunto alla lista d'attesa — ti invieremo un invito via email.",
+      waitlisted: "Divergify è in early access. Ti abbiamo aggiunto alla lista d'attesa — ti invieremo un invito via email.",
     },
     profile: {
       back: "Torna alla dashboard",
@@ -897,7 +907,7 @@ export const TRANSLATIONS = {
       focus: { name: "Timer Focus", desc: "Sessioni di concentrazione in stile Pomodoro." },
       ai: { name: "Assistente AI", desc: "Chatta con un LLM a tua scelta. Aggiungine più di uno!" },
       clipboard: { name: "Cronologia Appunti", desc: "Riutilizza tutto ciò che hai copiato di recente." },
-      messaging: { name: "Messaggi", desc: "Chatta con altri utenti DiVerge. Altri canali in arrivo!" },
+      messaging: { name: "Messaggi", desc: "Chatta con altri utenti Divergify. Altri canali in arrivo!" },
       braindump: { name: "Brain Dump", desc: "Cattura un pensiero ora, lo smisti dopo." },
       imap: { name: "Email (IMAP)", desc: "Collega una casella qualsiasi via IMAP/SMTP." },
       revolut: { name: "Revolut", desc: "Saldo e ultimi movimenti, a colpo d'occhio." },
@@ -1061,7 +1071,7 @@ export const TRANSLATIONS = {
       demoLine1: "{model} · {provider} (demo)",
       demoYouWrote: "Hai scritto: “{q}”.",
       demoNote:
-        "In questa versione di DiVerge le risposte sono simulate. Collegando una vera API {provider}, qui comparirà la risposta autentica del modello — senza modificare l'interfaccia. ✨",
+        "In questa versione di Divergify le risposte sono simulate. Collegando una vera API {provider}, qui comparirà la risposta autentica del modello — senza modificare l'interfaccia. ✨",
       demoEmpty: "Sono {model} ({provider}). Scrivimi pure!",
     },
     messaging: {
@@ -1076,6 +1086,16 @@ export const TRANSLATIONS = {
       send: "Invia",
       selectConversation: "Seleziona una conversazione",
       startConversation: "Inizia a chattare con {name}.",
+    },
+    landing: {
+      waitlist: {
+        placeholder: "tu@email.com",
+        cta: "Entra in early access",
+        success: "Sei in lista. Ti scriviamo presto.",
+        already: "Ci sei già — controlla la tua inbox.",
+        invalid: "Inserisci un'email valida.",
+        error: "Qualcosa è andato storto. Riprova.",
+      },
     },
   },
 };
