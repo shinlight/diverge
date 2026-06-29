@@ -1,6 +1,6 @@
 import { useTheme } from "../../lib/theme/ThemeContext";
 
-// DiVerge mark: two paths diverging from a single point.
+// Divergify mark: two paths diverging from a single point.
 export default function Logo({ size = 34 }) {
   const { mono } = useTheme();
   const brand = mono ? "#ffffff" : "var(--color-accent)";
@@ -38,7 +38,7 @@ export default function Logo({ size = 34 }) {
         />
       </svg>
       <span className="text-xl font-semibold tracking-tight">
-        Di<span className={mono ? "" : "text-accent"}>Verge</span>
+        Diverg<span className={mono ? "" : "text-accent"}>ify</span>
       </span>
     </span>
   );

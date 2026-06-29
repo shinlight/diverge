@@ -2,7 +2,7 @@
 
 Date: 2026-06-28
 
-Goal: open DiVerge to a controlled set of real testers. Access model: **email
+Goal: open Divergify to a controlled set of real testers. Access model: **email
 allowlist** — only invited emails can sign up / sign in; everyone else lands on a
 waitlist.
 

@@ -1,5 +1,5 @@
 /*
-  DiVerge — Mood & Energy service.
+  Divergify — Mood & Energy service.
 
   Fully local mock (no backend, no keys): quick mood + energy check-ins, persisted
   in localStorage. ADHD-friendly: externalizes interoception (naming how you feel)

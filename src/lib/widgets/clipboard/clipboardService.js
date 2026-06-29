@@ -1,4 +1,4 @@
-// DiVerge — Clipboard history (local, capped at 24 entries).
+// Divergify — Clipboard history (local, capped at 24 entries).
 const KEY = "diverge.clipboard";
 export const MAX_ITEMS = 24;
 

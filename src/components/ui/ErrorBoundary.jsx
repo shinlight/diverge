@@ -2,7 +2,7 @@ import { Component } from "react";
 import { AlertTriangle } from "lucide-react";
 
 /*
-  DiVerge — Error Boundary.
+  Divergify — Error Boundary.
 
   React error boundaries MUST be class components. Without one, a single render
   error anywhere unmounts the whole tree → blank white page. We use this per
@@ -22,7 +22,7 @@ export default class ErrorBoundary extends Component {
   componentDidCatch(error, info) {
     // eslint-disable-next-line no-console
     console.error(
-      `[DiVerge] Crash${this.props.label ? ` in "${this.props.label}"` : ""}:`,
+      `[Divergify] Crash${this.props.label ? ` in "${this.props.label}"` : ""}:`,
       error,
       info?.componentStack
     );

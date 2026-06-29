@@ -1,5 +1,5 @@
 /*
-  DiVerge — SaaS billing predisposition.
+  Divergify — SaaS billing predisposition.
 
   No real charges happen yet. This file defines the product tiers and a
   single entry point, startCheckout(), that we'll later wire to:
@@ -47,7 +47,7 @@ export const PAYMENT_METHODS = [
  */
 export async function startCheckout(planId, method) {
   // eslint-disable-next-line no-console
-  console.info(`[DiVerge] Checkout richiesto: piano="${planId}" metodo="${method}"`);
+  console.info(`[Divergify] Checkout richiesto: piano="${planId}" metodo="${method}"`);
   return {
     ok: false,
     pending: true,

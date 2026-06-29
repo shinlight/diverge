@@ -1,5 +1,5 @@
 /*
-  DiVerge — AI assistant service.
+  Divergify — AI assistant service.
 
   Each AI widget instance has its OWN model choice + conversations, persisted
   under "diverge.ai.<instanceId>", so several AI widgets can run side by side,

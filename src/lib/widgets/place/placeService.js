@@ -1,5 +1,5 @@
 /*
-  DiVerge — Find a Place service.
+  Divergify — Find a Place service.
 
   This file is the SWAP POINT: today it serves a mock set of places and a
   substring search so the widget UX is fully testable without any key. To go

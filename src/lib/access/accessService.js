@@ -1,5 +1,5 @@
 /*
-  DiVerge — Early-access allowlist.
+  Divergify — Early-access allowlist.
 
   Controls who can join during early access: only allowlisted emails can sign up
   / sign in. A waitlist collects requests from everyone else.

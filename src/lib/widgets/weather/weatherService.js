@@ -1,5 +1,5 @@
 /*
-  DiVerge — Weather service (real data).
+  Divergify — Weather service (real data).
 
   Provider: Open-Meteo (https://open-meteo.com) — free, accurate, no API key,
   CORS-friendly. City name via BigDataCloud reverse geocoding (also key-free).

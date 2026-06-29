@@ -1,5 +1,5 @@
 /*
-  DiVerge — Google Calendar service (interactive).
+  Divergify — Google Calendar service (interactive).
 
   In-memory agenda seeded with realistic events so the widget is fully
   operative (view / create / edit / reschedule / delete) without Google setup.
@@ -54,7 +54,7 @@ function seedEvents() {
     },
     {
       id: "e3",
-      title: "Sessione focus: DiVerge",
+      title: "Sessione focus: Divergify",
       start: at(0, 16, 0),
       end: at(0, 17, 30),
       location: "",

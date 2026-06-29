@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /*
-  DiVerge — design tokens.
+  Divergify — design tokens.
   These are the DEFAULT values. They get overridden at runtime by the
   ThemeContext (src/lib/theme), which sets the same CSS variables on
   <html> to apply themes and the user's custom accent color live.

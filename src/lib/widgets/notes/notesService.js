@@ -1,4 +1,4 @@
-// DiVerge — Quick Notes (local, persisted).
+// Divergify — Quick Notes (local, persisted).
 const KEY = "diverge.notes";
 
 export const NOTE_COLORS = ["#f0a132", "#7c5cff", "#2fb380", "#22b8cf", "#ff6b6b"];

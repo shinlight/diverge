@@ -1,5 +1,5 @@
 /*
-  DiVerge — Tasks service (the canonical task store).
+  Divergify — Tasks service (the canonical task store).
 
   This is the single source of truth for tasks + projects (tags). The Focus
   (Pomodoro) widget and the Cockpit read/write through here too, so there's one

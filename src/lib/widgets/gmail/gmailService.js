@@ -1,5 +1,5 @@
 /*
-  DiVerge — Gmail service (interactive).
+  Divergify — Gmail service (interactive).
 
   This is the ONLY file the Gmail widget talks to. Today it runs a small
   in-memory inbox seeded with realistic sample data, so the widget is fully
@@ -56,12 +56,12 @@ Google Calendar`,
       id: "m2",
       from: "GitHub",
       email: "notifications@github.com",
-      subject: "[DiVerge] La build è passata ✓",
+      subject: "[Divergify] La build è passata ✓",
       snippet:
         "Il workflow CI per il commit 208cd80 è stato completato con successo.",
       body: `Buone notizie!
 
-Il workflow di Continuous Integration per il repository DiVerge è stato completato con successo.
+Il workflow di Continuous Integration per il repository Divergify è stato completato con successo.
 
 Commit: 208cd80 — "Initial commit: setup app React + Vite"
 Durata: 1m 12s
@@ -83,7 +83,7 @@ Puoi vedere i dettagli completi su GitHub.
         "Ciao! Ho provato la nuova griglia di widget, è davvero fluida. Una sola cosa…",
       body: `Ciao!
 
-Ho provato la nuova griglia di widget di DiVerge ed è davvero fluida, complimenti. Il drag & drop è soddisfacente e i colori personalizzabili sono un tocco di classe.
+Ho provato la nuova griglia di widget di Divergify ed è davvero fluida, complimenti. Il drag & drop è soddisfacente e i colori personalizzabili sono un tocco di classe.
 
 Una sola cosa: sul widget Gmail mi piacerebbe poter aprire le email senza uscire dalla dashboard. Sarebbe possibile?
 
@@ -144,7 +144,7 @@ Buona lettura!`,
       snippet: "Grazie! Ecco la ricevuta del pagamento del piano Pro.",
       body: `Grazie per il tuo pagamento.
 
-Piano: DiVerge Pro
+Piano: Divergify Pro
 Importo: € 6,00
 Periodo: mensile
 
@@ -209,7 +209,7 @@ export async function deleteMessage(id) {
 export async function sendMessage({ to, subject, body }) {
   await delay(800); // Phase 3: real Gmail "send" call.
   // eslint-disable-next-line no-console
-  console.info("[DiVerge] Email inviata (demo):", { to, subject, body });
+  console.info("[Divergify] Email inviata (demo):", { to, subject, body });
   return { ok: true };
 }
 

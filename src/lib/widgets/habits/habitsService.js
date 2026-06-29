@@ -1,5 +1,5 @@
 /*
-  DiVerge — Habits service.
+  Divergify — Habits service.
 
   Fully local mock (no backend, no keys): daily habits with streaks, persisted in
   localStorage. ADHD-friendly: externalizes routines and rewards consistency with

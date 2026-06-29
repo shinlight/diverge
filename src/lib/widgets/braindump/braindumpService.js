@@ -1,5 +1,5 @@
 /*
-  DiVerge — Brain Dump service.
+  Divergify — Brain Dump service.
 
   A frictionless capture buffer: get the thought out of your head NOW, triage
   later (→ task or delete). Local-only. Item: { id, text, createdAt }.

@@ -23,7 +23,7 @@ function loadPrefs() {
 }
 
 /*
-  DiVerge — Notification system.
+  Divergify — Notification system.
 
   Notifications live here. They show up in two places:
     - floating toasts (dismissible with X, auto-hide after a few seconds)
@@ -61,7 +61,7 @@ function seed() {
       color: "#4285f4",
     }),
     mk(30, {
-      title: "Benvenuto in DiVerge",
+      title: "Benvenuto in Divergify",
       message: "Rinomina i widget e scegli il tuo tema dal pannello 🎨.",
       color: "#7c5cff",
     }),
