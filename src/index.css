@@ -97,3 +97,9 @@ body {
 }
 .landing .lp-display { font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif; letter-spacing: -0.02em; }
 .landing .lp-mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+
+/* FAQ accordion */
+.landing details > summary { list-style: none; cursor: pointer; }
+.landing details > summary::-webkit-details-marker { display: none; }
+.landing .lp-faq-icon { transition: transform 0.2s ease; }
+.landing details[open] .lp-faq-icon { transform: rotate(45deg); }
