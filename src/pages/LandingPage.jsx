@@ -6,6 +6,9 @@ import TrustStrip from "../components/landing/TrustStrip";
 import ProblemSection from "../components/landing/ProblemSection";
 import HowItWorks from "../components/landing/HowItWorks";
 import WidgetShowcase from "../components/landing/WidgetShowcase";
+import BuiltForYourBrain from "../components/landing/BuiltForYourBrain";
+import Manifesto from "../components/landing/Manifesto";
+import Personalization from "../components/landing/Personalization";
 
 // Temporary stubs — each becomes its own component in later tasks.
 function Stub({ id, label, bg }) {
@@ -27,9 +30,9 @@ export default function LandingPage() {
       <ProblemSection />
       <HowItWorks />
       <WidgetShowcase />
-      <Stub label="built for your brain" />
-      <Stub id="manifesto" label="manifesto" bg="cream" />
-      <Stub label="personalization" />
+      <BuiltForYourBrain />
+      <Manifesto />
+      <Personalization />
       <Stub id="pricing" label="pricing" />
       <Stub label="faq" />
       <Stub id="cta" label="final cta" bg="accent" />
