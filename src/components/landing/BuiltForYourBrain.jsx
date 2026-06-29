@@ -14,7 +14,17 @@ const FEATURES = [
 ];
 
 export default function BuiltForYourBrain() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
+  const shots = [
+    {
+      src: `/landing/06-todo-focus.${lang}.png`,
+      caption: `${t("landing.brain.f3.name")} · ${t("landing.brain.f6.name")}`,
+    },
+    {
+      src: `/landing/07-focus-pomodoro.${lang}.png`,
+      caption: t("landing.brain.f5.name"),
+    },
+  ];
   const reduce = useReducedMotion();
   const anim = reduce
     ? {}
@@ -70,6 +80,29 @@ export default function BuiltForYourBrain() {
                 {t(`landing.brain.${key}.body`)}
               </p>
             </div>
+          ))}
+        </div>
+
+        {/* Product gallery — real screenshots proving the features */}
+        <div className="mt-14 grid gap-6 md:grid-cols-2">
+          {shots.map(({ src, caption }) => (
+            <figure key={src} className="m-0">
+              <div
+                className="overflow-hidden rounded-[14px]"
+                style={{
+                  border: "1px solid var(--lp-line)",
+                  backgroundColor: "var(--lp-panel)",
+                }}
+              >
+                <img src={src} alt={caption} loading="lazy" className="block w-full h-auto" />
+              </div>
+              <figcaption
+                className="lp-mono mt-3 text-[11px] uppercase tracking-[0.08em]"
+                style={{ color: "var(--lp-mono-muted)" }}
+              >
+                {caption}
+              </figcaption>
+            </figure>
           ))}
         </div>
       </motion.div>

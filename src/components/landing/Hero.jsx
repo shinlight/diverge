@@ -7,8 +7,7 @@ import Placeholder from "./Placeholder";
 import CockpitBand from "./CockpitBand";
 
 // Mini floating product card — 2x2 grid of widget tile stubs
-function FloatingProductCard({ label }) {
-  const TILE_LABELS = ["Gmail", "Calendar", "To-Do", "Weather"];
+function FloatingProductCard({ label, src }) {
   return (
     <div
       className="hidden md:block absolute"
@@ -30,37 +29,14 @@ function FloatingProductCard({ label }) {
         <span style={{ width: "9px", height: "9px", borderRadius: "50%", background: "var(--lp-accent)", display: "inline-block" }} />
       </div>
 
-      {/* 2x2 widget grid */}
-      <div className="grid grid-cols-2 gap-2">
-        {TILE_LABELS.map((name) => (
-          <div
-            key={name}
-            style={{
-              height: "52px",
-              borderRadius: "8px",
-              backgroundColor: "#352f25",
-              backgroundImage:
-                "repeating-linear-gradient(135deg,rgba(239,233,221,.05) 0 8px,transparent 8px 16px)",
-              display: "flex",
-              alignItems: "flex-end",
-              padding: "6px 8px",
-            }}
-          >
-            <span
-              className="lp-mono"
-              style={{
-                fontSize: "9px",
-                fontWeight: 500,
-                letterSpacing: "0.06em",
-                textTransform: "uppercase",
-                color: "rgba(239,233,221,.4)",
-              }}
-            >
-              {name}
-            </span>
-          </div>
-        ))}
-      </div>
+      {/* Real product card — the live To-Do widget */}
+      <img
+        src={src}
+        alt={label}
+        loading="lazy"
+        className="block w-full rounded-[8px]"
+        style={{ border: "1px solid rgba(239,233,221,.1)" }}
+      />
 
       <div
         className="lp-mono"
@@ -81,7 +57,7 @@ function FloatingProductCard({ label }) {
 }
 
 export default function Hero() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const reduce = useReducedMotion();
   const anim = reduce
     ? {}
@@ -168,7 +144,10 @@ export default function Hero() {
             caption={t("landing.hero.portrait")}
             height={480}
           />
-          <FloatingProductCard label={t("landing.hero.floatingCard")} />
+          <FloatingProductCard
+            label={t("landing.hero.floatingCard")}
+            src={`/landing/03-card-todo.${lang}.png`}
+          />
         </div>
       </motion.div>
 

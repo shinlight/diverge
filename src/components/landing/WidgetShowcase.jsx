@@ -18,7 +18,7 @@ const CHIPS = [
 ];
 
 export default function WidgetShowcase() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const reduce = useReducedMotion();
   const anim = reduce
     ? {}
@@ -51,8 +51,8 @@ export default function WidgetShowcase() {
         </p>
 
         <Placeholder
-          height={560}
-          caption={t("landing.showcase.photoCaption")}
+          src={`/landing/01-dashboard.${lang}.png`}
+          caption={t("landing.showcase.h2")}
         />
 
         {/* Widget chips */}

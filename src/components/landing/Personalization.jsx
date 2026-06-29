@@ -14,7 +14,7 @@ const ACCENT_SWATCHES = [
 ];
 
 export default function Personalization() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const reduce = useReducedMotion();
   const anim = reduce
     ? {}
@@ -27,7 +27,8 @@ export default function Personalization() {
 
   return (
     <SectionWrap>
-      <motion.div {...anim} className="grid gap-16 lg:grid-cols-2 lg:items-center">
+      <motion.div {...anim}>
+        <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
         {/* LEFT — text */}
         <div>
           <MonoKicker className="mb-[22px]">{t("landing.personalization.kicker")}</MonoKicker>
@@ -148,6 +149,23 @@ export default function Personalization() {
               </span>
             ))}
           </div>
+        </div>
+        </div>
+
+        {/* The same dashboard, your way — total black theme */}
+        <div
+          className="mt-12 overflow-hidden rounded-[18px]"
+          style={{
+            border: "1px solid var(--lp-line)",
+            backgroundColor: "var(--lp-panel)",
+          }}
+        >
+          <img
+            src={`/landing/08-dashboard-totalblack.${lang}.png`}
+            alt={t("landing.personalization.h2")}
+            loading="lazy"
+            className="block w-full h-auto"
+          />
         </div>
       </motion.div>
     </SectionWrap>
