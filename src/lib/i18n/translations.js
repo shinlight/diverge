@@ -683,7 +683,7 @@ export const TRANSLATIONS = {
         badge: "Most popular",
         period: {
           free: "Forever",
-          pro: "mo",
+          pro: "Per month",
         },
         free: {
           name: "Free",
@@ -1415,7 +1415,7 @@ export const TRANSLATIONS = {
         badge: "Più scelto",
         period: {
           free: "Per sempre",
-          pro: "mese",
+          pro: "Al mese",
         },
         free: {
           name: "Free",

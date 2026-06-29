@@ -80,11 +80,6 @@ export default function Pricing() {
                   >
                     {priceStr}
                   </span>
-                  {plan.price > 0 && (
-                    <span className="text-[18px]" style={{ color: "var(--lp-muted)" }}>
-                      /{t(`landing.pricing.period.${plan.id}`)}
-                    </span>
-                  )}
                 </div>
 
                 {/* Period label */}
