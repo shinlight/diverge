@@ -8,6 +8,7 @@ import { FeedbackProvider } from "./lib/feedback/FeedbackContext";
 import NotificationToasts from "./components/notifications/NotificationToasts";
 import ErrorBoundary from "./components/ui/ErrorBoundary";
 import LoginPage from "./pages/LoginPage";
+import LandingPage from "./pages/LandingPage";
 import DashboardPage from "./pages/DashboardPage";
 import ProfilePage from "./pages/ProfilePage";
 import AdminPage from "./pages/AdminPage";
@@ -18,7 +19,9 @@ function AppRoutes() {
   if (!isAuthenticated) {
     return (
       <Routes>
-        <Route path="*" element={<LoginPage />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     );
   }
@@ -42,7 +45,7 @@ export default function App() {
             <FeedbackProvider>
             <BrowserRouter>
               <ErrorBoundary
-                label="DiVerge"
+                label="Divergify"
                 fallback={(error, reset) => (
                   <div className="flex min-h-screen flex-col items-center justify-center gap-3 p-6 text-center">
                     <span className="grid h-12 w-12 place-items-center rounded-2xl bg-red-500/10 text-red-400">
