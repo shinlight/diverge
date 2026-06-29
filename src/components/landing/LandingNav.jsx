@@ -13,8 +13,7 @@ export default function LandingNav() {
       }}
     >
       <div
-        className="mx-auto flex max-w-[1240px] items-center justify-between px-6 sm:px-16"
-        style={{ padding: "18px 64px" }}
+        className="mx-auto flex max-w-[1240px] items-center justify-between px-6 py-[18px] sm:px-16"
       >
         {/* Wordmark */}
         <div

@@ -1,7 +1,7 @@
 // src/components/landing/BuiltForYourBrain.jsx
 import { motion, useReducedMotion } from "framer-motion";
 import SectionWrap from "./SectionWrap";
-import { MonoKicker, Pill } from "./MonoKicker";
+import { MonoKicker } from "./MonoKicker";
 import { useI18n } from "../../lib/i18n/LanguageContext";
 
 const FEATURES = [
