@@ -3,6 +3,9 @@ import SectionWrap from "../components/landing/SectionWrap";
 import LandingNav from "../components/landing/LandingNav";
 import Hero from "../components/landing/Hero";
 import TrustStrip from "../components/landing/TrustStrip";
+import ProblemSection from "../components/landing/ProblemSection";
+import HowItWorks from "../components/landing/HowItWorks";
+import WidgetShowcase from "../components/landing/WidgetShowcase";
 
 // Temporary stubs — each becomes its own component in later tasks.
 function Stub({ id, label, bg }) {
@@ -21,9 +24,9 @@ export default function LandingPage() {
       <LandingNav />
       <Hero />
       <TrustStrip />
-      <Stub label="problem" bg="cream" />
-      <Stub id="how" label="how it works" />
-      <Stub id="product" label="widget showcase" />
+      <ProblemSection />
+      <HowItWorks />
+      <WidgetShowcase />
       <Stub label="built for your brain" />
       <Stub id="manifesto" label="manifesto" bg="cream" />
       <Stub label="personalization" />

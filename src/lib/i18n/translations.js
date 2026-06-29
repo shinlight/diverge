@@ -590,6 +590,37 @@ export const TRANSLATIONS = {
         quoteAttr: "— early tester, diagnosed at 31",
         badge: "Built by an\nADHD founder",
       },
+      problem: {
+        kicker: "The before",
+        h2: "Ten apps open. Still nothing done.",
+        sub: "It's not a discipline problem. Neurotypical tools were never built for how your attention actually works.",
+        p1: "Tasks vanish the second you look away.",
+        p2: "The wall before starting feels physical.",
+        p3: "Time disappears — then the guilt arrives.",
+        photoCaption: "[ photo — a desk overflowing with sticky notes & too many open tabs ]",
+      },
+      how: {
+        kicker: "How it works",
+        h2: "Three steps to a quieter mind.",
+        s1: {
+          title: "Dump everything",
+          body: "Brain-dump the chaos — one tap turns a thought into a task. Nothing gets lost.",
+        },
+        s2: {
+          title: "See what matters",
+          body: "The Cockpit surfaces your Big 3, your next event and your unread — always answering \"what now?\"",
+        },
+        s3: {
+          title: "Do one thing",
+          body: "Pick by energy, start a timer, or let Spin choose for you. The wall comes down.",
+        },
+      },
+      showcase: {
+        kicker: "The dashboard",
+        h2: "Your whole stack, on one screen.",
+        sub: "Real, working widgets — email, calendar, to-dos, AI, notes and more — in resizable squares you arrange yourself.",
+        photoCaption: "[ product screenshot — the live widget dashboard, Cockpit band on top, draggable widget grid below ]",
+      },
     },
   },
 
@@ -1165,6 +1196,37 @@ export const TRANSLATIONS = {
         quote: "\"Finalmente un'app che non mi fa sentire indietro.\"",
         quoteAttr: "— tester, diagnosi a 31 anni",
         badge: "Fatto da un\nfounder ADHD",
+      },
+      problem: {
+        kicker: "Il prima",
+        h2: "Dieci app aperte. E ancora niente fatto.",
+        sub: "Non è un problema di disciplina. Gli strumenti neurotipici non sono mai stati pensati per come funziona davvero la tua attenzione.",
+        p1: "I task spariscono appena distogli lo sguardo.",
+        p2: "Il muro prima di iniziare sembra fisico.",
+        p3: "Il tempo svanisce — poi arriva la colpa.",
+        photoCaption: "[ photo — a desk overflowing with sticky notes & too many open tabs ]",
+      },
+      how: {
+        kicker: "Come funziona",
+        h2: "Tre passi verso una mente più quieta.",
+        s1: {
+          title: "Butta fuori tutto",
+          body: "Butta fuori il caos — un tap trasforma un pensiero in task. Niente va perso.",
+        },
+        s2: {
+          title: "Vedi cosa conta",
+          body: "Il Cockpit fa emergere i tuoi Big 3, il prossimo evento e le non lette — risponde sempre a \"cosa ora?\"",
+        },
+        s3: {
+          title: "Fai una cosa",
+          body: "Scegli per energia, avvia un timer, o lascia scegliere a Spin. Il muro cade.",
+        },
+      },
+      showcase: {
+        kicker: "La dashboard",
+        h2: "Tutto il tuo stack, su una schermata.",
+        sub: "Widget reali e funzionanti — email, calendario, to-do, AI, note e altro — in quadrati ridimensionabili che organizzi tu.",
+        photoCaption: "[ product screenshot — the live widget dashboard, Cockpit band on top, draggable widget grid below ]",
       },
     },
   },
