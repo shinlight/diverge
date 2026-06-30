@@ -1,4 +1,4 @@
-// DiVerge — theme presets.
+// Divergify — theme presets.
 // Each theme is a full palette mapped to the CSS variables declared in index.css.
 // The user can additionally override just the accent colour on top of any theme.
 

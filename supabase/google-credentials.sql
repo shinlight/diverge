@@ -1,4 +1,4 @@
--- DiVerge — Google refresh-token storage.
+-- Divergify — Google refresh-token storage.
 --
 -- Holds the long-lived Google OAuth refresh token per user so the serverless
 -- function (api/google-token.js) can mint fresh access tokens in the

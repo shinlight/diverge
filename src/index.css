@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /*
-  DiVerge — design tokens.
+  Divergify — design tokens.
   These are the DEFAULT values. They get overridden at runtime by the
   ThemeContext (src/lib/theme), which sets the same CSS variables on
   <html> to apply themes and the user's custom accent color live.
@@ -71,3 +71,35 @@ body {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
+
+/* ----------------------------------------------------------------------
+   Divergify landing — FIXED palette, isolated from the app's themeable
+   @theme tokens (the app can be re-themed to total black; the marketing
+   page must stay on its own art direction). Scoped under .landing.
+---------------------------------------------------------------------- */
+.landing {
+  --lp-bg: #1b1815;          /* dark warm page bg */
+  --lp-panel: #252019;       /* dark panels */
+  --lp-cream: #f4eee2;       /* alternate cream sections */
+  --lp-cream-ink: #211f1b;
+  --lp-cream-muted: #4a463f;
+  --lp-accent: #8f78ff;      /* flat purple accent (NO gradients) */
+  --lp-accent-ink: #1b1043;  /* ink on purple */
+  --lp-content: #efe9dd;     /* text on dark */
+  --lp-muted: #b8b1a4;       /* muted text on dark */
+  --lp-mono-muted: #9a9183;  /* mono labels */
+  --lp-line: rgba(239, 233, 221, 0.1);  /* borders on dark */
+
+  background: var(--lp-bg);
+  color: var(--lp-content);
+  font-family: "Spline Sans", ui-sans-serif, system-ui, sans-serif;
+  min-height: 100vh;
+}
+.landing .lp-display { font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif; letter-spacing: -0.02em; }
+.landing .lp-mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+
+/* FAQ accordion */
+.landing details > summary { list-style: none; cursor: pointer; }
+.landing details > summary::-webkit-details-marker { display: none; }
+.landing .lp-faq-icon { transition: transform 0.2s ease; }
+.landing details[open] .lp-faq-icon { transform: rotate(45deg); }

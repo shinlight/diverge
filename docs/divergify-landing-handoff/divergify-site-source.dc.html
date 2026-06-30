@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{margin:0;}
+  a{text-decoration:none;color:inherit;}
+  .lang-it{display:none;}
+  [data-lang="it"] .lang-it{display:inline;}
+  [data-lang="it"] .lang-en{display:none;}
+  .langbtn-en,.langbtn-it{cursor:pointer;background:none;border:none;font:inherit;padding:0 5px;opacity:.4;line-height:1;color:inherit;}
+  [data-lang="en"] .langbtn-en{opacity:1;font-weight:700;}
+  [data-lang="it"] .langbtn-it{opacity:1;font-weight:700;}
+  details>summary{list-style:none;cursor:pointer;}
+  details>summary::-webkit-details-marker{display:none;}
+  details[open] .faq-plus{transform:rotate(45deg);}
+  @media (max-width:880px){
+    .r-pad{padding-left:24px !important;padding-right:24px !important;}
+    .r-2col,.r-hero,.r-3col{grid-template-columns:1fr !important;}
+    .r-nav-links,.r-hide-sm{display:none !important;}
+    .r-h1{font-size:42px !important;}
+    .r-flex{flex-direction:column !important;align-items:flex-start !important;}
+  }
+</style>
+</helmet>
+
+<div data-lang="{{ lang }}" style="background:#1b1815;color:#efe9dd;font-family:'Spline Sans',system-ui,sans-serif;min-height:100vh;overflow-x:hidden;">
+
+  <!-- ============ 1 · NAV ============ -->
+  <nav style="position:sticky;top:0;z-index:50;background:rgba(27,24,21,.86);backdrop-filter:blur(12px);border-bottom:1px solid rgba(239,233,221,.1);">
+    <div class="r-pad" style="max-width:1240px;margin:0 auto;padding:18px 64px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-family:'Space Grotesk',system-ui,sans-serif;font-size:22px;font-weight:600;letter-spacing:-.01em;display:flex;align-items:center;gap:8px;">Divergify<span style="width:8px;height:8px;border-radius:50%;background:#8f78ff;"></span></div>
+      <div class="r-nav-links" style="display:flex;align-items:center;gap:30px;font-size:14.5px;color:#b8b1a4;">
+        <a href="#product"><span class="lang-en">Product</span><span class="lang-it">Prodotto</span></a>
+        <a href="#how"><span class="lang-en">How it works</span><span class="lang-it">Come funziona</span></a>
+        <a href="#pricing"><span class="lang-en">Pricing</span><span class="lang-it">Prezzi</span></a>
+        <a href="#manifesto">Manifesto</a>
+      </div>
+      <div style="display:flex;align-items:center;gap:18px;">
+        <div style="display:flex;align-items:center;font-size:13px;color:#efe9dd;">
+          <button class="langbtn-en" onClick="{{ setEN }}">EN</button><span style="opacity:.3;">/</span><button class="langbtn-it" onClick="{{ setIT }}">IT</button>
+        </div>
+        <a href="#cta" style="background:#8f78ff;color:#1b1043;padding:11px 20px;border-radius:999px;font-weight:600;font-size:14px;"><span class="lang-en">Enter early access</span><span class="lang-it">Entra in early access</span></a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ============ 2 · HERO ============ -->
+  <header style="border-bottom:1px solid rgba(239,233,221,.1);">
+    <div class="r-pad r-hero" style="max-width:1240px;margin:0 auto;padding:96px 64px 80px;display:grid;grid-template-columns:1.12fr .88fr;gap:64px;align-items:center;">
+      <div>
+        <div style="font:500 12.5px/1 'IBM Plex Mono',monospace;letter-spacing:.2em;text-transform:uppercase;color:#8f78ff;margin-bottom:28px;">One screen · zero overwhelm</div>
+        <h1 class="r-h1" style="font-family:'Space Grotesk',system-ui,sans-serif;font-weight:600;font-size:66px;line-height:1.02;letter-spacing:-.025em;margin:0 0 26px;max-width:15ch;">
+          <span class="lang-en">Everything that matters, on <span style="color:#8f78ff;">one screen</span> — finally.</span>
+          <span class="lang-it">Tutto ciò che conta, su <span style="color:#8f78ff;">una schermata</span> sola — finalmente.</span>
+        </h1>
+        <p style="font-size:19px;line-height:1.55;color:#b8b1a4;max-width:46ch;margin:0 0 36px;">
+          <span class="lang-en">Divergify holds the cognitive load so your brain doesn't have to — a cockpit that always answers one question: what matters now?</span>
+          <span class="lang-it">Divergify regge il carico cognitivo al posto tuo — un cockpit che risponde sempre a una domanda: cosa conta adesso?</span>
+        </p>
+        <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
+          <a href="#cta" style="background:#8f78ff;color:#1b1043;padding:15px 28px;border-radius:999px;font-weight:600;font-size:16px;"><span class="lang-en">Enter early access</span><span class="lang-it">Entra in early access</span></a>
+          <a href="#how" style="font-size:16px;color:#efe9dd;border-bottom:1.5px solid rgba(239,233,221,.6);padding-bottom:2px;"><span class="lang-en">Watch the 60s tour</span><span class="lang-it">Guarda il tour di 60s</span></a>
+        </div>
+      </div>
+      <div style="position:relative;align-self:stretch;min-height:480px;">
+        <div style="width:100%;height:480px;border-radius:18px;background-color:#272219;background-image:repeating-linear-gradient(135deg,rgba(239,233,221,.05) 0 10px,transparent 10px 20px);display:flex;align-items:flex-start;justify-content:center;padding:26px;border:1px solid rgba(239,233,221,.1);">
+          <span style="font:500 12px/1.5 'IBM Plex Mono',monospace;color:#9a9183;text-align:center;background:#1b1815;padding:7px 12px;border-radius:6px;">[ warm portrait — person mid-flow<br>at their desk, soft daylight ]</span>
+        </div>
+        <div class="r-hide-sm" style="position:absolute;bottom:-26px;left:-34px;width:290px;background:#2a251d;border:1px solid rgba(239,233,221,.14);border-radius:14px;padding:14px;box-shadow:0 22px 48px rgba(0,0,0,.5);">
+          <div style="display:flex;gap:6px;margin-bottom:12px;"><span style="width:9px;height:9px;border-radius:50%;background:#2fb380;"></span><span style="width:9px;height:9px;border-radius:50%;background:#f0a132;"></span><span style="width:9px;height:9px;border-radius:50%;background:#8f78ff;"></span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div style="height:52px;border-radius:8px;background-color:#352f25;background-image:repeating-linear-gradient(135deg,rgba(239,233,221,.05) 0 8px,transparent 8px 16px);"></div>
+            <div style="height:52px;border-radius:8px;background-color:#352f25;background-image:repeating-linear-gradient(135deg,rgba(239,233,221,.05) 0 8px,transparent 8px 16px);"></div>
+            <div style="height:52px;border-radius:8px;background-color:#352f25;background-image:repeating-linear-gradient(135deg,rgba(239,233,221,.05) 0 8px,transparent 8px 16px);"></div>
+            <div style="height:52px;border-radius:8px;background-color:#352f25;background-image:repeating-linear-gradient(135deg,rgba(239,233,221,.05) 0 8px,transparent 8px 16px);"></div>
+          </div>
+          <div style="margin-top:10px;font:500 10.5px/1 'IBM Plex Mono',monospace;color:#9a9183;text-transform:uppercase;letter-spacing:.06em;">[ widget dashboard ]</div>
+        </div>
+      </div>
+    </div>
+    <!-- cockpit band -->
+    <div class="r-pad" style="max-width:1240px;margin:0 auto;padding:0 64px 44px;">
+      <div class="r-flex" style="background:#252019;border:1px solid rgba(239,233,221,.13);border-radius:16px;padding:16px 22px;display:flex;align-items:center;gap:22px;flex-wrap:wrap;font:500 12px/1 'IBM Plex Mono',monospace;letter-spacing:.04em;color:#b8b1a4;text-transform:uppercase;">
+        <span style="display:flex;align-items:center;gap:8px;"><span style="color:#8f78ff;">●</span> Today · Sun 28</span>
+        <span class="r-hide-sm" style="width:1px;height:16px;background:rgba(239,233,221,.16);"></span>
+        <span style="color:#efe9dd;">Next ↗ 14:30 Standup · <span style="color:#22b8cf;">22m</span></span>
+        <span class="r-hide-sm" style="width:1px;height:16px;background:rgba(239,233,221,.16);"></span>
+        <span>Big 3 · <span style="color:#2fb380;">1/3 ✓</span></span>
+        <span class="r-hide-sm" style="width:1px;height:16px;background:rgba(239,233,221,.16);"></span>
+        <span>Inbox · <span style="color:#f0a132;">2</span></span>
+        <span class="r-hide-sm" style="width:1px;height:16px;background:rgba(239,233,221,.16);"></span>
+        <span>18° clear</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ 3 · TRUST STRIP ============ -->
+  <section style="border-bottom:1px solid rgba(239,233,221,.1);">
+    <div class="r-pad r-flex" style="max-width:1240px;margin:0 auto;padding:36px 64px;display:flex;align-items:center;justify-content:space-between;gap:40px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:baseline;gap:14px;">
+        <span style="font-family:'Space Grotesk',system-ui,sans-serif;font-size:34px;font-weight:600;letter-spacing:-.02em;">3,000+</span>
+        <span style="font:500 12px/1.4 'IBM Plex Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:#9a9183;"><span class="lang-en">on the early-access<br>waitlist</span><span class="lang-it">in lista per<br>l'early access</span></span>
+      </div>
+      <div style="flex:1;min-width:260px;max-width:520px;font-size:18px;line-height:1.5;color:#cfc8ba;">
+        <span class="lang-en">“Finally an app that doesn't make me feel behind.”</span><span class="lang-it">“Finalmente un'app che non mi fa sentire indietro.”</span>
+        <span style="display:block;margin-top:8px;font:500 12px/1 'IBM Plex Mono',monospace;letter-spacing:.04em;text-transform:uppercase;color:#8f78ff;"><span class="lang-en">— early tester, diagnosed at 31</span><span class="lang-it">— tester, diagnosi a 31 anni</span></span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;font:500 12.5px/1.3 'IBM Plex Mono',monospace;letter-spacing:.04em;text-transform:uppercase;color:#b8b1a4;"><span style="width:9px;height:9px;border-radius:50%;background:#2fb380;"></span><span class="lang-en">Built by an<br>ADHD founder</span><span class="lang-it">Fatto da un<br>founder ADHD</span></span>
+    </div>
+  </section>
+
+  <!-- ============ 4 · THE PROBLEM (cream) ============ -->
+  <section style="background:#f4eee2;color:#211f1b;">
+    <div class="r-pad r-2col" style="max-width:1240px;margin:0 auto;padding:120px 64px;display:grid;grid-template-columns:1.05fr .95fr;gap:64px;align-items:center;">
+      <div>
+        <div style="font:500 12.5px/1 'IBM Plex Mono',monospace;letter-spacing:.2em;text-transform:uppercase;color:#b87716;margin-bottom:26px;"><span class="lang-en">The before</span><span class="lang-it">Il prima</span></div>
+        <h2 style="font-family:'Space Grotesk',system-ui,sans-serif;font-weight:600;font-size:52px;line-height:1.03;letter-spacing:-.025em;margin:0 0 24px;max-width:14ch;"><span class="lang-en">Ten apps open. Still nothing done.</span><span class="lang-it">Dieci app aperte. E ancora niente fatto.</span></h2>
+        <p style="font-size:19px;line-height:1.55;color:#4a463f;max-width:46ch;margin:0 0 36px;"><span class="lang-en">It's not a discipline problem. Neurotypical tools were never built for how your attention actually works.</span><span class="lang-it">Non è un problema di disciplina. Gli strumenti neurotipici non sono mai stati pensati per come funziona davvero la tua attenzione.</span></p>
+        <div style="display:flex;flex-direction:column;gap:0;">
+          <div style="display:flex;gap:16px;padding:18px 0;border-top:1px solid rgba(33,31,27,.16);"><span style="color:#b87716;font-family:'IBM Plex Mono',monospace;font-size:14px;">01</span><span style="font-size:18px;color:#211f1b;"><span class="lang-en">Tasks vanish the second you look away.</span><span class="lang-it">I task spariscono appena distogli lo sguardo.</span></span></div>
+          <div style="display:flex;gap:16px;padding:18px 0;border-top:1px solid rgba(33,31,27,.16);"><span style="color:#b87716;font-family:'IBM Plex Mono',monospace;font-size:14px;">02</span><span style="font-size:18px;color:#211f1b;"><span class="lang-en">The wall before starting feels physical.</span><span class="lang-it">Il muro prima di iniziare sembra fisico.</span></span></div>
+          <div style="display:flex;gap:16px;padding:18px 0;border-top:1px solid rgba(33,31,27,.16);border-bottom:1px solid rgba(33,31,27,.16);"><span style="color:#b87716;font-family:'IBM Plex Mono',monospace;font-size:14px;">03</span><span style="font-size:18px;color:#211f1b;"><span class="lang-en">Time disappears — then the guilt arrives.</span><span class="lang-it">Il tempo svanisce — poi arriva la colpa.</span></span></div>
+        </div>
+      </div>
+      <div style="height:520px;border-radius:18px;background-color:#e7e0d2;background-image:repeating-linear-gradient(135deg,rgba(33,31,27,.05) 0 10px,transparent 10px 20px);display:flex;align-items:flex-end;justify-content:center;padding:26px;border:1px solid rgba(33,31,27,.08);">
+        <span style="font:500 12px/1.5 'IBM Plex Mono',monospace;color:#7a7064;text-align:center;background:#f4eee2;padding:7px 12px;border-radius:6px;">[ photo — a desk overflowing with sticky<br>notes &amp; too many open tabs ]</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5 · HOW IT WORKS ============ -->
+  <section id="how" style="border-bottom:1px solid rgba(239,233,221,.1);">
+    <div class="r-pad" style="max-width:1240px;margin:0 auto;padding:120px 64px;">
+      <div style="font:500 12.5px/1 'IBM Plex Mono',monospace;letter-spacing:.2em;text-transform:uppercase;color:#8f78ff;margin-bottom:22px;"><span class="lang-en">How it works</span><span class="lang-it">Come funziona</span></div>
+      <h2 style="font-family:'Space Grotesk',system-ui,sans-serif;font-weight:600;font-size:48px;line-height:1.04;letter-spacing:-.025em;margin:0 0 64px;max-width:18ch;"><span class="lang-en">Three steps to a quieter mind.</span><span class="lang-it">Tre passi verso una mente più quieta.</span></h2>
+      <div class="r-3col" style="display:grid;grid-template-columns:repeat(3,1fr);gap:48px;">
+        <div style="border-top:2px solid #8f78ff;padding-top:24px;">
+          <div style="font-family:'Space Grotesk',system-ui,sans-serif;font-size:40px;font-weight:600;color:#8f78ff;margin-bottom:18px;">01</div>
+          <h3 style="font-family:'Space Grotesk',system-ui,sans-serif;font-size:24px;font-weight:600;letter-spacing:-.01em;margin:0 0 12px;"><span class="lang-en">Dump everything</span><span class="lang-it">Butta fuori tutto</span></h3>
+          <p style="font-size:17px;line-height:1.55;color:#b8b1a4;"><span class="lang-en">Brain-dump the chaos — one tap turns a thought into a task. Nothing gets lost.</span><span class="lang-it">Butta fuori il caos — un tap trasforma un pensiero in task. Niente va perso.</span></p>
+        </div>
+        <div style="border-top:2px solid #8f78ff;padding-top:24px;">
+          <div style="font-family:'Space Grotesk',system-ui,sans-serif;font-size:40px;font-weight:600;color:#8f78ff;margin-bottom:18px;">02</div>
+          <h3 style="font-family:'Space Grotesk',system-ui,sans-serif;font-size:24px;font-weight:600;letter-spacing:-.01em;margin:0 0 12px;"><span class="lang-en">See what matters</span><span class="lang-it">Vedi cosa conta</span></h3>
+          <p style="font-size:17px;line-height:1.55;color:#b8b1a4;"><span class="lang-en">The Cockpit surfaces your Big 3, your next event and your unread — always answering “what now?”</span><span class="lang-it">Il Cockpit fa emergere i tuoi Big 3, il prossimo evento e le non lette — risponde sempre a “cosa ora?”</span></p>
+        </div>
+        <div style="border-top:2px solid #8f78ff;padding-top:24px;">
+          <div style="font-family:'Space Grotesk',system-ui,sans-serif;font-size:40px;font-weight:600;color:#8f78ff;margin-bottom:18px;">03</div>
+          <h3 style="font-family:'Space Grotesk',system-ui,sans-serif;font-size:24px;font-weight:600;letter-spacing:-.01em;margin:0 0 12px;"><span class="lang-en">Do one thing</span><span class="lang-it">Fai una cosa</span></h3>
+          <p style="font-size:17px;line-height:1.55;color:#b8b1a4;"><span class="lang-en">Pick by energy, start a timer, or let Spin choose for you. The wall comes down.</span><span class="lang-it">Scegli per energia, avvia un timer, o lascia scegliere a Spin. Il muro cade.</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 6 · WIDGET SHOWCASE ============ -->
+  <section id="product" style="border-bottom:1px solid rgba(239,233,221,.1);">
+    <div class="r-pad" style="max-width:1240px;margin:0 auto;padding:120px 64px;text-align:center;">
+      <div style="font:500 12.5px/1 'IBM Plex Mono',monospace;letter-spacing:.2em;text-transform:uppercase;color:#8f78ff;margin-bottom:22px;"><span class="lang-en">The dashboard</span><span class="lang-it">La dashboard</span></div>
+      <h2 style="font-family:'Space Grotesk',system-ui,sans-serif;font-weight:600;font-size:48px;line-height:1.04;letter-spacing:-.025em;margin:0 auto 18px;max-width:18ch;"><span class="lang-en">Your whole stack, on one screen.</span><span class="lang-it">Tutto il tuo stack, su una schermata.</span></h2>
+      <p style="font-size:19px;line-height:1.55;color:#b8b1a4;max-width:54ch;margin:0 auto 56px;"><span class="lang-en">Real, working widgets — email, calendar, to-dos, AI, notes and more — in resizable squares you arrange yourself.</span><span class="lang-it">Widget reali e funzionanti — email, calendario, to-do, AI, note e altro — in quadrati ridimensionabili che organizzi tu.</span></p>
+      <div style="height:560px;border-radius:20px;background-color:#272219;background-image:repeating-linear-gradient(135deg,rgba(239,233,221,.045) 0 11px,transparent 11px 22px);display:flex;align-items:center;justify-content:center;border:1px solid rgba(239,233,221,.1);position:relative;">
+        <span style="font:500 13px/1.6 'IBM Plex Mono',monospace;color:#9a9183;text-align:center;background:#1b1815;padding:10px 16px;border-radius:8px;">[ product screenshot — the live widget dashboard,<br>Cockpit band on top, draggable widget grid below ]</span>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:28px;">
+        <span style="font:500 12px/1 'IBM Plex Mono',monospace;letter-spacing:.04em;text-transform:uppercase;color:#b8b1a4;border:1px solid rgba(239,233,221,.16);border-radius:999px;padding:9px 14px;">Gmail</span>
+        <span style="font:500 12px/1 'IBM Plex Mono',monospace;letter-spacing:.04em;text-transform:uppercase;color:#b8b1a4;border:1px solid rgba(239,233,221,.16);border-radius:999px;padding:9px 14px;">Calendar</span>
+        <span style="font:500 12px/1 'IBM Plex Mono',monospace;letter-spacing:.04em;text-transform:uppercase;color:#b8b1a4;border:1px solid rgba(239,233,221,.16);border-radius:999px;padding:9px 14px;">To-Do</span>
+        <span style="font:500 12px/1 'IBM Plex Mono',monospace;letter-spacing:.04em;text-transform:uppercase;color:#b8b1a4;border:1px solid rgba(239,233,221,.16);border-radius:999px;padding:9px 14px;">Brain Dump</span>
+        <span style="font:500 12px/1 'IBM Plex Mono',monospace;letter-spacing:.04em;text-transform:uppercase;color:#b8b1a4;border:1px solid rgba(239,233,221,.16);border-radius:999px;padding:9px 14px;">AI Chat</span>
+        <span style="font:500 12px/1 'IBM Plex Mono',monospace;letter-spacing:.04em;text-transform:uppercase;color:#b8b1a4;border:1px solid rgba(239,233,221,.16);border-radius:999px;padding:9px 14px;">Weather</span>
+        <span style="font:500 12px/1 'IBM Plex Mono',monospace;letter-spacing:.04em;text-transform:uppercase;color:#b8b1a4;border:1px solid rgba(239,233,221,.16);border-radius:999px;padding:9px 14px;">Pomodoro</span>
+        <span style="font:500 12px/1 'IBM Plex Mono',monospace;letter-spacing:.04em;text-transform:uppercase;color:#b8b1a4;border:1px solid rgba(239,233,221,.16);border-radius:999px;padding:9px 14px;">Mood &amp; Energy</span>
+        <span style="font:500 12px/1 'IBM Plex Mono',monospace;letter-spacing:.04em;text-transform:uppercase;color:#b8b1a4;border:1px solid rgba(239,233,221,.16);border-radius:999px;padding:9px 14px;">Habits</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 7 · BUILT FOR YOUR BRAIN ============ -->
+  <section style="border-bottom:1px solid rgba(239,233,221,.1);">
+    <div class="r-pad" style="max-width:1240px;margin:0 auto;padding:120px 64px;">
+      <div style="font:500 12.5px/1 'IBM Plex Mono',monospace;letter-spacing:.2em;text-transform:uppercase;color:#8f78ff;margin-bottom:22px;"><span class="lang-en">Built for your brain</span><span class="lang-it">Costruito per il tuo cervello</span></div>
+      <h2 style="font-family:'Space Grotesk',system-ui,sans-serif;font-weight:600;font-size:48px;line-height:1.04;letter-spacing:-.025em;margin:0 0 56px;max-width:20ch;"><span class="lang-en">Features that get how ADHD actually works.</span><span class="lang-it">Feature che capiscono come funziona davvero l'ADHD.</span></h2>
+
+      <div style="display:flex;flex-direction:column;">
+        <!-- row -->
+        <div class="r-2col" style="display:grid;grid-template-columns:.8fr 1.2fr;gap:40px;padding:30px 0;border-top:1px solid rgba(239,233,221,.13);align-items:baseline;">
+          <div><h3 style="font-family:'Space Grotesk',system-ui,sans-serif;font-size:26px;font-weight:600;letter-spacing:-.01em;margin:0 0 10px;">Cockpit</h3><span style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:#22b8cf;border:1px solid rgba(34,184,207,.4);border-radius:999px;padding:6px 11px;">Anti time-blindness</span></div>
+          <p style="font-size:18px;line-height:1.55;color:#cfc8ba;"><span class="lang-en">A fixed band that always answers “what matters now?” — date, next event with countdown, your Big 3, unread email, weather.</span><span class="lang-it">Una fascia fissa che risponde sempre a “cosa conta adesso?” — data, prossimo evento con countdown, i tuoi Big 3, email non lette, meteo.</span></p>
+        </div>
+        <div class="r-2col" style="display:grid;grid-template-columns:.8fr 1.2fr;gap:40px;padding:30px 0;border-top:1px solid rgba(239,233,221,.13);align-items:baseline;">
+          <div><h3 style="font-family:'Space Grotesk',system-ui,sans-serif;font-size:26px;font-weight:600;letter-spacing:-.01em;margin:0 0 10px;">Big 3</h3><span style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:#2fb380;border:1px solid rgba(47,179,128,.4);border-radius:999px;padding:6px 11px;">Anti paralysis</span></div>
+          <p style="font-size:18px;line-height:1.55;color:#cfc8ba;"><span class="lang-en">Max three priorities a day, reset every morning. The cure for the infinite list.</span><span class="lang-it">Massimo tre priorità al giorno, reset ogni mattina. La cura per la lista infinita.</span></p>
+        </div>
+        <div class="r-2col" style="display:grid;grid-template-columns:.8fr 1.2fr;gap:40px;padding:30px 0;border-top:1px solid rgba(239,233,221,.13);align-items:baseline;">
+          <div><h3 style="font-family:'Space Grotesk',system-ui,sans-serif;font-size:26px;font-weight:600;letter-spacing:-.01em;margin:0 0 10px;">Chunk-it</h3><span style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:#8f78ff;border:1px solid rgba(143,120,255,.4);border-radius:999px;padding:6px 11px;">AI · Claude</span></div>
+          <p style="font-size:18px;line-height:1.55;color:#cfc8ba;"><span class="lang-en">AI breaks one giant, intimidating task into tiny doable steps. The initiation wall comes down.</span><span class="lang-it">L'AI spezza un task gigante e intimidatorio in micro-passi fattibili. Il muro dell'iniziazione cade.</span></p>
+        </div>
+        <div class="r-2col" style="display:grid;grid-template-columns:.8fr 1.2fr;gap:40px;padding:30px 0;border-top:1px solid rgba(239,233,221,.13);align-items:baseline;">
+          <div><h3 style="font-family:'Space Grotesk',system-ui,sans-serif;font-size:26px;font-weight:600;letter-spacing:-.01em;margin:0 0 10px;">Brain Dump</h3><span style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:#e864c4;border:1px solid rgba(232,100,196,.4);border-radius:999px;padding:6px 11px;">Nothing lost</span></div>
+          <p style="font-size:18px;line-height:1.55;color:#cfc8ba;"><span class="lang-en">Capture with zero friction — get the thought out, turn it into a task with one tap.</span><span class="lang-it">Cattura senza attrito — butta fuori il pensiero, trasformalo in task con un tap.</span></p>
+        </div>
+        <div class="r-2col" style="display:grid;grid-template-columns:.8fr 1.2fr;gap:40px;padding:30px 0;border-top:1px solid rgba(239,233,221,.13);align-items:baseline;">
+          <div><h3 style="font-family:'Space Grotesk',system-ui,sans-serif;font-size:26px;font-weight:600;letter-spacing:-.01em;margin:0 0 10px;"><span class="lang-en">One-thing focus</span><span class="lang-it">Focus su una cosa</span></h3><span style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:#f0a132;border:1px solid rgba(240,161,50,.4);border-radius:999px;padding:6px 11px;">Focus</span></div>
+          <p style="font-size:18px;line-height:1.55;color:#cfc8ba;"><span class="lang-en">One thing at a time, a Pomodoro timer right on the task — or let Spin pick when you can't decide.</span><span class="lang-it">Una cosa alla volta, un timer Pomodoro sul task — o lascia scegliere a Spin quando non riesci a decidere.</span></p>
+        </div>
+        <div class="r-2col" style="display:grid;grid-template-columns:.8fr 1.2fr;gap:40px;padding:30px 0;border-top:1px solid rgba(239,233,221,.13);border-bottom:1px solid rgba(239,233,221,.13);align-items:baseline;">
+          <div><h3 style="font-family:'Space Grotesk',system-ui,sans-serif;font-size:26px;font-weight:600;letter-spacing:-.01em;margin:0 0 10px;"><span class="lang-en">Energy × Time</span><span class="lang-it">Energia × Tempo</span></h3><span style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:#22b8cf;border:1px solid rgba(34,184,207,.4);border-radius:999px;padding:6px 11px;"><span class="lang-en">Self-kind</span><span class="lang-it">Gentile</span></span></div>
+          <p style="font-size:18px;line-height:1.55;color:#cfc8ba;"><span class="lang-en">Every task tagged by energy and time, with a colour traffic-light. Choose by how you feel now — not abstract duty.</span><span class="lang-it">Ogni task etichettato per energia e tempo, con un semaforo di colore. Scegli in base a come stai ora — non a un dovere astratto.</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 8 · MANIFESTO (cream) ============ -->
+  <section id="manifesto" style="background:#f4eee2;color:#211f1b;">
+    <div class="r-pad" style="max-width:1000px;margin:0 auto;padding:130px 64px;">
+      <div style="font:500 12.5px/1 'IBM Plex Mono',monospace;letter-spacing:.2em;text-transform:uppercase;color:#b87716;margin-bottom:34px;">Manifesto</div>
+      <p style="font-family:'Space Grotesk',system-ui,sans-serif;font-weight:500;font-size:40px;line-height:1.22;letter-spacing:-.02em;margin:0 0 36px;">
+        <span class="lang-en">Your brain isn't broken. Your tools were. We don't think you need fixing — we think your tools failed you. Divergify holds the load, drops the guilt, and bends to how you actually work, because <span style="color:#2fb380;">neurodivergence is a difference, not a defect.</span></span>
+        <span class="lang-it">Il tuo cervello non è rotto. Lo erano i tuoi strumenti. Non pensiamo che tu sia da riparare — pensiamo che i tuoi strumenti ti abbiano deluso. Divergify regge il carico, lascia andare la colpa e si piega a come lavori davvero, perché <span style="color:#2fb380;">la neurodivergenza è una differenza, non un difetto.</span></span>
+      </p>
+      <p style="font:500 14px/1.5 'IBM Plex Mono',monospace;letter-spacing:.04em;text-transform:uppercase;color:#8a8174;"><span class="lang-en">Your brain is welcome here — exactly as it is.</span><span class="lang-it">Il tuo cervello è il benvenuto qui — esattamente com'è.</span></p>
+    </div>
+  </section>
+
+  <!-- ============ 9 · PERSONALIZATION ============ -->
+  <section style="border-bottom:1px solid rgba(239,233,221,.1);">
+    <div class="r-pad r-2col" style="max-width:1240px;margin:0 auto;padding:120px 64px;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;">
+      <div>
+        <div style="font:500 12.5px/1 'IBM Plex Mono',monospace;letter-spacing:.2em;text-transform:uppercase;color:#8f78ff;margin-bottom:22px;"><span class="lang-en">Make it yours</span><span class="lang-it">Rendilo tuo</span></div>
+        <h2 style="font-family:'Space Grotesk',system-ui,sans-serif;font-weight:600;font-size:48px;line-height:1.04;letter-spacing:-.025em;margin:0 0 24px;max-width:14ch;"><span class="lang-en">Unmistakably yours.</span><span class="lang-it">Inconfondibilmente tuo.</span></h2>
+        <p style="font-size:19px;line-height:1.55;color:#b8b1a4;max-width:46ch;margin:0;"><span class="lang-en">Drag widgets into the order your brain likes. Pin up to six. Dilate the ones that matter. Switch themes — including a high-contrast total black — and pick your accent. It's your second brain; it should look like you.</span><span class="lang-it">Trascina i widget nell'ordine che piace al tuo cervello. Fissane fino a sei. Dilata quelli che contano. Cambia tema — incluso un total black ad alto contrasto — e scegli il tuo accento. È il tuo secondo cervello: deve somigliarti.</span></p>
+      </div>
+      <div style="background:#252019;border:1px solid rgba(239,233,221,.13);border-radius:18px;padding:30px;">
+        <div style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#9a9183;margin-bottom:14px;"><span class="lang-en">Theme</span><span class="lang-it">Tema</span></div>
+        <div style="display:flex;gap:10px;margin-bottom:26px;flex-wrap:wrap;">
+          <span style="display:flex;align-items:center;gap:8px;border:1px solid rgba(239,233,221,.18);border-radius:999px;padding:9px 14px;font-size:13px;color:#efe9dd;"><span style="width:14px;height:14px;border-radius:50%;background:#f4eee2;border:1px solid rgba(0,0,0,.15);"></span>Light</span>
+          <span style="display:flex;align-items:center;gap:8px;border:1px solid rgba(239,233,221,.18);border-radius:999px;padding:9px 14px;font-size:13px;color:#efe9dd;"><span style="width:14px;height:14px;border-radius:50%;background:#e7e0d2;"></span>Cream</span>
+          <span style="display:flex;align-items:center;gap:8px;border:1px solid #8f78ff;border-radius:999px;padding:9px 14px;font-size:13px;color:#efe9dd;background:rgba(143,120,255,.12);"><span style="width:14px;height:14px;border-radius:50%;background:#0a0a0a;"></span>Total Black</span>
+        </div>
+        <div style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#9a9183;margin-bottom:14px;"><span class="lang-en">Accent</span><span class="lang-it">Accento</span></div>
+        <div style="display:flex;gap:12px;margin-bottom:26px;flex-wrap:wrap;">
+          <span style="width:30px;height:30px;border-radius:50%;background:#2fb380;"></span>
+          <span style="width:30px;height:30px;border-radius:50%;background:#8f78ff;outline:2px solid #efe9dd;outline-offset:2px;"></span>
+          <span style="width:30px;height:30px;border-radius:50%;background:#f0a132;"></span>
+          <span style="width:30px;height:30px;border-radius:50%;background:#22b8cf;"></span>
+          <span style="width:30px;height:30px;border-radius:50%;background:#e864c4;"></span>
+          <span style="width:30px;height:30px;border-radius:50%;background:#f97316;"></span>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:#b8b1a4;">
+          <span style="border:1px dashed rgba(239,233,221,.25);border-radius:8px;padding:8px 12px;">Drag</span>
+          <span style="border:1px dashed rgba(239,233,221,.25);border-radius:8px;padding:8px 12px;">Pin · max 6</span>
+          <span style="border:1px dashed rgba(239,233,221,.25);border-radius:8px;padding:8px 12px;">Dilate</span>
+          <span style="border:1px dashed rgba(239,233,221,.25);border-radius:8px;padding:8px 12px;">IT / EN</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 10 · PRICING ============ -->
+  <section id="pricing" style="border-bottom:1px solid rgba(239,233,221,.1);">
+    <div class="r-pad" style="max-width:1240px;margin:0 auto;padding:120px 64px;">
+      <div style="text-align:center;margin-bottom:56px;">
+        <div style="font:500 12.5px/1 'IBM Plex Mono',monospace;letter-spacing:.2em;text-transform:uppercase;color:#8f78ff;margin-bottom:22px;"><span class="lang-en">Pricing</span><span class="lang-it">Prezzi</span></div>
+        <h2 style="font-family:'Space Grotesk',system-ui,sans-serif;font-weight:600;font-size:48px;line-height:1.04;letter-spacing:-.025em;margin:0;"><span class="lang-en">Honest and simple.</span><span class="lang-it">Onesti e semplici.</span></h2>
+      </div>
+      <div class="r-2col" style="display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:900px;margin:0 auto;">
+        <!-- Free -->
+        <div style="border:1px solid rgba(239,233,221,.16);border-radius:20px;padding:40px;display:flex;flex-direction:column;">
+          <div style="font-family:'Space Grotesk',system-ui,sans-serif;font-size:22px;font-weight:600;margin-bottom:8px;">Free</div>
+          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:6px;"><span style="font-family:'Space Grotesk',system-ui,sans-serif;font-size:52px;font-weight:600;letter-spacing:-.02em;">€0</span></div>
+          <div style="font:500 12px/1 'IBM Plex Mono',monospace;letter-spacing:.04em;text-transform:uppercase;color:#9a9183;margin-bottom:28px;"><span class="lang-en">Forever</span><span class="lang-it">Per sempre</span></div>
+          <div style="display:flex;flex-direction:column;gap:14px;font-size:16px;color:#cfc8ba;margin-bottom:32px;">
+            <span style="display:flex;gap:10px;"><span style="color:#2fb380;">✓</span><span class="lang-en">Up to 4 widgets</span><span class="lang-it">Fino a 4 widget</span></span>
+            <span style="display:flex;gap:10px;"><span style="color:#2fb380;">✓</span><span class="lang-en">1 theme</span><span class="lang-it">1 tema</span></span>
+            <span style="display:flex;gap:10px;"><span style="color:#2fb380;">✓</span><span class="lang-en">Local sync</span><span class="lang-it">Sync locale</span></span>
+          </div>
+          <a href="#cta" style="margin-top:auto;text-align:center;border:1px solid rgba(239,233,221,.3);color:#efe9dd;padding:14px;border-radius:999px;font-weight:600;font-size:15px;"><span class="lang-en">Start free</span><span class="lang-it">Inizia gratis</span></a>
+        </div>
+        <!-- Pro -->
+        <div style="border:1.5px solid #8f78ff;border-radius:20px;padding:40px;display:flex;flex-direction:column;background:rgba(143,120,255,.06);position:relative;">
+          <span style="position:absolute;top:-12px;left:40px;background:#8f78ff;color:#1b1043;font:600 11px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;text-transform:uppercase;padding:7px 12px;border-radius:999px;"><span class="lang-en">Most popular</span><span class="lang-it">Più scelto</span></span>
+          <div style="font-family:'Space Grotesk',system-ui,sans-serif;font-size:22px;font-weight:600;margin-bottom:8px;">Pro</div>
+          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:6px;"><span style="font-family:'Space Grotesk',system-ui,sans-serif;font-size:52px;font-weight:600;letter-spacing:-.02em;">€6</span><span style="font-size:18px;color:#b8b1a4;">/<span class="lang-en">mo</span><span class="lang-it">mese</span></span></div>
+          <div style="font:500 12px/1 'IBM Plex Mono',monospace;letter-spacing:.04em;text-transform:uppercase;color:#8f78ff;margin-bottom:28px;"><span class="lang-en">Everything, unlocked</span><span class="lang-it">Tutto, sbloccato</span></div>
+          <div style="display:flex;flex-direction:column;gap:14px;font-size:16px;color:#efe9dd;margin-bottom:32px;">
+            <span style="display:flex;gap:10px;"><span style="color:#8f78ff;">✓</span><span class="lang-en">Unlimited widgets</span><span class="lang-it">Widget illimitati</span></span>
+            <span style="display:flex;gap:10px;"><span style="color:#8f78ff;">✓</span><span class="lang-en">All themes + custom colours</span><span class="lang-it">Tutti i temi + colori custom</span></span>
+            <span style="display:flex;gap:10px;"><span style="color:#8f78ff;">✓</span><span class="lang-en">Multi-device cloud sync</span><span class="lang-it">Sync cloud multi-device</span></span>
+            <span style="display:flex;gap:10px;"><span style="color:#8f78ff;">✓</span><span class="lang-en">Premium widgets (coming)</span><span class="lang-it">Widget premium (in arrivo)</span></span>
+          </div>
+          <a href="#cta" style="margin-top:auto;text-align:center;background:#8f78ff;color:#1b1043;padding:14px;border-radius:999px;font-weight:600;font-size:15px;"><span class="lang-en">Go Pro</span><span class="lang-it">Passa a Pro</span></a>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:28px;font:500 12px/1.6 'IBM Plex Mono',monospace;letter-spacing:.04em;text-transform:uppercase;color:#9a9183;"><span class="lang-en">Pay with card (Stripe) or crypto · cancel anytime</span><span class="lang-it">Paga con carta (Stripe) o crypto · disdici quando vuoi</span></div>
+    </div>
+  </section>
+
+  <!-- ============ 11 · FAQ ============ -->
+  <section style="border-bottom:1px solid rgba(239,233,221,.1);">
+    <div class="r-pad" style="max-width:860px;margin:0 auto;padding:120px 64px;">
+      <div style="font:500 12.5px/1 'IBM Plex Mono',monospace;letter-spacing:.2em;text-transform:uppercase;color:#8f78ff;margin-bottom:22px;">FAQ</div>
+      <h2 style="font-family:'Space Grotesk',system-ui,sans-serif;font-weight:600;font-size:44px;line-height:1.05;letter-spacing:-.025em;margin:0 0 48px;"><span class="lang-en">Good questions.</span><span class="lang-it">Belle domande.</span></h2>
+      <div>
+        <details style="border-top:1px solid rgba(239,233,221,.13);padding:6px 0;">
+          <summary style="display:flex;justify-content:space-between;align-items:center;gap:20px;padding:22px 0;font-family:'Space Grotesk',system-ui,sans-serif;font-size:20px;font-weight:500;"><span><span class="lang-en">Is my data private?</span><span class="lang-it">I miei dati sono privati?</span></span><span class="faq-plus" style="color:#8f78ff;font-size:24px;transition:transform .2s;flex:0 0 auto;">+</span></summary>
+          <p style="padding:0 0 24px;font-size:17px;line-height:1.6;color:#b8b1a4;max-width:60ch;"><span class="lang-en">Your data is yours. Connections like Gmail and Calendar use official OAuth, and we don't sell anything. Cloud sync is opt-in.</span><span class="lang-it">I tuoi dati sono tuoi. Le connessioni come Gmail e Calendar usano OAuth ufficiale e non vendiamo nulla. La sync cloud è opzionale.</span></p>
+        </details>
+        <details style="border-top:1px solid rgba(239,233,221,.13);padding:6px 0;">
+          <summary style="display:flex;justify-content:space-between;align-items:center;gap:20px;padding:22px 0;font-family:'Space Grotesk',system-ui,sans-serif;font-size:20px;font-weight:500;"><span><span class="lang-en">Does it work if I don't have ADHD?</span><span class="lang-it">Funziona se non ho l'ADHD?</span></span><span class="faq-plus" style="color:#8f78ff;font-size:24px;transition:transform .2s;flex:0 0 auto;">+</span></summary>
+          <p style="padding:0 0 24px;font-size:17px;line-height:1.6;color:#b8b1a4;max-width:60ch;"><span class="lang-en">Yes. It's built around ADHD friction, but anyone drowning in tabs and tasks benefits.</span><span class="lang-it">Sì. È pensato attorno alle frizioni dell'ADHD, ma chiunque sia sommerso da tab e task ne trae beneficio.</span></p>
+        </details>
+        <details style="border-top:1px solid rgba(239,233,221,.13);padding:6px 0;">
+          <summary style="display:flex;justify-content:space-between;align-items:center;gap:20px;padding:22px 0;font-family:'Space Grotesk',system-ui,sans-serif;font-size:20px;font-weight:500;"><span><span class="lang-en">What devices does it run on?</span><span class="lang-it">Su quali dispositivi gira?</span></span><span class="faq-plus" style="color:#8f78ff;font-size:24px;transition:transform .2s;flex:0 0 auto;">+</span></summary>
+          <p style="padding:0 0 24px;font-size:17px;line-height:1.6;color:#b8b1a4;max-width:60ch;"><span class="lang-en">Any modern browser. Cloud sync (Pro) keeps you in step across devices.</span><span class="lang-it">Qualsiasi browser moderno. La sync cloud (Pro) ti tiene allineato su tutti i dispositivi.</span></p>
+        </details>
+        <details style="border-top:1px solid rgba(239,233,221,.13);padding:6px 0;">
+          <summary style="display:flex;justify-content:space-between;align-items:center;gap:20px;padding:22px 0;font-family:'Space Grotesk',system-ui,sans-serif;font-size:20px;font-weight:500;"><span><span class="lang-en">Do I need a diagnosis?</span><span class="lang-it">Mi serve una diagnosi?</span></span><span class="faq-plus" style="color:#8f78ff;font-size:24px;transition:transform .2s;flex:0 0 auto;">+</span></summary>
+          <p style="padding:0 0 24px;font-size:17px;line-height:1.6;color:#b8b1a4;max-width:60ch;"><span class="lang-en">No. Diagnosed or self-recognised, you're welcome here.</span><span class="lang-it">No. Diagnosticato o auto-riconosciuto, sei il benvenuto.</span></p>
+        </details>
+        <details style="border-top:1px solid rgba(239,233,221,.13);border-bottom:1px solid rgba(239,233,221,.13);padding:6px 0;">
+          <summary style="display:flex;justify-content:space-between;align-items:center;gap:20px;padding:22px 0;font-family:'Space Grotesk',system-ui,sans-serif;font-size:20px;font-weight:500;"><span><span class="lang-en">Can I cancel anytime?</span><span class="lang-it">Posso disdire quando voglio?</span></span><span class="faq-plus" style="color:#8f78ff;font-size:24px;transition:transform .2s;flex:0 0 auto;">+</span></summary>
+          <p style="padding:0 0 24px;font-size:17px;line-height:1.6;color:#b8b1a4;max-width:60ch;"><span class="lang-en">Yes, anytime. No guilt — that's the whole point.</span><span class="lang-it">Sì, quando vuoi. Senza colpa — è tutto il punto.</span></p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 12 · FINAL CTA (viola) ============ -->
+  <section id="cta" style="background:#8f78ff;color:#1b1043;">
+    <div class="r-pad" style="max-width:1000px;margin:0 auto;padding:120px 64px;text-align:center;">
+      <div style="font:500 12.5px/1 'IBM Plex Mono',monospace;letter-spacing:.2em;text-transform:uppercase;color:#3a2b8a;margin-bottom:26px;"><span class="lang-en">Early access</span><span class="lang-it">Early access</span></div>
+      <h2 style="font-family:'Space Grotesk',system-ui,sans-serif;font-weight:600;font-size:58px;line-height:1.02;letter-spacing:-.025em;margin:0 0 24px;"><span class="lang-en">Give your brain a second one.</span><span class="lang-it">Regala al tuo cervello un secondo.</span></h2>
+      <p style="font-size:20px;line-height:1.5;color:#2a1f6b;max-width:52ch;margin:0 auto 40px;"><span class="lang-en">Join early access and help shape the second brain that's finally on your side.</span><span class="lang-it">Entra in early access e aiutaci a plasmare il secondo cervello che è finalmente dalla tua parte.</span></p>
+      <div style="display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;">
+        <a href="#cta" style="background:#1b1043;color:#efe9dd;padding:16px 34px;border-radius:999px;font-weight:600;font-size:17px;"><span class="lang-en">Enter early access</span><span class="lang-it">Entra in early access</span></a>
+        <span style="font:500 12.5px/1 'IBM Plex Mono',monospace;letter-spacing:.04em;text-transform:uppercase;color:#3a2b8a;"><span class="lang-en">3,000+ already in</span><span class="lang-it">3.000+ già dentro</span></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 13 · FOOTER ============ -->
+  <footer>
+    <div class="r-pad r-2col" style="max-width:1240px;margin:0 auto;padding:80px 64px 40px;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;">
+      <div>
+        <div style="font-family:'Space Grotesk',system-ui,sans-serif;font-size:22px;font-weight:600;display:flex;align-items:center;gap:8px;margin-bottom:14px;">Divergify<span style="width:8px;height:8px;border-radius:50%;background:#8f78ff;"></span></div>
+        <p style="font-size:15px;line-height:1.5;color:#9a9183;max-width:32ch;"><span class="lang-en">The second brain, finally on your side. Made by and for ADHD minds.</span><span class="lang-it">Il secondo cervello, finalmente dalla tua parte. Fatto da e per menti ADHD.</span></p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;font-size:14.5px;color:#b8b1a4;">
+        <span style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#6f685c;margin-bottom:4px;"><span class="lang-en">Product</span><span class="lang-it">Prodotto</span></span>
+        <a href="#product"><span class="lang-en">Dashboard</span><span class="lang-it">Dashboard</span></a>
+        <a href="#how"><span class="lang-en">How it works</span><span class="lang-it">Come funziona</span></a>
+        <a href="#pricing"><span class="lang-en">Pricing</span><span class="lang-it">Prezzi</span></a>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;font-size:14.5px;color:#b8b1a4;">
+        <span style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#6f685c;margin-bottom:4px;"><span class="lang-en">Company</span><span class="lang-it">Azienda</span></span>
+        <a href="#manifesto">Manifesto</a>
+        <a href="mailto:hello@divergify.app">Contact</a>
+        <a href="#cta"><span class="lang-en">Early access</span><span class="lang-it">Early access</span></a>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;font-size:14.5px;color:#b8b1a4;">
+        <span style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#6f685c;margin-bottom:4px;">Legal</span>
+        <a href="#"><span class="lang-en">Privacy</span><span class="lang-it">Privacy</span></a>
+        <a href="#"><span class="lang-en">Terms</span><span class="lang-it">Termini</span></a>
+      </div>
+    </div>
+    <div class="r-pad r-flex" style="max-width:1240px;margin:0 auto;padding:24px 64px 48px;border-top:1px solid rgba(239,233,221,.1);display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:13px;color:#6f685c;">
+      <span>© 2026 Divergify · hello@divergify.app</span>
+      <div style="display:flex;align-items:center;font-size:13px;color:#b8b1a4;">
+        <button class="langbtn-en" onClick="{{ setEN }}">EN</button><span style="opacity:.3;">/</span><button class="langbtn-it" onClick="{{ setIT }}">IT</button>
+      </div>
+    </div>
+  </footer>
+
+</div>
+
+<template id="__bundler_thumbnail">
+  <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <rect width="200" height="200" rx="36" fill="#1b1815"/>
+    <text x="100" y="128" font-family="'Space Grotesk',sans-serif" font-size="92" font-weight="700" fill="#efe9dd" text-anchor="middle">D</text>
+    <circle cx="150" cy="62" r="13" fill="#8f78ff"/>
+  </svg>
+</template></x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { lang: 'en' };
+  renderVals() {
+    return {
+      lang: this.state.lang,
+      setEN: () => this.setState({ lang: 'en' }),
+      setIT: () => this.setState({ lang: 'it' }),
+    };
+  }
+}
+</script>
+</body>
+</html>

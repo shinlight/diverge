@@ -1,5 +1,5 @@
 /*
-  DiVerge — Admin dashboard service.
+  Divergify — Admin dashboard service.
 
   Fully local MOCK now (seeded users, subscriptions, payments) so the management
   UI is testable without a backend. SWAP POINTS to go live:

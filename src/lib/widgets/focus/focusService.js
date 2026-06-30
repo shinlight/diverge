@@ -1,5 +1,5 @@
 /*
-  DiVerge — Focus (Pomodoro) service.
+  Divergify — Focus (Pomodoro) service.
 
   Local widget (no external API). Settings + the day's completed pomodoros
   persist here. Tasks + tags are NOT owned here anymore — they live in the

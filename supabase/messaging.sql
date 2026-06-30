@@ -1,4 +1,4 @@
--- DiVerge — internal messaging (user-to-user direct messages)
+-- Divergify — internal messaging (user-to-user direct messages)
 -- Paste into the Supabase SQL Editor and run. Safe to run more than once.
 
 -- 1) messages table ------------------------------------------------------

@@ -1,5 +1,5 @@
 /*
-  DiVerge — chunk-it with real AI (Vercel serverless function).
+  Divergify — chunk-it with real AI (Vercel serverless function).
 
   Breaks a task title into 3-6 tiny, concrete ADHD-friendly micro-steps using
   Claude. The first step is always a ~2-minute starter (the hardest part for

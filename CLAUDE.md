@@ -1,4 +1,4 @@
-# DiVerge — project guide for Claude
+# Divergify — project guide for Claude
 
 ADHD-friendly **widget dashboard** web app. A grid of widgets (Gmail, Calendar,
 To-Do, Brain Dump, AI, Weather, Messaging, IMAP email, …) over a pinned

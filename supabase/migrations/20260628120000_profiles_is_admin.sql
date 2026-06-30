@@ -1,4 +1,4 @@
--- DiVerge — add an admin flag to profiles.
+-- Divergify — add an admin flag to profiles.
 -- Needed by: admin dashboard gate + the early-access RLS policies (which check
 -- public.is_admin()). Safe to re-run.
 

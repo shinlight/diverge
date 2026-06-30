@@ -1,5 +1,5 @@
 /*
-  DiVerge — Google token broker (Vercel serverless function).
+  Divergify — Google token broker (Vercel serverless function).
 
   Keeps the user's Google access token alive without re-authorising every
   session. The long-lived Google *refresh* token is stored server-side and is

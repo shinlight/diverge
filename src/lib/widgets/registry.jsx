@@ -1,9 +1,9 @@
 import { Mail, Calendar, CheckSquare, StickyNote, Cloud, Clock, Sparkles, ClipboardList, MessageCircle, BrainCircuit, AtSign, Wallet, MapPin, Flame, Smile, Zap } from "lucide-react";
 
 /*
-  DiVerge — Widget registry.
+  Divergify — Widget registry.
 
-  Every widget DiVerge can show is declared here once. The dashboard reads
+  Every widget Divergify can show is declared here once. The dashboard reads
   this catalog to render the grid and the "add widget" picker.
 
   Today these are PLACEHOLDERS (status: "soon") with no real integration.

@@ -1,5 +1,5 @@
 /*
-  DiVerge — IMAP/SMTP email service.
+  Divergify — IMAP/SMTP email service.
 
   IMAP/SMTP are TCP protocols the browser can't speak directly. This file is
   the SWAP POINT: today it stores the account config locally and serves a mock
@@ -186,7 +186,7 @@ export async function deleteMessage(id) {
 export async function sendMessage({ to, subject, body }) {
   await delay(800);
   // eslint-disable-next-line no-console
-  console.info("[DiVerge] IMAP/SMTP send (demo):", { to, subject, body });
+  console.info("[Divergify] IMAP/SMTP send (demo):", { to, subject, body });
   // Echo it into the inbox as a "sent" marker would, but keep mock simple.
   nextId += 1;
   return { ok: true };

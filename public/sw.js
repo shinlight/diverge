@@ -1,5 +1,5 @@
 /*
-  DiVerge — minimal service worker.
+  Divergify — minimal service worker.
 
   Its only job is to make the app installable as a PWA. It deliberately does
   NOT cache anything (the app needs the network for Supabase, and caching could

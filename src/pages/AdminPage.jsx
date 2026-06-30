@@ -39,7 +39,7 @@ export default function AdminPage() {
               <ArrowLeft size={18} />
             </Link>
             <h1 className="text-base font-semibold">
-              DiVerge <span className="text-muted">· {t("admin.console")}</span>
+              Divergify <span className="text-muted">· {t("admin.console")}</span>
             </h1>
           </div>
           <span className="hidden text-sm text-muted sm:block">{user?.email}</span>

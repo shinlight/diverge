@@ -1,5 +1,5 @@
 /*
-  DiVerge — Revolut (retail) service.
+  Divergify — Revolut (retail) service.
 
   Revolut retail has no direct public API: the only sanctioned way to read a
   personal account is Open Banking (PSD2 / AIS) through a licensed aggregator.

@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { supabase, isSupabaseConfigured } from "../supabase/client";
 
 /*
-  DiVerge — Authentication.
+  Divergify — Authentication.
 
   Uses Supabase when configured (real accounts, persisted sessions); otherwise
   falls back to the original local MOCK so the app keeps working before the

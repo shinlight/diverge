@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 
 /*
-  DiVerge — Supabase client.
+  Divergify — Supabase client.
 
   Reads the project URL + anon (public) key from environment variables.
   The anon key is safe to ship to the browser by design — row-level security

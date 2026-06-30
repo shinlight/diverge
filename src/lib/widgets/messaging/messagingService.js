@@ -1,10 +1,10 @@
 import { supabase } from "../../supabase/client";
 
 /*
-  DiVerge — Messaging service.
+  Divergify — Messaging service.
 
   Multi-channel by design: each widget instance picks a channel. Only the
-  "internal" DiVerge channel is live (real, via Supabase). The others are
+  "internal" Divergify channel is live (real, via Supabase). The others are
   declared here so the UI + architecture are ready — adding a real one later
   is just a new entry + its fetch/send functions.
 
@@ -15,7 +15,7 @@ import { supabase } from "../../supabase/client";
 */
 
 export const CHANNELS = {
-  internal: { id: "internal", name: "DiVerge", color: "#7c5cff", status: "live" },
+  internal: { id: "internal", name: "Divergify", color: "#7c5cff", status: "live" },
   whatsapp: { id: "whatsapp", name: "WhatsApp", color: "#25d366", status: "soon" },
   telegram: { id: "telegram", name: "Telegram", color: "#2aabee", status: "soon" },
   imessage: { id: "imessage", name: "iMessage", color: "#34c759", status: "unavailable" },

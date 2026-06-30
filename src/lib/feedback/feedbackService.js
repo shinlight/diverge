@@ -1,5 +1,5 @@
 /*
-  DiVerge — Feedback service (bug reports & improvement ideas).
+  Divergify — Feedback service (bug reports & improvement ideas).
 
   SWAP POINT: today feedback is stored locally so the flow is testable without a
   backend. To go live, replace submit/load with a Supabase `feedback` table
@@ -60,7 +60,7 @@ export async function submitFeedback(entry) {
   localStorage.setItem(KEY, JSON.stringify(list));
   // Mirror to console so it's visible during local/early testing.
   // eslint-disable-next-line no-console
-  console.info("[DiVerge] feedback:", record);
+  console.info("[Divergify] feedback:", record);
   return { ok: true, record };
 }
 

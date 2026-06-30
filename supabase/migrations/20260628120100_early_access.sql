@@ -1,4 +1,4 @@
--- DiVerge — early access: allowlist + waitlist + server-side enforcement.
+-- Divergify — early access: allowlist + waitlist + server-side enforcement.
 --
 -- ⚠️ Running this turns ON the lock: after the trigger exists, NO new signup
 -- succeeds unless the email is in early_access_allowlist (existing users are

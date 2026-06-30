@@ -1,4 +1,4 @@
--- DiVerge — profiles table + avatars storage
+-- Divergify — profiles table + avatars storage
 -- Paste this whole file into the Supabase SQL Editor and run it.
 -- Safe to run more than once (idempotent).
 

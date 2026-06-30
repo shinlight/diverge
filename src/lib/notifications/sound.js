@@ -1,5 +1,5 @@
 /*
-  DiVerge — notification sounds & haptics.
+  Divergify — notification sounds & haptics.
 
   Sounds are synthesized with the Web Audio API (no audio files to bundle).
   Haptics use the Vibration API (mobile; a no-op on desktop).

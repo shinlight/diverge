@@ -1,6 +1,6 @@
 # Supabase migrations
 
-SQL migrations for DiVerge. Apply them **in filename order**.
+SQL migrations for Divergify. Apply them **in filename order**.
 
 ## How to apply
 

@@ -1,5 +1,5 @@
 /*
-  DiVerge — Dopamine Menu service.
+  Divergify — Dopamine Menu service.
 
   Fully local mock (no backend, no keys): a curated menu of small, doable actions
   to reach for when stuck, bored, or dysregulated — picked by energy level. ADHD-
